@@ -246,37 +246,56 @@ th{ text-align:left; color:var(--muted); background:linear-gradient(180deg, rgba
 .w-160{ width:160px }
 .no-scroll-x{ overflow-x:hidden }
 
-/* === V12.1 Clean Grid & Compact Mode === */
-.table-wrap table { border-radius: 12px; overflow: hidden; }
-thead th, tbody td { padding: 8px 10px; } /* compact cells */
-tbody tr{ height:44px; }
-tbody tr:nth-child(odd){ background: transparent;}
-tbody tr.data-row:hover{ background: color-mix(in oklab, var(--accent) 8%, transparent); }
-tbody tr.details-row td{ background: color-mix(in oklab, var(--card) 85%, transparent); border-top: 1px dashed var(--border); padding: 12px 14px; }
-td.nowrap{ white-space:nowrap; }
-.sticky-head thead th{ position: sticky; top: 0; z-index: 1; }
+/* === V12.2 Landa Nova Ultra === */
+:root{
+  --nova-glow: color-mix(in oklab, var(--accent) 40%, transparent);
+  --card-deep: color-mix(in oklab, var(--card) 85%, transparent);
+}
+.header{ backdrop-filter: blur(14px) saturate(1.05); }
+.menu-pill{ display:flex; align-items:center; justify-content:center; gap:10px; }
+.menu-pill .bars{ display:flex; align-items:center; justify-content:center; width:16px; line-height:1; font-size:16px; }
+.menu-pill .label{ line-height:1; position:relative; top:0; }
 
-/* Expand arrow cell */
-.expand-btn{ cursor:pointer; user-select:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; border:1px solid var(--input-border); background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); font-size:12px; line-height:1; }
-.expand-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+.cards-grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:16px; }
+@media (max-width: 1300px){ .cards-grid{ grid-template-columns: repeat(8, 1fr); } }
+@media (max-width: 900px){ .cards-grid{ grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 600px){ .cards-grid{ grid-template-columns: repeat(2, 1fr); } }
 
-/* View/Download buttons – text only */
-a.link-btn{ text-decoration: none; border:1px solid var(--input-border); padding:6px 10px; border-radius:8px; display:inline-flex; align-items:center; height:28px; font-size:12.5px; background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); }
+.case-card{
+  grid-column: span 12;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 8%, transparent), transparent), var(--card-glass);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+  overflow:hidden;
+  transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease;
+}
+.case-card:hover{ transform: translateY(-2px); box-shadow: 0 24px 60px rgba(0,0,0,.45); border-color: color-mix(in oklab, var(--accent) 30%, var(--border) 70%); }
+.case-head, .case-foot{ padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.case-body{ padding:12px 14px; display:none; border-top:1px dashed var(--border); background: var(--card-deep); }
+.case-open .case-body{ display:block; animation: reveal .25s ease; }
+@keyframes reveal{ from{ opacity:0; transform: translateY(-4px);} to{ opacity:1; transform: translateY(0);} }
+
+.case-title{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:15px; }
+.chip{ padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid color-mix(in oklab, var(--accent) 35%, transparent); background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 24%, transparent), transparent); }
+.chip.duplex{ background: linear-gradient(180deg, color-mix(in oklab, #7dd3fc 35%, transparent), transparent); }
+
+.keyline{ color: var(--muted); }
+.value{ color: var(--text); }
+
+.actions .btn{ height:30px; padding:6px 10px; border-radius:8px; font-size:12.5px; }
+
+.attach-list{ display:flex; flex-direction:column; gap:6px; }
+a.link-btn{ text-decoration:none; border:1px solid var(--input-border); padding:6px 10px; border-radius:8px; display:inline-flex; align-items:center; height:28px; font-size:12.5px; background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); }
 a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
 .attach-empty{ color: var(--muted); font-style: italic; }
 
-/* Menu pill centering fix */
-.menu-pill{ display:flex; align-items:center; justify-content:center; }
-.menu-pill .bars{ display:flex; align-items:center; line-height:1; font-size:16px; }
-.menu-pill .label{ position:relative; top:1px; }
+.file-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.add-file{ border:1px dashed var(--input-border); background:transparent; }
+.add-file:hover{ border-color: var(--accent); }
 
-/* Details grid */
-.details-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px 16px; font-size:13px; }
-.details-grid .k{ color: var(--muted); }
-.details-grid .v{ color: var(--text); }
-@media (max-width: 900px){
-  .details-grid{ grid-template-columns: 1fr; }
-}
+.case-meta{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:13px; }
+.case-meta .kv{ display:flex; gap:6px; }
 
 </style>
 </head>
@@ -421,8 +440,9 @@ a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0
             </div>
 
             <div class="full">
-              <label class="label" for="attachment">Attachment (optional)</label>
-              <input type="file" id="attachment" name="attachment" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" class="input">
+              <label class="label">Attachments (optional)</label>
+              <div id="attachmentsWrap"></div>
+<button class="btn add-file" type="button" id="addFileBtn">+ Add another file</button>
             </div>
 
             <div class="full actions-row">
@@ -462,17 +482,7 @@ a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0
           </select></div>
           <button class="btn" onclick="refreshTable()">Apply</button>
         </div>
-        <div class="table-wrap">
-          <table class="sticky-head">
-            <thead>
-              <tr>
-                <th></th><th>#</th><th>SF Case</th><th>Machine</th><th>Type</th><th>TFS</th>
-                <th>System</th><th>SW Version</th><th>Issue</th><th>Attachment</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="casesBody"></tbody>
-          </table>
-        </div>
+        <div id="cardsContainer" class="cards-grid"></div>
       </div>
     </section>
   </main>
@@ -689,56 +699,34 @@ function refreshTable(){
   const sub = document.getElementById('filterSubSystem').value;
   const body = document.getElementById('casesBody');
   const cases = getCases();
-  
-  if (!window.__expandedRows) window.__expandedRows = new Set();
   const rows = cases.map((c,i)=>Object.assign({idx:i},c))
     .filter(r => !q || (r.whatIsMyIssue||'').toLowerCase().includes(q) || (r.machineNumber||'').toLowerCase().includes(q) || (r.caseDescription||'').toLowerCase().includes(q))
     .filter(r => !type || r.machineType===type).filter(r => !sys || r.system===sys).filter(r => !sub || r.subSystem===sub)
     .map(r => {
-      const isOpen = window.__expandedRows.has(r.idx);
-      let attachCell='';
-      if (r.attachment) {
-        const fname = (r.attachmentMeta && r.attachmentMeta.name) || 'Attachment';
-        attachCell = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <a class="link-btn" href="${r.attachment}" target="_blank" rel="noopener">View</a>
-          <a class="link-btn" href="${r.attachment}" download="${fname}">Download</a>
-          <span class="nowrap" style="opacity:.8">${fname}</span>
-        </div>`;
-      } else {
-        attachCell = `<div class="attach-empty">No attachment</div>`;
+      let preview=''; if (r.attachment){
+        if ((r.attachmentMeta && r.attachmentMeta.type && r.attachmentMeta.type.startsWith('image/')) || String(r.attachment).startsWith('data:image')){
+          preview = `<img src="${r.attachment}" style="max-width:60px;max-height:60px;border-radius:8px">`;
+        } else {
+          const fname = (r.attachmentMeta && r.attachmentMeta.name) || 'Attachment';
+          preview = `<div style="display:flex;align-items:center;gap:8px;"><button class="btn small" onclick="openAttachment(${r.idx})">Open</button><span>${fname}</span></div>`;
+        }
       }
-      const main = `<tr class="data-row">
-        <td><span class="expand-btn" onclick="toggleExpand(${r.idx})">${isOpen ? '▾' : '▸'}</span></td>
+      return `<tr>
         <td>${r.idx+1}</td>
         <td>${r.sfCase||''}</td>
         <td>${r.machineNumber||''}</td>
         <td><span class="badge">${r.machineType||''}</span></td>
-        <td>${r.tfsNumber||''}</td>
-        <td>${r.system||''}${r.subSystem ? ' · <span style="opacity:.7">'+r.subSystem+'</span>' : ''}</td>
-        <td>${r.softwareVersion||''}</td>
         <td>${r.whatIsMyIssue||''}</td>
-        <td>${attachCell}</td>
+        <td>${r.caseDescription||''}</td>
+        <td>${r.solution||''}</td>
+        <td>${preview}</td>
         <td>
           <button class="btn small" onclick="editCase(${r.idx})">Edit</button>
           <button class="btn small danger" onclick="deleteCase(${r.idx})">Delete</button>
         </td>
       </tr>`;
-      const details = `<tr class="details-row" data-i="${r.idx}" style="${isOpen ? '' : 'display:none;'}">
-        <td></td>
-        <td colspan="10">
-          <div class="details-grid">
-            <div><div class="k">Description</div><div class="v">${r.caseDescription||'<span class=\'attach-empty\'>—</span>'}</div></div>
-            <div><div class="k">Sub-System</div><div class="v">${r.subSystem||'<span class=\'attach-empty\'>—</span>'}</div></div>
-            <div><div class="k">Troubleshooting</div><div class="v">${r.troubleshooting||'<span class=\'attach-empty\'>—</span>'}</div></div>
-            <div><div class="k">Parts / Service</div><div class="v">${r.parts||'<span class=\'attach-empty\'>—</span>'}</div></div>
-            <div style="grid-column:1/-1;"><div class="k">Solution</div><div class="v">${r.solution||'<span class=\'attach-empty\'>—</span>'}</div></div>
-          </div>
-        </td>
-      </tr>`;
-      return main + details;
     }).join('');
-  body.innerHTML = rows || '<tr><td colspan="11">No cases found.</td></tr>';
-
+  body.innerHTML = rows || '<tr><td colspan="9">No cases found.</td></tr>';
 }
 function editCase(index){
   const c = getCases()[index]; if (!c) return;
@@ -775,17 +763,116 @@ function openAttachment(idx){
 /* Bind form submit last */
 document.getElementById('caseForm').addEventListener('submit', saveCase);
 
-// V12.1: expand/collapse per row
-function toggleExpand(i){
-  if (!window.__expandedRows) window.__expandedRows = new Set();
-  const opened = window.__expandedRows;
-  const key = Number(i);
-  if (opened.has(key)) opened.delete(key); else opened.add(key);
-  refreshTable();
+// V12.2 Multi-file attachments + Nova cards
+(function(){
+  const wrap = document.getElementById('attachmentsWrap');
+  const addBtn = document.getElementById('addFileBtn');
+  if (wrap && addBtn){
+    function addRow(){
+      const row = document.createElement('div'); row.className='file-row';
+      const inp = document.createElement('input'); inp.type='file'; inp.name='attachments[]'; inp.className='input';
+      inp.accept='image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar';
+      const rm = document.createElement('button'); rm.type='button'; rm.className='btn small danger'; rm.textContent='Remove';
+      rm.addEventListener('click', ()=> row.remove());
+      row.appendChild(inp); row.appendChild(rm); wrap.appendChild(row);
+    }
+    addBtn.addEventListener('click', addRow); addRow();
+  }
+})();
+
+async function saveCase(e){
+  e.preventDefault();
+  const fd = new FormData(document.getElementById('caseForm'));
+  const machineType = document.querySelector('input[name="machineType"]:checked')?.value || 'Simplex';
+  const machineNumber = machineType === 'Simplex' ? document.getElementById('simplexSelect').value : document.getElementById('duplexSelect').value;
+  const raw = Object.fromEntries(fd.entries());
+  const data = { ...raw, machineType, machineNumber };
+  const inputs = Array.from(document.querySelectorAll('input[name="attachments[]"]'));
+  const files = inputs.map(i => i.files && i.files[0]).filter(Boolean);
+  if (files.length){
+    data.attachments = [];
+    for (const f of files){
+      const base64 = await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f); });
+      data.attachments.push({ data: base64, name: f.name, type: f.type });
+    }
+  }
+  if (!validateForm(data)) { toast('Please fix highlighted fields','err'); return; }
+  const cases = getCases(); cases.push(data); setCases(cases);
+  document.getElementById('caseForm').reset();
+  toast('Saved successfully','ok'); navigate('#cases');
 }
-// Ensure logo navigates to dashboard
+
+function buildCard(r){
+  let attHTML='';
+  if (Array.isArray(r.attachments) && r.attachments.length){
+    attHTML = '<div class="attach-list">' + r.attachments.map(a=>{
+      const url=a.data||a; const name=a.name||'Attachment';
+      return `<div><span>${name}</span> <a class="link-btn" href="${url}" target="_blank" rel="noopener">View</a> <a class="link-btn" href="${url}" download="${name}">Download</a></div>`;
+    }).join('') + '</div>';
+  } else if (r.attachment){
+    const fname=(r.attachmentMeta && r.attachmentMeta.name)||'Attachment';
+    attHTML = `<div class="attach-list"><div><span>${fname}</span> <a class="link-btn" href="${r.attachment}" target="_blank" rel="noopener">View</a> <a class="link-btn" href="${r.attachment}" download="${fname}">Download</a></div></div>`;
+  } else {
+    attHTML = '<div class="attach-empty">No attachments</div>';
+  }
+
+  const chip = `<span class="chip ${String(r.machineType||'').toLowerCase()}">${r.machineType||''}</span>`;
+  return `<div class="case-card" id="case-${r.idx}">
+    <div class="case-head">
+      <div class="case-title">
+        <strong>#${r.idx+1} – ${r.sfCase||''}</strong>
+        <span class="keyline">•</span>
+        <span>Machine ${r.machineNumber||''}</span>
+        <span class="keyline">•</span>
+        <span>${r.system||''}${r.subSystem?' / '+r.subSystem:''}</span>
+        ${chip}
+      </div>
+      <div class="actions">
+        <button class="btn small" onclick="editCase(${r.idx})">Edit</button>
+        <button class="btn small danger" onclick="deleteCase(${r.idx})">Delete</button>
+      </div>
+    </div>
+    <div class="case-meta" style="padding:0 14px 8px;">
+      <div class="kv"><span class="keyline">Issue:</span><span class="value">${r.whatIsMyIssue||''}</span></div>
+      <div class="kv"><span class="keyline">SW:</span><span class="value">${r.softwareVersion||''}</span></div>
+      ${r.tfsNumber ? `<div class="kv"><span class="keyline">TFS:</span><span class="value">${r.tfsNumber}</span></div>` : ''}
+      <div class="kv"><a class="link-btn" href="javascript:void(0)" onclick="toggleCard(${r.idx})">Details</a></div>
+    </div>
+    <div class="case-body" id="details-${r.idx}">
+      <div class="details-grid">
+        <div><div class="k">Description</div><div class="v">${r.caseDescription||'<span class=\\'attach-empty\\'>—</span>'}</div></div>
+        <div><div class="k">Troubleshooting</div><div class="v">${r.troubleshooting||'<span class=\\'attach-empty\\'>—</span>'}</div></div>
+        <div><div class="k">Parts / Service</div><div class="v">${r.parts||'<span class=\\'attach-empty\\'>—</span>'}</div></div>
+        <div style="grid-column:1/-1;"><div class="k">Solution</div><div class="v">${r.solution||'<span class=\\'attach-empty\\'>—</span>'}</div></div>
+        <div style="grid-column:1/-1;"><div class="k">Attachments</div><div class="v">${attHTML}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(i){
+  const el=document.getElementById('case-'+i);
+  if (!el) return;
+  el.classList.toggle('case-open');
+}
+
+function refreshTable(){
+  populateSubSystemsFilter();
+  const q=(document.getElementById('searchBox').value||'').toLowerCase();
+  const type=document.getElementById('filterType').value;
+  const sys=document.getElementById('filterSystem').value;
+  const sub=document.getElementById('filterSubSystem').value;
+  const cont=document.getElementById('cardsContainer');
+  const list=getCases().map((c,i)=>Object.assign({idx:i},c))
+    .filter(r=>!q || (r.whatIsMyIssue||'').toLowerCase().includes(q) || (r.machineNumber||'').toLowerCase().includes(q) || (r.caseDescription||'').toLowerCase().includes(q))
+    .filter(r=>!type || r.machineType===type).filter(r=>!sys || r.system===sys).filter(r=>!sub || r.subSystem===sub)
+    .map(buildCard).join('');
+  cont.innerHTML = list || '<div class="attach-empty">No cases found.</div>';
+}
+
+// Logo -> dashboard
 document.addEventListener('DOMContentLoaded', ()=>{
-  const lg = document.getElementById('homeLogo');
+  const lg=document.getElementById('homeLogo');
   if (lg){ lg.addEventListener('click', ()=> navigate('#dashboard')); }
 });
 
