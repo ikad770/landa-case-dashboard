@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Landa Case Management — V11 Step 12.1 · Glass Ultra Elite (Fix)</title>
+<link rel="icon" type="image/png" href="Landa.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== Base Theme — Cyan (Landa) ===== */
+:root{
+  --radius: 12px;
+  --gap: 12px;
+  --container-max: 1180px;
+  --container-pad: 20px;
+  --font-base: 14px;
+  --font-label: 13px;
+  --font-title: 18px;
+  --line: 1.45;
+  --cyan:#00AEEF;
+  --accent: var(--cyan);
+  --accent-2:#00B8F2;
+  --accent-3:#6BE1FF;
+  /* Light */
+  --bg:#f6f9fc;
+  --bg-decor: radial-gradient(1100px 900px at -10% -20%, rgba(0,174,239,.08), transparent 60%),
+              radial-gradient(850px 650px at 110% 10%, rgba(0,159,217,.08), transparent 60%);
+  --text:#101318;
+  --muted:#5b6679;
+  --card:#ffffff;
+  --card-glass:rgba(255,255,255,0.92);
+  --border:#e6e9f0;
+  --input-bg:#ffffff;
+  --input-border:#d6dbe6;
+  --row-alt:#f2f5fb;
+  --toast-bg:#0f172a;
+  --toast-text:#e5e7eb;
+  --nav-text:#101318;
+  --nav-text-active:#00384a;
+  --badge-text:#00384a;
+}
+html[data-theme="dark"]{
+  --bg:#0c0f14;
+  --bg-decor: radial-gradient(1200px 1000px at -10% -20%, rgba(0,174,239,.16), transparent 60%),
+              radial-gradient(900px 700px at 110% 10%, rgba(0,159,217,.16), transparent 60%);
+  --text:#e8edf5;
+  --muted:#a5b0c3;
+  --card:#111622;
+  --card-glass:rgba(17,22,34,0.86);
+  --border:rgba(255,255,255,0.08);
+  --input-bg:#131a2a;
+  --input-border:#283249;
+  --row-alt:#0f1522;
+  --toast-bg:#0b1222;
+  --toast-text:#dbe2f2;
+  --nav-text:#e8edf5;
+  --nav-text-active:#DFF7FF;
+  --badge-text:#DFF7FF;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{overflow-x:hidden}
+body{
+  margin:0;
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  background:var(--bg-decor),var(--bg);
+  color:var(--text);
+  font-size:var(--font-base);
+  line-height:var(--line);
+  font-weight:300;
+}
+
+/* ===== Accent lines / glow ===== */
+.accent-bar{
+  position:fixed; inset:0 0 auto 0; height:3px; z-index:120;
+  background:linear-gradient(90deg,transparent,var(--accent-3),var(--accent),var(--accent-2),transparent);
+  background-size:200% 100%;
+  animation:moveAccent 6s linear infinite;
+  box-shadow:0 0 10px rgba(0,0,0,.35), 0 0 12px color-mix(in oklab,var(--accent) 40%, transparent);
+}
+@keyframes moveAccent{0%{background-position:0% 0}100%{background-position:200% 0}}
+
+.side-gradient.left,.side-gradient.right{
+  position:fixed; top:0; bottom:0; width:140px; pointer-events:none; z-index:0;
+}
+.side-gradient.left{ left:0; background:linear-gradient(90deg, color-mix(in oklab, var(--accent) 20%, transparent), transparent); }
+.side-gradient.right{ right:0; background:linear-gradient(270deg, color-mix(in oklab, var(--accent) 20%, transparent), transparent); }
+
+.glow-dot{
+  position:fixed; width:10px; height:10px; border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, var(--accent-3), transparent 70%);
+  box-shadow:0 0 16px color-mix(in oklab, var(--accent-3) 70%, transparent), 0 0 40px color-mix(in oklab, var(--accent) 30%, transparent);
+  opacity:.6; z-index:0; animation:float 14s ease-in-out infinite;
+}
+.glow-dot.d1{ top:16%; left:8%; } .glow-dot.d2{ top:38%; right:10%; animation-delay:3s } .glow-dot.d3{ bottom:18%; left:14%; animation-delay:6s }
+@keyframes float{0%,100%{transform:translate(0,0);opacity:.5}50%{transform:translate(0,-8px);opacity:.85}}
+
+/* ===== Header ===== */
+.header{
+  position:sticky; top:3px; z-index:110;
+  background:linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, transparent), transparent);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  max-width:var(--container-max); margin:0 auto; padding:12px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.brand{ display:flex; align-items:center; gap:14px; white-space:nowrap; }
+.brand h1{ margin:0; font-size:16px; letter-spacing:.2px; font-weight:400 }
+.brand small{ display:block; opacity:.8; font-size:12px; color:var(--muted) }
+.header-actions{ display:flex; align-items:center; gap:10px; }
+
+/* Logo “glassified” container (uses original PNG) */
+.logo-wrap{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  height:34px; padding:2px 10px; border-radius:10px;
+  background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 10%, var(--card) 90%), color-mix(in oklab, var(--accent) 2%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 20%, var(--border) 80%), 0 4px 14px rgba(0,0,0,.18);
+  backdrop-filter: blur(6px);
+}
+.logo-wrap img{ height:26px; width:auto; display:block; mix-blend-mode:multiply; opacity:.95 }
+html[data-theme="dark"] .logo-wrap img{ mix-blend-mode:screen; opacity:.9 }
+
+/* Buttons */
+.btn{
+  position:relative; overflow:hidden; border:1px solid var(--input-border);
+  background:color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
+  color:var(--text); padding:8px 12px; border-radius:10px;
+  cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  height:36px; font-size:14px; font-weight:400;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.12) }
+.btn.primary{ background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 95%, #fff 5%), var(--accent)); color:#001018; border-color:transparent }
+.btn.ghost{ background:transparent; box-shadow:none }
+.btn.danger{ border-color:#c2410c; color:var(--text) }
+.btn.small{ height:30px; padding:6px 10px; border-radius:8px; font-size:13px }
+.btn .ripple{ position:absolute; border-radius:50%; transform:scale(0); animation:ripple .6s linear; background:rgba(255,255,255,.3) }
+@keyframes ripple{ to{ transform:scale(4); opacity:0 } }
+
+/* ===== New Menu — Glass Pro Left (button + panel) ===== */
+/* Button (pill) — centered content */
+.menu-pill{
+  position:fixed; left:18px; top:76px; z-index:300;
+  min-width:110px; height:38px; padding:0 16px; border-radius:999px;
+  border:1px solid color-mix(in oklab, var(--accent) 35%, #000 65%);
+  display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer;
+  background: radial-gradient(120% 120% at 50% 0%, color-mix(in oklab, var(--accent) 20%, var(--card) 80%), var(--card));
+  box-shadow: 0 10px 24px rgba(0,0,0,.28), 0 0 0 6px rgba(0,174,239,.10), inset 0 0 18px rgba(255,255,255,.16);
+  color: var(--text);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.menu-pill .bars{ font-size:16px; line-height:1 }
+.menu-pill .label{ font-size:13px; line-height:1; opacity:.9 }
+.menu-pill:hover{ transform: translateY(-2px); box-shadow:0 16px 28px rgba(0,0,0,.35), 0 0 0 8px rgba(0,174,239,.14) }
+
+.menu-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.25); z-index:240; display:none }
+.menu-overlay.show{ display:block }
+.left-menu{
+  position:fixed; left:18px; top:120px; width:260px; z-index:260;
+  border-radius:14px; overflow:hidden;
+  background: color-mix(in oklab, var(--card-glass) 92%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
+  border:1px solid color-mix(in oklab, var(--accent) 25%, var(--border) 75%);
+  transform:translateY(-10px); opacity:0; pointer-events:none;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.left-menu.open{ transform:translateY(0); opacity:1; pointer-events:auto }
+.left-menu .item{
+  padding:12px 14px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+  background:transparent; color:var(--nav-text); text-decoration:none;
+}
+.left-menu .item:hover{ background:linear-gradient(90deg, rgba(0,174,239,.10), transparent) }
+.left-menu .item.active{ background:linear-gradient(90deg, rgba(0,174,239,.18), transparent); color:var(--nav-text-active) }
+
+/* ===== Layout (FIX: single column) ===== */
+.shell{
+  max-width:var(--container-max); margin:16px auto 28px; padding:0 var(--container-pad);
+  display:grid; grid-template-columns: 1fr; gap:20px;
+}
+
+/* ===== Cards ===== */
+.card{
+  background:var(--card-glass);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  overflow:hidden; position:relative; z-index:1;
+}
+.card .head{ padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 6%, transparent), transparent) }
+.card .body{ padding:16px }
+
+/* ===== Grid & Fields ===== */
+.grid{ display:grid; grid-template-columns:repeat(2, minmax(280px,1fr)); gap:16px 18px; align-items:start }
+.grid .full{ grid-column:1 / -1 }
+.label{ font-weight:400; margin-bottom:6px; display:block; color:var(--muted); font-size:var(--font-label) }
+.input,textarea,select{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--input-border);
+  background:var(--input-bg); color:var(--text); font-size:var(--font-base);
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease; height:36px;
+}
+textarea{ min-height:90px; height:auto }
+.input:focus,textarea:focus,select:focus{ border-color:var(--accent); outline:none; box-shadow:0 0 0 3px rgba(0,174,239,.18) }
+.select-wrap{ position:relative }
+.select-wrap select{ -webkit-appearance:none; appearance:none; padding-right:38px; cursor:pointer }
+.select-wrap::after{
+  content:""; position:absolute; right:12px; top:50%; transform:translateY(-50%) rotate(45deg);
+  width:10px; height:10px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); opacity:.9; pointer-events:none;
+}
+
+/* TFS optional */
+.tfs-row{ display:flex; align-items:center; gap:10px; margin-top:2px }
+#tfsWrap{ display:none }
+.error-msg{ font-size:12px; color:#dc2626; display:none }
+.error-msg.show{ display:block }
+
+/* Actions row */
+.actions-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:4px }
+.actions-row .btn{ min-width:0 }
+
+/* Table */
+.table-wrap{ overflow:auto; border-top:1px solid var(--border) }
+table{ width:100%; border-collapse:collapse; min-width:860px }
+th,td{ padding:10px 12px; border-bottom:1px solid var(--border) }
+th{ text-align:left; color:var(--muted); background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0)); position:sticky; top:0 }
+.badge{
+  display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px;
+  background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 30%, transparent), color-mix(in oklab, var(--accent) 12%, transparent));
+  color:var(--badge-text);
+  border:1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Toasts */
+.toasts{ position:fixed; bottom:16px; right:16px; display:flex; flex-direction:column; gap:10px; z-index:9999 }
+.toast{ background:var(--toast-bg); color:var(--toast-text); padding:10px 12px; border:1px solid #293042; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.25); font-size:13px; display:flex; align-items:center; gap:10px }
+.toast .ico{ font-size:16px }
+
+/* Utils */
+.hidden{ display:none !important }
+.inline-flex{ display:inline-flex; align-items:center; gap:10px }
+.w-160{ width:160px }
+.no-scroll-x{ overflow-x:hidden }
+
+/* === V12.1 Clean Grid & Compact Mode === */
+.table-wrap table { border-radius: 12px; overflow: hidden; }
+thead th, tbody td { padding: 8px 10px; } /* compact cells */
+tbody tr{ height:44px; }
+tbody tr:nth-child(odd){ background: transparent;}
+tbody tr.data-row:hover{ background: color-mix(in oklab, var(--accent) 8%, transparent); }
+tbody tr.details-row td{ background: color-mix(in oklab, var(--card) 85%, transparent); border-top: 1px dashed var(--border); padding: 12px 14px; }
+td.nowrap{ white-space:nowrap; }
+.sticky-head thead th{ position: sticky; top: 0; z-index: 1; }
+
+/* Expand arrow cell */
+.expand-btn{ cursor:pointer; user-select:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; border:1px solid var(--input-border); background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); font-size:12px; line-height:1; }
+.expand-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+
+/* View/Download buttons – text only */
+a.link-btn{ text-decoration: none; border:1px solid var(--input-border); padding:6px 10px; border-radius:8px; display:inline-flex; align-items:center; height:28px; font-size:12.5px; background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); }
+a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+.attach-empty{ color: var(--muted); font-style: italic; }
+
+/* Menu pill centering fix */
+.menu-pill{ display:flex; align-items:center; justify-content:center; }
+.menu-pill .bars{ display:flex; align-items:center; line-height:1; font-size:16px; }
+.menu-pill .label{ position:relative; top:1px; }
+
+/* Details grid */
+.details-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px 16px; font-size:13px; }
+.details-grid .k{ color: var(--muted); }
+.details-grid .v{ color: var(--text); }
+@media (max-width: 900px){
+  .details-grid{ grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body data-theme="dark" class="no-scroll-x">
+<!-- accents -->
+<div class="accent-bar" aria-hidden="true"></div>
+<div class="side-gradient left" aria-hidden="true"></div>
+<div class="side-gradient right" aria-hidden="true"></div>
+<div class="glow-dot d1" aria-hidden="true"></div>
+<div class="glow-dot d2" aria-hidden="true"></div>
+<div class="glow-dot d3" aria-hidden="true"></div>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-wrap" id="homeLogo" style="cursor:pointer"><img src="Landa.png" alt="Landa logo"></div>
+      <div>
+        <h1>SF Cases Tracker</h1>
+        <small>Landa Digital Printing — Case Management System</small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="themeToggle" title="Toggle theme">🌙 Dark Mode</button>
+      <a class="btn primary" href="#cases" onclick="navigate('#cases')">Cases</a>
+    </div>
+  </div>
+</header>
+
+<!-- Menu (button + panel) -->
+<button class="menu-pill" id="menuPill" title="Menu"><span class="bars">☰</span><span class="label">Menu</span></button>
+<div class="menu-overlay" id="menuOverlay"></div>
+<nav class="left-menu" id="leftMenu">
+  <a class="item" href="#dashboard" onclick="navigate('#dashboard')">Dashboard</a>
+  <a class="item" href="#cases" onclick="navigate('#cases')">Cases</a>
+  <a class="item" href="#reports" onclick="alert('Coming soon')">Reports</a>
+  <a class="item" href="#settings" onclick="alert('Coming soon')">Settings</a>
+</nav>
+
+<div class="shell">
+  <main>
+    <!-- Create/Edit Case -->
+    <section id="view-dashboard" class="card view active">
+      <div class="head">
+        <h2 style="margin:0; font-size:var(--font-title); font-weight:400">Create / Edit Case</h2>
+        <div class="inline-flex"><button class="btn ghost" onclick="navigate('#cases')">Manage Cases</button></div>
+      </div>
+      <div class="body">
+        <form id="caseForm" novalidate>
+          <div class="grid">
+            <div>
+              <label class="label" for="sfCase">SF Case Number <span style="color:#dc2626">*</span></label>
+              <input id="sfCase" name="sfCase" type="text" class="input" required>
+              <div class="error-msg" id="err-sf">SF Case Number is required or already exists</div>
+            </div>
+
+            <div>
+              <div class="tfs-row"><input type="checkbox" id="tfsToggle"> <span>Include TFS Number</span></div>
+              <div id="tfsWrap">
+                <label class="label" for="tfsNumber">TFS Number (optional)</label>
+                <input id="tfsNumber" name="tfsNumber" type="text" class="input">
+              </div>
+            </div>
+
+            <div class="full">
+              <label class="label">Machine Type</label>
+              <div class="tfs-row">
+                <label class="tfs-row" style="gap:6px;"><input type="radio" name="machineType" value="Simplex" checked> Simplex</label>
+                <label class="tfs-row" style="gap:6px;"><input type="radio" name="machineType" value="Duplex"> Duplex</label>
+                <div class="select-wrap simplex-only" id="wrapSimplex">
+                  <select id="simplexSelect" name="simplexSelect" class="input w-160">
+                    <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option>
+                    <option value="S6">S6</option><option value="S7">S7</option><option value="S8">S8</option><option value="S9">S9</option><option value="S10">S10</option>
+                  </select>
+                </div>
+                <div class="select-wrap duplex-only hidden" id="wrapDuplex">
+                  <select id="duplexSelect" name="duplexSelect" class="input w-160">
+                    <option value="D1">D1</option><option value="D2">D2</option><option value="D3">D3</option><option value="D4">D4</option><option value="D5">D5</option>
+                    <option value="D6">D6</option><option value="D7">D7</option><option value="D8">D8</option><option value="D9">D9</option><option value="D10">D10</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="label" for="system">System <span style="color:#dc2626">*</span></label>
+              <div class="select-wrap">
+                <select id="system" name="system" class="input" required>
+                  <option value="">Select System</option>
+                  <option>Machine</option><option>BSS</option><option>STS</option><option>IPS</option>
+                  <option>BCU</option><option>IRD</option><option>Hot Air</option><option>PSS</option>
+                  <option>CWS</option><option>Ventilation</option><option>MSPS</option><option>ITS</option>
+                  <option>EC</option><option>DFE</option><option>PQ</option><option>QCS</option>
+                  <option>PC Cabinet</option><option>ICS</option>
+                </select>
+              </div>
+              <div class="error-msg" id="err-system">System is required</div>
+            </div>
+
+            <!-- Sub-System appears ONLY after System chosen -->
+            <div id="subSystemBlock" class="hidden">
+              <label class="label" for="subSystem">Sub-System</label>
+              <div class="select-wrap">
+                <select id="subSystem" name="subSystem" class="input" disabled>
+                  <option value="">Select Sub-System</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="full">
+              <label class="label" for="whatIsMyIssue">What Is My Issue <span style="color:#dc2626">*</span></label>
+              <textarea id="whatIsMyIssue" name="whatIsMyIssue" class="input" rows="2" required></textarea>
+              <div class="error-msg" id="err-issue">This field is required</div>
+            </div>
+
+            <div class="full">
+              <label class="label" for="caseDescription">Case Description (optional)</label>
+              <textarea id="caseDescription" name="caseDescription" rows="3" class="input"></textarea>
+            </div>
+
+            <div>
+              <label class="label" for="softwareVersion">Software Version <span style="color:#dc2626">*</span></label>
+              <input id="softwareVersion" name="softwareVersion" type="text" class="input" required>
+              <div class="error-msg" id="err-sw">Software Version is required</div>
+            </div>
+
+            <!-- Parts field renamed + optional -->
+            <div>
+              <label class="label" for="parts">Component Details / Service Actions (Optional)</label>
+              <input id="parts" name="parts" type="text" class="input" placeholder="e.g., replaced fusers, inspected rollers">
+            </div>
+
+            <div class="full">
+              <label class="label" for="troubleshooting">Troubleshooting Actions <span style="color:#dc2626">*</span></label>
+              <textarea id="troubleshooting" name="troubleshooting" rows="3" class="input" required></textarea>
+              <div class="error-msg" id="err-trouble">This field is required</div>
+            </div>
+
+            <div class="full">
+              <label class="label" for="solution">Solution <span style="color:#dc2626">*</span></label>
+              <textarea id="solution" name="solution" rows="3" class="input" required></textarea>
+              <div class="error-msg" id="err-solution">This field is required</div>
+            </div>
+
+            <div class="full">
+              <label class="label" for="attachment">Attachment (optional)</label>
+              <input type="file" id="attachment" name="attachment" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" class="input">
+            </div>
+
+            <div class="full actions-row">
+              <button type="submit" class="btn primary">Submit</button>
+              <button type="reset" class="btn">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Cases Table -->
+    <section id="view-cases" class="card view" style="display:none;">
+      <div class="head">
+        <h2 style="margin:0; font-size:var(--font-title); font-weight:400">Cases Manager</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn ghost" onclick="navigate('#dashboard')">Back</button>
+          <button class="btn" onclick="exportCSV()">Export CSV</button>
+        </div>
+      </div>
+      <div class="body">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+          <input type="text" id="searchBox" class="input" placeholder="Search text (Issue/Machine/Description)" style="min-width:260px;">
+          <div class="select-wrap"><select id="filterType" class="input" style="min-width:140px;">
+            <option value="">All Types</option><option value="Simplex">Simplex</option><option value="Duplex">Duplex</option>
+          </select></div>
+          <div class="select-wrap"><select id="filterSystem" class="input" style="min-width:160px;">
+            <option value="">All Systems</option>
+            <option>Machine</option><option>BSS</option><option>STS</option><option>IPS</option>
+            <option>BCU</option><option>IRD</option><option>Hot Air</option><option>PSS</option>
+            <option>CWS</option><option>Ventilation</option><option>MSPS</option><option>ITS</option>
+            <option>EC</option><option>DFE</option><option>PQ</option><option>QCS</option>
+            <option>PC Cabinet</option><option>ICS</option>
+          </select></div>
+          <div class="select-wrap"><select id="filterSubSystem" class="input" disabled style="min-width:180px;">
+            <option value="">All Sub-Systems</option>
+          </select></div>
+          <button class="btn" onclick="refreshTable()">Apply</button>
+        </div>
+        <div class="table-wrap">
+          <table class="sticky-head">
+            <thead>
+              <tr>
+                <th></th><th>#</th><th>SF Case</th><th>Machine</th><th>Type</th><th>TFS</th>
+                <th>System</th><th>SW Version</th><th>Issue</th><th>Attachment</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="casesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* ===== Menu pill logic ===== */
+(function(){
+  const btn = document.getElementById('menuPill');
+  const panel = document.getElementById('leftMenu');
+  const overlay = document.getElementById('menuOverlay');
+  let open=false, busy=false;
+  function setOpen(v){ open=v; panel.classList.toggle('open', v); overlay.classList.toggle('show', v); }
+  function toggle(){ if(busy) return; busy=true; setOpen(!open); setTimeout(()=>busy=false,180); }
+  ['pointerdown','click'].forEach(ev=>btn.addEventListener(ev, (e)=>{ e.stopPropagation(); toggle(); }));
+  overlay.addEventListener('click', ()=> setOpen(false));
+  document.addEventListener('click', (e)=>{ if (!panel.contains(e.target) && !btn.contains(e.target)){ setOpen(false); } });
+  function markActive(){
+    const h = location.hash || '#dashboard';
+    document.querySelectorAll('.left-menu .item').forEach(a => a.classList.toggle('active', a.getAttribute('href')===h));
+  }
+  window.addEventListener('hashchange', markActive); markActive();
+})();
+
+/* Buttons ripple (only for .btn) */
+document.addEventListener('click', function(e){
+  const t = e.target.closest('.btn'); if(!t) return;
+  const r = document.createElement('span'); r.className='ripple';
+  const rect = t.getBoundingClientRect();
+  r.style.width = r.style.height = Math.max(rect.width, rect.height) + 'px';
+  r.style.left = (e.clientX - rect.left - rect.width/2) + 'px';
+  r.style.top = (e.clientY - rect.top - rect.height/2) + 'px';
+  t.appendChild(r); setTimeout(()=> r.remove(), 600);
+});
+
+/* Router */
+function navigate(hash){ location.hash = hash; renderRoute(); }
+function renderRoute(){
+  const dash = document.getElementById('view-dashboard');
+  const cases = document.getElementById('view-cases');
+  const h = location.hash || '#dashboard';
+  if (h==='#cases'){ dash.style.display='none'; cases.style.display='block'; refreshTable(); }
+  else { cases.style.display='none'; dash.style.display='block'; }
+}
+window.addEventListener('hashchange', renderRoute);
+document.addEventListener('DOMContentLoaded', renderRoute);
+
+/* Theme toggle */
+(function(){
+  const KEY='landa_theme_v12_1';
+  const saved=localStorage.getItem(KEY);
+  const btn=document.getElementById('themeToggle');
+  function apply(t){
+    document.documentElement.setAttribute('data-theme', t);
+    btn.textContent = (t==='light') ? '🌙 Dark Mode' : '☀️ Light Mode';
+    localStorage.setItem(KEY, t);
+  }
+  apply(saved || 'dark');
+  btn.addEventListener('click', ()=>{
+    const curr = document.documentElement.getAttribute('data-theme');
+    apply(curr==='light' ? 'dark' : 'light');
+  });
+})();
+
+/* Toasts */
+const toasts = document.getElementById('toasts');
+function toast(msg, type='ok'){
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='err'?'err':'ok');
+  const ico = document.createElement('span'); ico.className='ico';
+  ico.textContent = type==='err' ? '❌' : '✅';
+  const txt = document.createElement('span'); txt.textContent = msg;
+  el.appendChild(ico); el.appendChild(txt);
+  toasts.appendChild(el); setTimeout(()=> el.remove(), 3200);
+}
+
+/* Storage */
+function getCases(){ return JSON.parse(localStorage.getItem('cases')||'[]'); }
+function setCases(arr){ localStorage.setItem('cases', JSON.stringify(arr)); }
+
+/* Subsystems */
+const SUBSYSTEMS = {
+  "Machine": ["Transport","Feeder","Drum","Calibrations","Sensors"],
+  "BSS": ["Print Server","RIP","Queue Manager","Connectivity"],
+  "STS": ["Scheduler","Jobs","Resources"],
+  "IPS": ["Plates","Imaging","Cooling"],
+  "BCU": ["Main Controller","I/O","Diagnostics"],
+  "IRD": ["Infrared Unit","Controllers"],
+  "Hot Air": ["Blower","Heaters","Temperature"],
+  "PSS": ["Power Supply","Distribution"],
+  "CWS": ["Cooling Water","Pumps"],
+  "Ventilation": ["Filters","Fans"],
+  "MSPS": ["Motion","Servos"],
+  "ITS": ["Touchscreen","UI"],
+  "EC": ["Electrical Cabinet","Circuit Breakers"],
+  "DFE": ["Front End","RIP"],
+  "PQ": ["Color","Registration","Uniformity"],
+  "QCS": ["Cameras","Quality Checks"],
+  "PC Cabinet": ["Motherboard","Storage"],
+  "ICS": ["Network","Security"]
+};
+
+/* Form behaviour */
+(function(){
+  const simplex = document.querySelector('input[name="machineType"][value="Simplex"]');
+  const wrapS = document.getElementById('wrapSimplex');
+  const wrapD = document.getElementById('wrapDuplex');
+  function toggleMachine(){
+    const type = document.querySelector('input[name="machineType"]:checked')?.value || 'Simplex';
+    if (type==='Simplex'){ wrapS.classList.remove('hidden'); wrapD.classList.add('hidden'); }
+    else { wrapS.classList.add('hidden'); wrapD.classList.remove('hidden'); }
+  }
+  document.querySelectorAll('input[name="machineType"]').forEach(r=>r.addEventListener('change', toggleMachine));
+  simplex && (simplex.checked = true);
+  toggleMachine();
+
+  const tfsToggle = document.getElementById('tfsToggle');
+  const tfsWrap = document.getElementById('tfsWrap');
+  function sync(){ tfsWrap.style.display = tfsToggle.checked ? 'block' : 'none'; }
+  tfsToggle.addEventListener('change', sync); sync();
+
+  const systemSel = document.getElementById('system');
+  const subBlock = document.getElementById('subSystemBlock');
+  const subSel = document.getElementById('subSystem');
+  function rebuildSub(){
+    subBlock.classList.add('hidden');
+    subSel.innerHTML = '<option value="">Select Sub-System</option>';
+    subSel.disabled = true;
+    const s = systemSel.value;
+    if (!s || !SUBSYSTEMS[s]) return;
+    SUBSYSTEMS[s].forEach(x=>{ const o=document.createElement('option'); o.value=x; o.textContent=x; subSel.appendChild(o); });
+    subSel.disabled = false;
+    subBlock.classList.remove('hidden');
+  }
+  systemSel.addEventListener('change', rebuildSub); rebuildSub();
+})();
+
+/* Validation */
+(function(){
+  const sf = document.getElementById('sfCase');
+  const system = document.getElementById('system');
+  const issue = document.getElementById('whatIsMyIssue');
+  const sw = document.getElementById('softwareVersion');
+  const trouble = document.getElementById('troubleshooting');
+  const solution = document.getElementById('solution');
+  function show(el, msgId, show){ const m = document.getElementById(msgId); if(!m) return; m.classList.toggle('show', !!show); }
+  function uniqOk(v){ return !getCases().some(c => String(c.sfCase||'').toLowerCase() === String(v||'').toLowerCase()); }
+  sf.addEventListener('blur', ()=>{ const v = sf.value.trim(); if(!v || !uniqOk(v)) show(sf,'err-sf',true); else show(sf,'err-sf',false); });
+  [system, issue, sw, trouble, solution].forEach(el => el.addEventListener('input', ()=>{
+    const id = el.id==='system' ? 'err-system' :
+              el.id==='whatIsMyIssue' ? 'err-issue' :
+              el.id==='softwareVersion' ? 'err-sw' :
+              el.id==='troubleshooting' ? 'err-trouble' : 'err-solution';
+    show(el, id, !el.value.trim());
+  }));
+  window.validateForm = function(data){
+    let ok = true;
+    if(!data.sfCase || !uniqOk(data.sfCase)){ show(sf,'err-sf',true); ok = false; }
+    if(!data.system){ show(system,'err-system',true); ok=false; }
+    if(!data.whatIsMyIssue){ show(issue,'err-issue',true); ok=false; }
+    if(!data.softwareVersion){ show(sw,'err-sw',true); ok=false; }
+    if(!data.troubleshooting){ show(trouble,'err-trouble',true); ok=false; }
+    if(!data.solution){ show(solution,'err-solution',true); ok=false; }
+    return ok;
+  }
+})();
+
+/* Collect & Save */
+function collectFormData(){
+  const fd = new FormData(document.getElementById('caseForm'));
+  const machineType = document.querySelector('input[name="machineType"]:checked')?.value || 'Simplex';
+  const machineNumber = machineType === 'Simplex' ? document.getElementById('simplexSelect').value : document.getElementById('duplexSelect').value;
+  const attInput = document.getElementById('attachment');
+  const raw = Object.fromEntries(fd.entries());
+  const data = { ...raw, machineType, machineNumber };
+  const file = (attInput && attInput.files && attInput.files[0]) ? attInput.files[0] : null;
+  return { data, file };
+}
+
+async function saveCase(e){
+  e.preventDefault();
+  const {data, file} = collectFormData();
+  if (!validateForm(data)) { toast('Please fix highlighted fields','err'); return; }
+  if (file) {
+    data.attachment = await new Promise((resolve)=>{ const r = new FileReader(); r.onload = ()=>resolve(r.result); r.readAsDataURL(file); });
+    data.attachmentMeta = { name: file.name, type: file.type };
+  }
+  const cases = getCases();
+  cases.push(data); setCases(cases);
+  document.getElementById('caseForm').reset();
+  toast('Saved successfully','ok');
+  navigate('#cases');
+}
+document.getElementById('caseForm').addEventListener('submit', saveCase);
+document.getElementById('caseForm').addEventListener('reset', ()=> toast('Canceled','ok'));
+
+/* Cases table */
+function populateSubSystemsFilter(){
+  const sys = document.getElementById('filterSystem').value;
+  const sub = document.getElementById('filterSubSystem');
+  sub.innerHTML = '<option value="">All Sub-Systems</option>';
+  if (!sys || !SUBSYSTEMS[sys]) { sub.disabled = true; return; }
+  sub.disabled = false; SUBSYSTEMS[sys].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sub.appendChild(o); });
+}
+document.getElementById('filterSystem').addEventListener('change', populateSubSystemsFilter);
+
+function refreshTable(){
+  populateSubSystemsFilter();
+  const q = (document.getElementById('searchBox').value||'').toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const sys = document.getElementById('filterSystem').value;
+  const sub = document.getElementById('filterSubSystem').value;
+  const body = document.getElementById('casesBody');
+  const cases = getCases();
+  
+  if (!window.__expandedRows) window.__expandedRows = new Set();
+  const rows = cases.map((c,i)=>Object.assign({idx:i},c))
+    .filter(r => !q || (r.whatIsMyIssue||'').toLowerCase().includes(q) || (r.machineNumber||'').toLowerCase().includes(q) || (r.caseDescription||'').toLowerCase().includes(q))
+    .filter(r => !type || r.machineType===type).filter(r => !sys || r.system===sys).filter(r => !sub || r.subSystem===sub)
+    .map(r => {
+      const isOpen = window.__expandedRows.has(r.idx);
+      let attachCell='';
+      if (r.attachment) {
+        const fname = (r.attachmentMeta && r.attachmentMeta.name) || 'Attachment';
+        attachCell = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a class="link-btn" href="${r.attachment}" target="_blank" rel="noopener">View</a>
+          <a class="link-btn" href="${r.attachment}" download="${fname}">Download</a>
+          <span class="nowrap" style="opacity:.8">${fname}</span>
+        </div>`;
+      } else {
+        attachCell = `<div class="attach-empty">No attachment</div>`;
+      }
+      const main = `<tr class="data-row">
+        <td><span class="expand-btn" onclick="toggleExpand(${r.idx})">${isOpen ? '▾' : '▸'}</span></td>
+        <td>${r.idx+1}</td>
+        <td>${r.sfCase||''}</td>
+        <td>${r.machineNumber||''}</td>
+        <td><span class="badge">${r.machineType||''}</span></td>
+        <td>${r.tfsNumber||''}</td>
+        <td>${r.system||''}${r.subSystem ? ' · <span style="opacity:.7">'+r.subSystem+'</span>' : ''}</td>
+        <td>${r.softwareVersion||''}</td>
+        <td>${r.whatIsMyIssue||''}</td>
+        <td>${attachCell}</td>
+        <td>
+          <button class="btn small" onclick="editCase(${r.idx})">Edit</button>
+          <button class="btn small danger" onclick="deleteCase(${r.idx})">Delete</button>
+        </td>
+      </tr>`;
+      const details = `<tr class="details-row" data-i="${r.idx}" style="${isOpen ? '' : 'display:none;'}">
+        <td></td>
+        <td colspan="10">
+          <div class="details-grid">
+            <div><div class="k">Description</div><div class="v">${r.caseDescription||'<span class=\'attach-empty\'>—</span>'}</div></div>
+            <div><div class="k">Sub-System</div><div class="v">${r.subSystem||'<span class=\'attach-empty\'>—</span>'}</div></div>
+            <div><div class="k">Troubleshooting</div><div class="v">${r.troubleshooting||'<span class=\'attach-empty\'>—</span>'}</div></div>
+            <div><div class="k">Parts / Service</div><div class="v">${r.parts||'<span class=\'attach-empty\'>—</span>'}</div></div>
+            <div style="grid-column:1/-1;"><div class="k">Solution</div><div class="v">${r.solution||'<span class=\'attach-empty\'>—</span>'}</div></div>
+          </div>
+        </td>
+      </tr>`;
+      return main + details;
+    }).join('');
+  body.innerHTML = rows || '<tr><td colspan="11">No cases found.</td></tr>';
+
+}
+function editCase(index){
+  const c = getCases()[index]; if (!c) return;
+  if (c.machineType==='Duplex') document.querySelector('input[name="machineType"][value="Duplex"]').checked=true;
+  else document.querySelector('input[name="machineType"][value="Simplex"]').checked=true;
+  document.getElementById(c.machineType==='Duplex'?'duplexSelect':'simplexSelect').value = c.machineNumber || (c.machineType==='Duplex'?'D1':'S1');
+  ['sfCase','tfsNumber','whatIsMyIssue','caseDescription','system','subSystem','softwareVersion','troubleshooting','parts','solution'].forEach(k=>{
+    const el=document.querySelector(`[name="${k}"]`); if (el) el.value=c[k]||'';
+  });
+  const systemSel = document.getElementById('system'); const subSel = document.getElementById('subSystem');
+  const subBlock = document.getElementById('subSystemBlock');
+  const evt = new Event('change'); systemSel.dispatchEvent(evt);
+  setTimeout(()=>{ if (c.subSystem) { subSel.value = c.subSystem; subBlock.classList.remove('hidden'); subSel.disabled=false; } }, 0);
+  navigate('#dashboard');
+}
+function deleteCase(idx){
+  const arr=getCases(); if (!confirm('Delete this case?')) return;
+  arr.splice(idx,1); setCases(arr); refreshTable();
+}
+function exportCSV(){
+  const headers = ['#','SF Case','Machine','Type','Issue','Description','Solution','AttachmentName'];
+  const cases = getCases();
+  const rows = cases.map((c,i)=>[i+1, c.sfCase||'', c.machineNumber||'', c.machineType||'', c.whatIsMyIssue||'', c.caseDescription||'', c.solution||'', (c.attachmentMeta&&c.attachmentMeta.name)||'']);
+  const csv = [headers].concat(rows).map(r => r.map(x => '"' + String(x).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download='cases_export.csv'; a.click(); URL.revokeObjectURL(url);
+}
+function openAttachment(idx){
+  const c = getCases()[idx];
+  if (c && c.attachment){ const w=window.open(); w.document.write("<iframe src='"+c.attachment+"' style='width:100%;height:100vh;border:0'></iframe>"); }
+}
+
+/* Bind form submit last */
+document.getElementById('caseForm').addEventListener('submit', saveCase);
+
+// V12.1: expand/collapse per row
+function toggleExpand(i){
+  if (!window.__expandedRows) window.__expandedRows = new Set();
+  const opened = window.__expandedRows;
+  const key = Number(i);
+  if (opened.has(key)) opened.delete(key); else opened.add(key);
+  refreshTable();
+}
+// Ensure logo navigates to dashboard
+document.addEventListener('DOMContentLoaded', ()=>{
+  const lg = document.getElementById('homeLogo');
+  if (lg){ lg.addEventListener('click', ()=> navigate('#dashboard')); }
+});
+
+</script>
+</body>
+</html>
