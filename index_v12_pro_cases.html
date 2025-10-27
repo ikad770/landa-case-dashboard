@@ -278,6 +278,38 @@ a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0
   .details-grid{ grid-template-columns: 1fr; }
 }
 
+
+/* === V12.3 Landa Ultra Glass Grid === */
+/* Card-like table rows */
+.card-table{ border-collapse: separate; border-spacing: 0 10px; }
+.card-table thead th{ background: transparent; }
+.card-table tbody tr{ background: var(--card-glass); box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+.card-table tbody tr:hover{ box-shadow: 0 16px 36px rgba(0,0,0,.35); }
+.card-table tbody td{ border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 12px; }
+.card-table tbody td:first-child{ border-left: 1px solid var(--border); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.card-table tbody td:last-child{ border-right: 1px solid var(--border); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+.sticky-head thead th{ position: sticky; top: 0; z-index: 2; backdrop-filter: blur(10px); }
+tbody tr.details-row td{ background: color-mix(in oklab, var(--card) 85%, transparent); border: 1px dashed var(--border); border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.03); }
+tbody tr.data-row{ height: 48px; }
+
+/* Buttons: View / Download – text only, minimal */
+a.link-btn{ text-decoration:none; border:1px solid var(--input-border); padding:6px 10px; border-radius:8px; display:inline-flex; align-items:center; height:30px; font-size:12.5px; background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); }
+a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+.attach-empty{ color: var(--muted); font-style: italic; }
+
+/* Expand arrow */
+.expand-btn{ cursor:pointer; user-select:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; border:1px solid var(--input-border); background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%); font-size:12px; line-height:1; }
+.expand-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+
+/* Menu pill centering — FIXED */
+.menu-pill{ display:flex; align-items:center; justify-content:center; gap:10px; }
+.menu-pill .bars{ display:flex; align-items:center; justify-content:center; width:16px; line-height:1; font-size:16px; }
+.menu-pill .label{ line-height:1; position:relative; top:0; }
+
+/* Subtle page enter animation for Cases */
+#cardsAnchor.page-enter{ animation: pageIn .28s ease; }
+@keyframes pageIn{ from{ opacity:0; transform: translateY(6px); } to{ opacity:1; transform: translateY(0); } }
+
 </style>
 </head>
 <body data-theme="dark" class="no-scroll-x">
@@ -463,7 +495,7 @@ a.link-btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0
           <button class="btn" onclick="refreshTable()">Apply</button>
         </div>
         <div class="table-wrap">
-          <table class="sticky-head">
+          <table class="sticky-head card-table">
             <thead>
               <tr>
                 <th></th><th>#</th><th>SF Case</th><th>Machine</th><th>Type</th><th>TFS</th>
@@ -691,18 +723,25 @@ function refreshTable(){
   const cases = getCases();
   
   if (!window.__expandedRows) window.__expandedRows = new Set();
+  
+  if (!window.__expandedRows) window.__expandedRows = new Set();
   const rows = cases.map((c,i)=>Object.assign({idx:i},c))
     .filter(r => !q || (r.whatIsMyIssue||'').toLowerCase().includes(q) || (r.machineNumber||'').toLowerCase().includes(q) || (r.caseDescription||'').toLowerCase().includes(q))
     .filter(r => !type || r.machineType===type).filter(r => !sys || r.system===sys).filter(r => !sub || r.subSystem===sub)
     .map(r => {
       const isOpen = window.__expandedRows.has(r.idx);
       let attachCell='';
-      if (r.attachment) {
+      if (Array.isArray(r.attachments) && r.attachments.length){
+        attachCell = '<div style="display:flex;flex-direction:column;gap:6px;">' + r.attachments.map(a=>{
+          const url = a.data || a; const name = a.name || 'Attachment';
+          return `<div><span class="nowrap" style="opacity:.8">${name}</span> <a class="link-btn" href="${url}" target="_blank" rel="noopener">View</a> <a class="link-btn" href="${url}" download="${name}">Download</a></div>`;
+        }).join('') + '</div>';
+      } else if (r.attachment){
         const fname = (r.attachmentMeta && r.attachmentMeta.name) || 'Attachment';
         attachCell = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="nowrap" style="opacity:.8">${fname}</span>
           <a class="link-btn" href="${r.attachment}" target="_blank" rel="noopener">View</a>
           <a class="link-btn" href="${r.attachment}" download="${fname}">Download</a>
-          <span class="nowrap" style="opacity:.8">${fname}</span>
         </div>`;
       } else {
         attachCell = `<div class="attach-empty">No attachment</div>`;
@@ -728,7 +767,6 @@ function refreshTable(){
         <td colspan="10">
           <div class="details-grid">
             <div><div class="k">Description</div><div class="v">${r.caseDescription||'<span class=\'attach-empty\'>—</span>'}</div></div>
-            <div><div class="k">Sub-System</div><div class="v">${r.subSystem||'<span class=\'attach-empty\'>—</span>'}</div></div>
             <div><div class="k">Troubleshooting</div><div class="v">${r.troubleshooting||'<span class=\'attach-empty\'>—</span>'}</div></div>
             <div><div class="k">Parts / Service</div><div class="v">${r.parts||'<span class=\'attach-empty\'>—</span>'}</div></div>
             <div style="grid-column:1/-1;"><div class="k">Solution</div><div class="v">${r.solution||'<span class=\'attach-empty\'>—</span>'}</div></div>
@@ -738,6 +776,7 @@ function refreshTable(){
       return main + details;
     }).join('');
   body.innerHTML = rows || '<tr><td colspan="11">No cases found.</td></tr>';
+
 
 }
 function editCase(index){
@@ -788,6 +827,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const lg = document.getElementById('homeLogo');
   if (lg){ lg.addEventListener('click', ()=> navigate('#dashboard')); }
 });
+
+
+// Ensure expand toggles and preserves state
+function toggleExpand(i){
+  if (!window.__expandedRows) window.__expandedRows = new Set();
+  const set = window.__expandedRows;
+  if (set.has(i)) set.delete(i); else set.add(i);
+  refreshTable();
+}
+// Logo -> dashboard
+document.addEventListener('DOMContentLoaded', ()=>{
+  const lg = document.getElementById('homeLogo');
+  if (lg){ lg.addEventListener('click', ()=> navigate('#dashboard')); }
+});
+
+// When entering cases page, animate container
+const _origNav = navigate;
+navigate = function(hash){
+  _origNav(hash);
+  if (hash === '#cases'){
+    const anchor = document.getElementById('cardsAnchor') || document.querySelector('.table-wrap');
+    if (anchor){ anchor.classList.remove('page-enter'); void anchor.offsetWidth; anchor.classList.add('page-enter'); }
+  }
+};
 
 </script>
 </body>
