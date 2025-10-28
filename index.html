@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Landa Quantum – Troubleshoot Suite</title>
-  <link rel="icon" href="Landa.png" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landa Quantum – Troubleshoot Suite (V13)</title>
+  <link rel="icon" href="Landa2.png">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <!-- Aurora Background -->
+  <!-- Glass Background -->
   <div class="bg-aurora"></div>
 
-  <!-- Login Screen -->
+  <!-- LOGIN SCREEN -->
   <section id="loginScreen" class="login-wrap">
-    <div class="login-card">
+    <div id="particles"></div>
+    <div class="login-card glass">
       <div class="brand">
-        <img src="Landa.png" alt="Landa" />
+        <img src="Landa2.png" alt="Landa" class="logo-glass" />
         <h2>Landa Quantum</h2>
       </div>
-      <h3>Welcome, Expert</h3>
       <div class="login-form">
         <label>User</label>
-        <input type="text" id="authUser" class="input" placeholder="User" value="Expert" />
+        <input type="text" id="authUser" class="input" value="Expert" />
         <label>Password</label>
         <input type="password" id="authPass" class="input" placeholder="Password" />
         <div class="login-actions">
@@ -30,153 +31,162 @@
         </div>
       </div>
     </div>
-    <div id="particles"></div>
   </section>
 
-  <!-- Main App -->
+  <!-- MAIN APP -->
   <div id="appRoot" class="hidden">
-    <header class="header">
+    <header class="header glass">
       <div class="logo-wrap" id="goHome">
-        <img src="Landa.png" alt="Landa" />
-        <h1>Landa Quantum – Troubleshoot Suite</h1>
+        <img src="Landa2.png" alt="Landa" class="logo-glass" />
+        <h1>Landa Quantum – Troubleshoot Suite (V13)</h1>
       </div>
     </header>
 
     <div class="layout">
-      <!-- Sidebar -->
-      <aside class="aside">
+      <aside class="aside glass">
         <nav class="nav">
           <a href="#" class="item active" data-route="dashboard">Dashboard</a>
           <a href="#" class="item" data-route="create">Create Case</a>
-          <a href="#" class="item" data-route="cases">All Cases <span class="badge" id="casesCount">0</span></a>
-          <a href="#" class="item" data-route="settings">Settings</a>
+          <a href="#" class="item" data-route="cases">All Cases <span id="casesCount" class="badge">0</span></a>
         </nav>
       </aside>
 
-      <!-- Main Pages -->
       <main class="main">
-        <!-- Dashboard -->
-        <section id="page-dashboard">
-          <h2>Dashboard</h2>
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page">
           <div class="grid cols-3">
-            <div class="panel kpi">
+            <div class="panel glass">
               <div class="kpi-title">Total Cases</div>
-              <div class="kpi-num" id="kpiTotal">0</div>
+              <div id="kpiTotal" class="kpi-num">0</div>
             </div>
-            <div class="panel kpi">
-              <div class="kpi-title">Cases with Attachments</div>
-              <div class="kpi-num" id="kpiFiles">0</div>
+            <div class="panel glass">
+              <div class="kpi-title">With Attachments</div>
+              <div id="kpiFiles" class="kpi-num">0</div>
             </div>
-            <div class="panel kpi">
-              <div class="kpi-title">Last Update</div>
-              <div class="kpi-num" id="kpiUpdated">—</div>
+            <div class="panel glass">
+              <div class="kpi-title">Last Updated</div>
+              <div id="kpiUpdated" class="kpi-small">—</div>
             </div>
           </div>
         </section>
 
-        <!-- Create Case -->
-        <section id="page-create" class="hidden">
-          <h2>Create New Case</h2>
-          <form id="caseForm" onsubmit="saveCase(event)">
-            <div class="grid cols-2">
-              <div>
-                <label>SF Case</label>
-                <input type="text" id="sfCase" class="input" placeholder="Case ID..." />
-              </div>
-              <div>
-                <label>TFS Number (Optional)</label>
-                <input type="text" id="tfsNumber" class="input" placeholder="TFS ID..." />
-              </div>
-              <div>
-                <label>Machine Type</label>
-                <div class="toggle" id="typeToggle">
-                  <div class="tbtn active" data-type="Simplex">Simplex</div>
-                  <div class="tbtn" data-type="Duplex">Duplex</div>
+        <!-- CREATE CASE -->
+        <section id="page-create" class="page hidden">
+          <div class="panel glass">
+            <h2>Create New Case</h2>
+            <form id="caseForm" onsubmit="saveCase(event)">
+              <div class="grid cols-2">
+                <div>
+                  <label>SF Case</label>
+                  <input id="sfCase" class="input" />
                 </div>
-                <input type="hidden" id="machineType" value="Simplex" />
+                <div>
+                  <label>TFS Number (Optional)</label>
+                  <input id="tfsNumber" class="input" />
+                </div>
+
+                <div class="full"><hr class="sep"></div>
+
+                <div class="full">
+                  <label>Machine Type</label>
+                  <div class="toggle" id="typeToggle">
+                    <span class="tbtn active" data-type="Simplex">Simplex</span>
+                    <span class="tbtn" data-type="Duplex">Duplex</span>
+                  </div>
+                  <input type="hidden" id="machineType" value="Simplex" />
+                </div>
+
+                <div>
+                  <label>Machine Number</label>
+                  <select id="machineNumber" class="select"></select>
+                </div>
+
+                <div>
+                  <label>System</label>
+                  <select id="system" class="select"></select>
+                </div>
+
+                <div>
+                  <label>Sub-System</label>
+                  <select id="subSystem" class="select"></select>
+                </div>
+
+                <div class="full"><hr class="sep"></div>
+
+                <div class="full">
+                  <label>Issue Summary</label>
+                  <input id="issueSummary" class="input" placeholder="One line summary" />
+                </div>
+
+                <div class="full">
+                  <label>Symptoms / Error Messages</label>
+                  <textarea id="symptoms" class="textarea"></textarea>
+                </div>
+
+                <div class="full">
+                  <label>Troubleshooting Steps</label>
+                  <div id="tsList"></div>
+                  <button type="button" class="btn small" onclick="addTS()">+ Add Step</button>
+                </div>
+
+                <div class="full">
+                  <label>Parts / Service Actions</label>
+                  <textarea id="parts" class="textarea"></textarea>
+                </div>
+
+                <div class="full">
+                  <label>Solution Implemented</label>
+                  <textarea id="solution" class="textarea"></textarea>
+                </div>
+
+                <div class="full">
+                  <label>Verification Method</label>
+                  <input id="verification" class="input" placeholder="How did we verify the fix?" />
+                </div>
+
+                <div class="full">
+                  <label>Attachments (multiple)</label>
+                  <div id="filesWrap"></div>
+                  <button type="button" class="btn small" onclick="addFileRow()">+ Add File</button>
+                </div>
+
+                <div class="inline full">
+                  <button type="submit" class="btn primary">Save Case</button>
+                  <button type="button" class="btn ghost" onclick="go('cases')">View All</button>
+                </div>
               </div>
-              <div>
-                <label>Machine Number</label>
-                <select id="machineNumber" class="select"></select>
-              </div>
-              <div>
-                <label>System</label>
-                <select id="system" class="select"></select>
-              </div>
-              <div>
-                <label>Sub System</label>
-                <select id="subSystem" class="select"></select>
-              </div>
-              <div class="full">
-                <label>Issue Summary</label>
-                <input type="text" id="issueSummary" class="input" placeholder="Describe issue..." />
-              </div>
-              <div class="full">
-                <label>Symptoms</label>
-                <textarea id="symptoms" class="textarea" placeholder="Describe symptoms..."></textarea>
-              </div>
-              <div class="full">
-                <label>Troubleshooting Steps</label>
-                <div id="tsList"></div>
-                <button type="button" class="btn small" onclick="addTS()">+ Add Step</button>
-              </div>
-              <div class="full">
-                <label>Parts Used</label>
-                <input type="text" id="parts" class="input" placeholder="Enter part numbers..." />
-              </div>
-              <div class="full">
-                <label>Solution</label>
-                <textarea id="solution" class="textarea" placeholder="Describe solution..."></textarea>
-              </div>
-              <div class="full">
-                <label>Verification</label>
-                <textarea id="verification" class="textarea" placeholder="Describe verification..."></textarea>
-              </div>
-              <div class="full">
-                <label>Attachments</label>
-                <div id="filesWrap"></div>
-                <button type="button" class="btn small" onclick="addFileRow()">+ Add File</button>
-              </div>
-              <div class="full">
-                <button type="submit" class="btn primary">Save Case</button>
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </section>
 
-        <!-- Cases -->
-        <section id="page-cases" class="hidden">
-          <div class="cases-head">
-            <h2>All Cases</h2>
-            <button class="btn" onclick="exportCSV()">Export CSV</button>
+        <!-- CASES -->
+        <section id="page-cases" class="page hidden">
+          <div class="panel glass">
+            <div class="cases-head">
+              <h2>All Cases</h2>
+              <button class="btn" onclick="exportCSV()">Export CSV</button>
+            </div>
           </div>
           <div id="casesList" class="grid list"></div>
-        </section>
-
-        <!-- Settings -->
-        <section id="page-settings" class="hidden">
-          <h2>Settings</h2>
-          <div class="panel">
-            <p>Future configuration area.</p>
-          </div>
         </section>
       </main>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div id="modalBack" class="modal-back" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
+  <!-- MODAL -->
+  <div id="modalBack" class="modal-back">
+    <div class="modal glass" id="modal">
       <div class="modal-head">
-        <h3 id="modalTitle"></h3>
+        <div id="modalTitle" class="title">Case</div>
         <button class="btn small" onclick="closeModal()">Close</button>
       </div>
-      <div id="modalBody"></div>
+      <div id="modalBody" class="modal-body"></div>
     </div>
   </div>
 
-  <div class="toast-wrap" id="toasts"></div>
+  <div id="toasts" class="toast-wrap"></div>
 
   <script src="script.js"></script>
 </body>
 </html>
+
