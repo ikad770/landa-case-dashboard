@@ -4,31 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Landa Quantum – Access Portal</title>
-  <!-- Inline favicon (SVG data URI with Landa blue dot) -->
+  <!-- Inline favicon -->
   <link rel="icon" href="data:image/svg+xml;utf8,
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
     <defs>
       <radialGradient id='g' cx='50%' cy='50%' r='60%'>
         <stop offset='0%' stop-color='%2300aeef'/>
-        <stop offset='100%' stop-color='%2300a0de'/>
+        <stop offset='100%' stop-color='%23008ec6'/>
       </radialGradient>
-      <filter id='s' x='-50%' y='-50%' width='200%' height='200%'>
-        <feDropShadow dx='0' dy='2' stdDeviation='3' flood-color='%2300aeef' flood-opacity='0.6'/>
-      </filter>
     </defs>
     <rect width='64' height='64' rx='14' ry='14' fill='%23091016'/>
-    <circle cx='32' cy='32' r='14' fill='url(%23g)' filter='url(%23s)'/>
+    <circle cx='32' cy='32' r='14' fill='url(%23g)'/>
   </svg>" />
   <style>
-    :root{
-      --bg:#060a12;
-      --bg2:#0b111d;
-      --glassA:rgba(255,255,255,.10);
-      --glassB:rgba(255,255,255,.04);
-      --border:rgba(255,255,255,.12);
-      --text:#eaf4ff;
-      --muted:#9fb4cc;
-      --accent:#00aeef;
+    :root {
+      --bg: #060a12;
+      --bg2: #0b111d;
+      --glassA: rgba(255,255,255,.10);
+      --glassB: rgba(255,255,255,.04);
+      --border: rgba(255,255,255,.12);
+      --text: #eaf4ff;
+      --muted: #9fb4cc;
+      --accent: #00aeef;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
@@ -41,17 +38,13 @@
       overflow:hidden;
     }
 
-    /* Starfield canvas */
-    #stars{
-      position:fixed;inset:0;z-index:0;display:block
-    }
+    #stars { position:fixed;inset:0;z-index:0;display:block }
 
-    /* Centered glass card */
-    .wrap{
+    .wrap {
       position:relative;z-index:2;height:100%;
       display:flex;align-items:center;justify-content:center;padding:28px;
     }
-    .card{
+    .card {
       width:min(460px,92vw);
       border:1px solid var(--border);
       border-radius:20px;
@@ -62,77 +55,98 @@
       box-shadow:0 28px 80px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.05);
       animation:pop .6s ease;
     }
-    @keyframes pop{
-      from{opacity:0;transform:translateY(12px) scale(.97)}
-      to{opacity:1;transform:translateY(0) scale(1)}
+    @keyframes pop {
+      from {opacity:0;transform:translateY(12px) scale(.97)}
+      to {opacity:1;transform:translateY(0) scale(1)}
     }
 
-    /* Inline glass logo */
-    .landa-logo{
-      position:relative;display:flex;flex-direction:column;align-items:center;user-select:none;
+    /* === Inline Glass Logo === */
+    .landa-logo {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
     }
-    .landa-row{
-      display:flex;align-items:flex-end;gap:3px;
-      line-height:1;letter-spacing:.5px;
-      text-shadow:0 10px 30px rgba(0,174,239,.35);
+    .landa-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      line-height: 1;
+      letter-spacing: .5px;
+      text-shadow: 0 10px 30px rgba(0,174,239,.35);
     }
-    .landa-L{
-      font-weight:300;font-size:56px;letter-spacing:-3px;
-      background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,235,255,.55));
-      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    .landa-L {
+      font-weight: 300;
+      font-size: 56px;
+      letter-spacing: -3px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(220,235,255,.55));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .landa-ring{
-      width:22px;height:22px;border-radius:50%;
-      margin:0 2px 8px 4px;
-      background:radial-gradient(circle at 40% 35%, #30d1ff, #00aeef 60%, #008ec6 100%);
-      box-shadow:inset 0 0 6px rgba(255,255,255,.85),0 0 18px rgba(0,174,239,.6);
-      animation:glow 3s ease-in-out infinite;
+    .landa-text {
+      position: relative;
+      font-weight: 200;
+      font-size: 56px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(220,230,255,.45));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-left: 6px;
+      text-shadow: 0 6px 20px rgba(0,174,239,0.4);
     }
-    @keyframes glow{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.08);filter:brightness(1.15)}}
-    .landa-text{
-      font-weight:200;font-size:56px;
-      background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,230,255,.45));
-      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    .landa-ring {
+      position: absolute;
+      top: 16px;
+      left: 23px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #30d1ff, #00aeef 60%, #008ec6 100%);
+      box-shadow: inset 0 0 6px rgba(255,255,255,.85), 0 0 18px rgba(0,174,239,.6);
+      animation: glow 3s ease-in-out infinite;
     }
-    .landa-sub{
-      margin-top:6px;font-size:12px;letter-spacing:2.6px;color:rgba(220,240,255,.85);
-      text-shadow:0 0 12px rgba(0,174,239,.35);
+    @keyframes glow {
+      0%,100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.08); filter: brightness(1.15); }
+    }
+    .landa-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      letter-spacing: 2.6px;
+      color: rgba(220,240,255,.85);
+      text-shadow: 0 0 12px rgba(0,174,239,.35);
     }
 
-    /* Heading */
-    .title{margin:20px 0 8px;font-size:22px;font-weight:600;text-align:center}
-    .subtitle{color:var(--muted);font-size:14px;text-align:center;margin-bottom:18px}
+    .title {margin:20px 0 8px;font-size:22px;font-weight:600;text-align:center}
+    .subtitle {color:var(--muted);font-size:14px;text-align:center;margin-bottom:18px}
 
-    /* Inputs */
-    .form{display:flex;flex-direction:column;gap:12px}
-    .input{
+    .form {display:flex;flex-direction:column;gap:12px}
+    .input {
       width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
       background:rgba(255,255,255,.05);color:var(--text);outline:none;
       transition:border .2s, box-shadow .2s;
     }
-    .input:focus{border-color:rgba(0,174,239,.7);box-shadow:0 0 0 3px rgba(0,174,239,.18)}
+    .input:focus {border-color:rgba(0,174,239,.7);box-shadow:0 0 0 3px rgba(0,174,239,.18)}
 
-    /* CTA */
-    .cta{
-      margin-top:6px;display:flex;gap:10px;align-items:center;justify-content:center
-    }
-    .btn{
-      border:1px solid var(--border);background:linear-gradient(180deg, rgba(0,174,239,.35), rgba(0,174,239,.15));
+    .cta {margin-top:6px;display:flex;gap:10px;align-items:center;justify-content:center}
+    .btn {
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(0,174,239,.35), rgba(0,174,239,.15));
       color:white;padding:10px 16px;border-radius:12px;cursor:pointer;
       box-shadow:0 10px 30px rgba(0,174,239,.25);
       transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
     }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 18px 40px rgba(0,174,239,.3);background:linear-gradient(180deg, rgba(0,174,239,.45), rgba(0,174,239,.2))}
-    .btn:active{transform:translateY(0) scale(.99)}
+    .btn:hover {transform:translateY(-1px);box-shadow:0 18px 40px rgba(0,174,239,.3);background:linear-gradient(180deg, rgba(0,174,239,.45), rgba(0,174,239,.2))}
+    .btn:active {transform:translateY(0) scale(.99)}
 
-    /* Toasts */
-    .toasts{position:fixed;top:20px;right:20px;z-index:5;display:flex;flex-direction:column;gap:8px}
-    .toast{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(9,16,28,.9);box-shadow:0 12px 24px rgba(0,0,0,.35)}
-    .toast.ok{border-color:rgba(0,174,239,.6)} .toast.err{border-color:#ff5470}
+    .toasts {position:fixed;top:20px;right:20px;z-index:5;display:flex;flex-direction:column;gap:8px}
+    .toast {padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(9,16,28,.9);box-shadow:0 12px 24px rgba(0,0,0,.35)}
+    .toast.ok {border-color:rgba(0,174,239,.6)}
+    .toast.err {border-color:#ff5470}
 
-    @media (max-width:520px){
+    @media (max-width:520px) {
       .landa-L,.landa-text{font-size:48px}
-      .landa-ring{width:20px;height:20px;margin-bottom:6px}
+      .landa-ring{width:18px;height:18px;margin-bottom:6px}
       .card{padding:28px 22px}
     }
   </style>
@@ -142,12 +156,10 @@
 
   <div class="wrap">
     <div class="card">
-      <!-- Inline coded logo -->
       <div class="landa-logo" aria-label="Landa Digital Printing">
         <div class="landa-row">
           <div class="landa-L">L</div>
-          <div class="landa-ring" aria-hidden="true"></div>
-          <div class="landa-text">anda</div>
+          <div class="landa-text">a<div class="landa-ring" aria-hidden="true"></div>nda</div>
         </div>
         <div class="landa-sub">DIGITAL&nbsp;PRINTING</div>
       </div>
@@ -168,16 +180,12 @@
   <div class="toasts" id="toasts"></div>
 
   <script>
-    /* Starfield animation (lightweight) */
+    /* Starfield animation */
     (function(){
-      const c = document.getElementById('stars'), dpr = Math.max(1, window.devicePixelRatio||1);
-      const ctx = c.getContext('2d'), MAX=140;
-      let w,h,stars=[];
+      const c = document.getElementById('stars'), ctx = c.getContext('2d');
+      const MAX=140; let stars=[];
       function resize(){
-        w = c.width = innerWidth*dpr;
-        h = c.height = innerHeight*dpr;
-        c.style.width = innerWidth + 'px'; c.style.height = innerHeight + 'px';
-        ctx.setTransform(dpr,0,0,dpr,0,0);
+        c.width = innerWidth; c.height = innerHeight;
       }
       function init(){
         stars = [];
@@ -208,20 +216,20 @@
       resize(); init(); tick();
     })();
 
-    /* Toast helper */
     function toast(msg,type='ok'){
-      const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
-      toasts.appendChild(t); setTimeout(()=>t.remove(), 2200);
+      const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+      toasts.appendChild(t);setTimeout(()=>t.remove(),2200);
     }
 
-    /* Login demo logic (keeps credentials local as before) */
+    /* Login and redirect */
     loginBtn.addEventListener('click', ()=>{
       const u = user.value.trim(), p = pass.value.trim();
       if(u==='Expert' && p==='Landa123456'){
         toast('Access Granted','ok');
-        loginBtn.textContent = 'Welcome';
-        loginBtn.disabled = true;
-      }else{
+        loginBtn.textContent='Redirecting...';
+        loginBtn.disabled=true;
+        setTimeout(()=>{ window.location.href='index_v13_quantum.html'; },1200);
+      } else {
         toast('Access Denied','err');
       }
     });
