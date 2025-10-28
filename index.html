@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landa Quantum – Troubleshoot Suite</title>
+  <link rel="icon" href="Landa.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Aurora Background -->
+  <div class="bg-aurora"></div>
+
+  <!-- Login Screen -->
+  <section id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <div class="brand">
+        <img src="Landa.png" alt="Landa" />
+        <h2>Landa Quantum</h2>
+      </div>
+      <h3>Welcome, Expert</h3>
+      <div class="login-form">
+        <label>User</label>
+        <input type="text" id="authUser" class="input" placeholder="User" value="Expert" />
+        <label>Password</label>
+        <input type="password" id="authPass" class="input" placeholder="Password" />
+        <div class="login-actions">
+          <button id="btnLogin" class="btn primary">Sign In</button>
+          <button id="btnFill" class="btn ghost">Auto Fill</button>
+        </div>
+      </div>
+    </div>
+    <div id="particles"></div>
+  </section>
+
+  <!-- Main App -->
+  <div id="appRoot" class="hidden">
+    <header class="header">
+      <div class="logo-wrap" id="goHome">
+        <img src="Landa.png" alt="Landa" />
+        <h1>Landa Quantum – Troubleshoot Suite</h1>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="aside">
+        <nav class="nav">
+          <a href="#" class="item active" data-route="dashboard">Dashboard</a>
+          <a href="#" class="item" data-route="create">Create Case</a>
+          <a href="#" class="item" data-route="cases">All Cases <span class="badge" id="casesCount">0</span></a>
+          <a href="#" class="item" data-route="settings">Settings</a>
+        </nav>
+      </aside>
+
+      <!-- Main Pages -->
+      <main class="main">
+        <!-- Dashboard -->
+        <section id="page-dashboard">
+          <h2>Dashboard</h2>
+          <div class="grid cols-3">
+            <div class="panel kpi">
+              <div class="kpi-title">Total Cases</div>
+              <div class="kpi-num" id="kpiTotal">0</div>
+            </div>
+            <div class="panel kpi">
+              <div class="kpi-title">Cases with Attachments</div>
+              <div class="kpi-num" id="kpiFiles">0</div>
+            </div>
+            <div class="panel kpi">
+              <div class="kpi-title">Last Update</div>
+              <div class="kpi-num" id="kpiUpdated">—</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Create Case -->
+        <section id="page-create" class="hidden">
+          <h2>Create New Case</h2>
+          <form id="caseForm" onsubmit="saveCase(event)">
+            <div class="grid cols-2">
+              <div>
+                <label>SF Case</label>
+                <input type="text" id="sfCase" class="input" placeholder="Case ID..." />
+              </div>
+              <div>
+                <label>TFS Number (Optional)</label>
+                <input type="text" id="tfsNumber" class="input" placeholder="TFS ID..." />
+              </div>
+              <div>
+                <label>Machine Type</label>
+                <div class="toggle" id="typeToggle">
+                  <div class="tbtn active" data-type="Simplex">Simplex</div>
+                  <div class="tbtn" data-type="Duplex">Duplex</div>
+                </div>
+                <input type="hidden" id="machineType" value="Simplex" />
+              </div>
+              <div>
+                <label>Machine Number</label>
+                <select id="machineNumber" class="select"></select>
+              </div>
+              <div>
+                <label>System</label>
+                <select id="system" class="select"></select>
+              </div>
+              <div>
+                <label>Sub System</label>
+                <select id="subSystem" class="select"></select>
+              </div>
+              <div class="full">
+                <label>Issue Summary</label>
+                <input type="text" id="issueSummary" class="input" placeholder="Describe issue..." />
+              </div>
+              <div class="full">
+                <label>Symptoms</label>
+                <textarea id="symptoms" class="textarea" placeholder="Describe symptoms..."></textarea>
+              </div>
+              <div class="full">
+                <label>Troubleshooting Steps</label>
+                <div id="tsList"></div>
+                <button type="button" class="btn small" onclick="addTS()">+ Add Step</button>
+              </div>
+              <div class="full">
+                <label>Parts Used</label>
+                <input type="text" id="parts" class="input" placeholder="Enter part numbers..." />
+              </div>
+              <div class="full">
+                <label>Solution</label>
+                <textarea id="solution" class="textarea" placeholder="Describe solution..."></textarea>
+              </div>
+              <div class="full">
+                <label>Verification</label>
+                <textarea id="verification" class="textarea" placeholder="Describe verification..."></textarea>
+              </div>
+              <div class="full">
+                <label>Attachments</label>
+                <div id="filesWrap"></div>
+                <button type="button" class="btn small" onclick="addFileRow()">+ Add File</button>
+              </div>
+              <div class="full">
+                <button type="submit" class="btn primary">Save Case</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- Cases -->
+        <section id="page-cases" class="hidden">
+          <div class="cases-head">
+            <h2>All Cases</h2>
+            <button class="btn" onclick="exportCSV()">Export CSV</button>
+          </div>
+          <div id="casesList" class="grid list"></div>
+        </section>
+
+        <!-- Settings -->
+        <section id="page-settings" class="hidden">
+          <h2>Settings</h2>
+          <div class="panel">
+            <p>Future configuration area.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalBack" class="modal-back" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button class="btn small" onclick="closeModal()">Close</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
