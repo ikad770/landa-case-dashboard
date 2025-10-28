@@ -59,9 +59,31 @@ textarea{min-height:84px; resize:vertical}
 .btn.primary{ border-color: var(--accent); background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); }
 .btn.ghost{ background:transparent } .btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px } .btn.danger{ border-color: rgba(255,73,103,.5); color:#fff }
 .fab{ position: fixed; right:24px; bottom:24px; z-index:60; } .fab .btn{ padding:16px 18px; border-radius:20px; font-weight:600; box-shadow: 0 18px 40px rgba(0,174,239,.35);}
-.auth-page{ max-width:460px; margin:8vh auto; } .brand{ display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:12px}
-.brand img{height:36px; animation: pulse 2.5s ease-in-out infinite;} .brand h2{margin:0; font-size:18px; letter-spacing:.5px; opacity:.9}
-@keyframes pulse{ 0%{filter:drop-shadow(0 0 0 rgba(0,174,239,.0))} 50%{filter:drop-shadow(0 0 16px rgba(0,174,239,.35))} 100%{filter:drop-shadow(0 0 0 rgba(0,174,239,.0))} }
+.auth-page {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 25px 70px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05);
+  border-radius: 20px;
+  text-align: center;
+  animation: fadeIn .6s ease;
+}
+.brand img {
+  filter: drop-shadow(0 10px 28px rgba(0,174,239,.6));
+  transition: transform .4s ease, filter .4s ease;
+}
+.brand img:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 12px 35px rgba(0,174,239,.85));
+}
+@keyframes pulseLogo {
+  0%,100% { transform: scale(1); opacity:1; }
+  50% { transform: scale(1.06); opacity:.95; }
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px) scale(.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
 .center{text-align:center}
 
 .case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns: auto 1fr auto; gap:12px;
@@ -97,20 +119,22 @@ textarea{min-height:84px; resize:vertical}
   </aside>
   <main class="main">
 
-    <section id="page-auth" class="page">
-      <div class="auth-page panel center">
-        <div class="brand"><img src="Landa.png" alt="Landa"><h2>Welcome, Expert</h2></div>
-        <label class="label">User</label>
-        <input class="input" id="authUser" placeholder="Expert" value="Expert">
-        <label class="label">Password</label>
-        <input class="input" id="authPass" type="password" placeholder="Password">
-        <div class="help">Demo → <b>User:</b> Expert &nbsp; <b>Password:</b> Landa123456</div>
-        <div class="inline center" style="justify-content:center; margin-top:12px">
-          <button class="btn primary" id="btnLogin">Sign In</button>
-          <button class="btn ghost" id="btnFill">Fill</button>
-        </div>
-      </div>
-    </section>
+<section id="page-auth" class="page">
+  <canvas id="particles"></canvas>
+  <div class="auth-page panel center glass" style="max-width:440px; margin:10vh auto; padding:40px 30px;">
+    <div class="brand">
+      <img src="Landa_glass.png" alt="Landa Logo" style="height:60px; filter:drop-shadow(0 10px 30px rgba(0,174,239,.55)); animation:pulseLogo 3s ease-in-out infinite;">
+      <h2 style="margin-top:10px; font-size:22px;">Landa Quantum Access Portal</h2>
+      <p style="font-size:14px; color:var(--muted); margin-top:4px;">Authorized Personnel Only</p>
+    </div>
+
+    <div class="login-fields" style="margin-top:30px;">
+      <input class="input" id="authUser" type="text" placeholder="Username" required>
+      <input class="input" id="authPass" type="password" placeholder="Password" required style="margin-top:12px;">
+      <button class="btn primary" id="btnLogin" style="width:100%; margin-top:18px;">Sign In</button>
+    </div>
+  </div>
+</section>
 
     <section id="page-dashboard" class="page hidden">
       <div class="grid cols-3">
@@ -224,7 +248,16 @@ function go(route){ pages.forEach(p=>document.getElementById('page-'+p).classLis
 document.getElementById('logoHome').addEventListener('click', ()=> go('dashboard'));
 document.querySelectorAll('.nav .item').forEach(a=>a.addEventListener('click', (e)=>{ e.preventDefault(); go(a.dataset.route)}));
 document.getElementById('btnFill').addEventListener('click', ()=>{document.getElementById('authUser').value='Expert'; document.getElementById('authPass').value='Landa123456';});
-document.getElementById('btnLogin').addEventListener('click', ()=>{ const u=val('authUser'), p=val('authPass'); if(u==='Expert' && p==='Landa123456'){ toast('Welcome, Expert','ok'); go('create'); } else toast('Invalid credentials','err'); });
+document.getElementById('btnLogin').addEventListener('click', () => {
+  const u = val('authUser'), p = val('authPass');
+  if (u === 'Expert' && p === 'Landa123456') {
+    toast('Access Granted', 'ok');
+    go('dashboard');
+  } else {
+    toast('Access Denied', 'err');
+  }
+});
+  
 function addFileRow(){ const w=document.getElementById('filesWrap'); const row=document.createElement('div'); row.className='inline';
   const inp=document.createElement('input'); inp.type='file'; inp.className='file'; inp.accept='.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip';
   const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
