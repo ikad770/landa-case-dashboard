@@ -3,20 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.2)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.3-Final • Create-Case Upgraded)</title>
 
-<!-- Favicon: black square + cyan circle -->
+<!-- Favicon: square + cyan circle -->
 <link rel="icon" type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.8' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
 
 <style>
 :root{
   --bg:#0b1016; --bg2:#0e1420; --panel:rgba(18,24,34,.6); --glass:rgba(22,30,45,.55);
   --text:#e8f0ff; --muted:#9bb0d0; --border:rgba(255,255,255,.08);
   --accent:#00aeef; --accent2:#3bd0ff; --ok:#4ade80; --err:#ff4967;
+  --header:56px;
+  --aside-w:260px;
+  --radius:16px;
 }
-
-/* Base */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -29,47 +30,45 @@ body{
   animation: breathe 14s ease-in-out infinite;
   overflow:hidden;
 }
-@keyframes breathe{0%,100%{filter:brightness(1) saturate(1)}50%{filter:brightness(1.07) saturate(1.06)}}
+@keyframes breathe{ 0%,100%{filter:brightness(1) saturate(1)} 50%{filter:brightness(1.07) saturate(1.06)} }
 
-.hidden{display:none !important}
+.hidden{ display:none !important }
 
-/* Glass panel */
+/* ====== Glass / Buttons ====== */
 .panel{
-  border:1px solid var(--border); border-radius:16px; padding:18px;
+  border:1px solid var(--border); border-radius:var(--radius); padding:18px;
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
   box-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
   backdrop-filter: blur(14px) saturate(1.08);
-  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+  transition: box-shadow .25s, transform .25s, border-color .25s;
 }
 .panel:hover{
   box-shadow: 0 20px 46px rgba(0,174,239,.24), inset 0 0 0 1px rgba(59,208,255,.12);
   border-color: rgba(59,208,255,.35);
   transform: translateY(-1px);
 }
-
-/* Buttons */
 .btn{
   border:1px solid var(--border); color:var(--text);
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   padding:10px 14px; border-radius:12px; cursor:pointer;
-  transition:.18s transform ease, .18s box-shadow ease, .18s border-color ease;
+  transition:.18s transform, .18s box-shadow, .18s border-color;
 }
 .btn:hover{ transform:translateY(-1px); box-shadow:0 16px 38px rgba(0,0,0,.36); border-color: rgba(59,208,255,.45);}
 .btn.primary{ border-color: var(--accent); background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); color:#fff; }
-.btn.ghost{ background:transparent } .btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px } .btn.danger{ border-color: rgba(255,73,103,.5); color:#fff }
-.btn.full{ width:100%; margin-top:14px }
+.btn.ghost{ background:transparent }
+.btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px }
+.btn.danger{ border-color: rgba(255,73,103,.5); color:#fff }
 
-/* Toasts + particles */
-.toast-wrap{ position: fixed; right:16px; top:72px; display:flex; flex-direction:column; gap:8px; z-index:1200 }
+.toast-wrap{ position: fixed; right:16px; top: calc(var(--header) + 8px); display:flex; flex-direction:column; gap:8px; z-index:110 }
 .toast{ padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(20,26,38,.85); box-shadow:0 14px 28px rgba(0,0,0,.35) }
-.toast.ok{ border-color: rgba(74,222,128,.5) } .toast.err{ border-color: rgba(255,73,103,.55) }
-#particles{ position:fixed; inset:0; z-index:-1; pointer-events:none }
+.toast.ok{ border-color: rgba(74,222,128,.5); } .toast.err{ border-color: rgba(255,73,103,.55); }
+#particles{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
 
-/* LOGIN */
-#loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px }
-.auth{ width:min(460px, 92vw) }
+/* ====== Login ====== */
+#loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+.auth{ width:min(460px, 92vw); }
 .logo{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:14px }
-.logo svg{ height:80px; filter: drop-shadow(0 0 16px rgba(0,174,239,.4)); animation: pulse 2.8s ease-in-out infinite }
+.logo svg{ height:80px; filter: drop-shadow(0 0 16px rgba(0,174,239,.4)); animation: pulse 2.8s ease-in-out infinite; }
 .logo .subtitle{ color:var(--muted); font-size:12.5px; letter-spacing:.6px }
 @keyframes pulse{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}50%{filter:drop-shadow(0 0 18px rgba(0,174,239,.45))}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}}
 .auth h2{ margin:0 0 6px; font-size:18px; letter-spacing:.5px; opacity:.92; text-align:center }
@@ -77,119 +76,127 @@ body{
 .input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none;}
 .helper{ color:var(--muted); font-size:12px; margin-top:6px; text-align:center }
+.btn.full{ width:100%; margin-top:14px }
 
-/* APP */
-/* === FIXED HEADER (stays on top) === */
-.header {
-  position: fixed; top:0; left:0; right:0;
-  display:flex; align-items:center; justify-content:flex-start; gap:12px;
-  height:56px; padding:8px 18px;
-  background: linear-gradient(180deg, rgba(10,14,20,.85), rgba(10,14,20,.35));
+/* ====== App Layout ====== */
+.app.hidden{ display:none !important }
+
+/* HEADER */
+.header{
+  position: sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; height:var(--header); padding:8px 14px 8px 14px;
+  background: linear-gradient(180deg, rgba(10,14,20,.82), rgba(10,14,20,.34));
   border-bottom:1px solid var(--border);
   backdrop-filter: blur(10px) saturate(1.1);
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
-  z-index:1100;
 }
+.header-left{ display:flex; align-items:center; gap:10px; min-width:0 }
+.header-title{ display:flex; align-items:center; gap:10px; min-width:0 }
+.header-title h1{ font-size:16px; letter-spacing:.4px; margin:0; opacity:.95; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.header .badge-env{ font-size:11px; color:#9bb0d0; border:1px solid var(--border); padding:2px 8px; border-radius:999px }
+.header .logo-mini svg{ width:28px; height:28px; animation: pulseGlow 3.2s ease-in-out infinite; transform-origin:center; }
+@keyframes pulseGlow{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0));transform:scale(1)}50%{filter:drop-shadow(0 0 12px rgba(0,174,239,.45));transform:scale(1.05)}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0));transform:scale(1)}}
 
-/* Brand: logo + title together */
-.brand { display:flex; align-items:center; gap:10px; cursor:pointer }
-.brand h1{ font-size:15px; font-weight:600; opacity:.95; letter-spacing:.4px; margin:0; line-height:1 }
+/* Mobile menu button */
+.header .menu-btn{ display:none; gap:8px; align-items:center }
+.header .menu-btn .bar{ width:18px; height:2px; background:#cfe7ff; border-radius:2px; box-shadow:0 0 8px rgba(0,174,239,.35) }
 
-/* Tiny glow on header emblem */
-.header .brand svg{
-  animation: pulseGlow 3.2s ease-in-out infinite; transform-origin:center
+/* GRID */
+.wrap{
+  display:grid; grid-template-columns: var(--aside-w) 1fr;
+  height: calc(100vh - var(--header));
 }
-@keyframes pulseGlow{
-  0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0)); transform:scale(1)}
-  50%{filter:drop-shadow(0 0 12px rgba(0,174,239,.45)); transform:scale(1.05)}
-  100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0)); transform:scale(1)}
-}
-
-/* Layout under fixed header */
-.app.hidden{display:none !important}
-.app { padding-top:56px }              /* keeps content below fixed header */
-.wrap{ display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 56px) }
 .aside{
   border-right:1px solid var(--border);
   background:linear-gradient(180deg, rgba(14,20,30,.6), rgba(14,20,30,.25));
   backdrop-filter: blur(8px);
   padding:16px 14px;
+  position: sticky; top: var(--header);
+  height: calc(100vh - var(--header));
+  overflow:auto;
+  z-index: 10;
 }
-.main{ padding:20px 20px 60px; overflow:auto }
+.main{ padding:20px 20px 60px; overflow:auto; }
 
-/* Nav */
 .nav{display:flex; flex-direction:column; gap:8px}
-.nav .item{
-  display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border);
+.nav .item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border);
   background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
   border-radius:10px; text-decoration:none; color:var(--text); opacity:.85;
-  transition: .18s transform ease, .18s box-shadow ease, .18s border-color ease;
-}
+  transition:.18s transform, .18s box-shadow, .18s border-color;}
 .nav .item:hover{ transform: translateY(-1px); box-shadow: 0 14px 30px rgba(0,0,0,.35); border-color: rgba(59,208,255,.35); opacity:1}
-.nav .item.active{ border-color: var(--accent); box-shadow: 0 0 0 1px inset rgba(59,208,255,.25), 0 12px 28px rgba(0,174,239,.25)}
+.nav .item.active{ border-color: var(--accent); box-shadow: 0 0 0 1px inset rgba(59,208,255,.25), 0 12px 28px rgba(0,174,239,.25);}
 .nav .badge{ margin-left:auto; padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted)}
 
-/* Grid helpers */
 .grid{display:grid; gap:16px}
 .grid.cols-2{grid-template-columns:1fr 1fr}
 .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-@media (max-width:1000px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
-@media (max-width:720px){
-  .wrap{grid-template-columns:1fr}
-  .aside{position:sticky; top:56px}
+@media (max-width: 1100px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
+@media (max-width: 780px){
+  .header{ padding:8px 10px }
+  .header .menu-btn{ display:flex }
+  .header-title h1{ font-size:15px; max-width: 62vw }
+  .wrap{ grid-template-columns: 1fr }
+  .aside{ position: fixed; top: var(--header); left:0; bottom:0; height:auto; width: min(82vw, 320px);
+          transform: translateX(-105%); transition: transform .25s ease; box-shadow: 16px 0 40px rgba(0,0,0,.45); z-index: 120; }
+  body.aside-open .aside{ transform: translateX(0) }
+  .main{ padding:14px 12px 72px }
   .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
 }
 
-/* Form controls (V13 style) */
+/* Form controls */
 .label.v13{display:block; color:var(--muted); margin:8px 2px 6px}
-.input.v13,.select,textarea,.file{
-  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;
-}
+.input.v13,.select,textarea,.file{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;}
 textarea{min-height:84px; resize:vertical}
 .inline{display:flex; gap:12px; align-items:center}
-.half{flex:1} .full{grid-column:1/-1} .help{color:var(--muted); font-size:12px; margin-top:6px}
+.half{flex:1}
+.full{grid-column:1/-1}
+.help{color:var(--muted); font-size:12px; margin-top:6px}
 
-/* FAB */
-.fab{ position: fixed; right:24px; bottom:24px; z-index:1060 }
-.fab .btn{ padding:16px 18px; border-radius:20px; font-weight:600; box-shadow: 0 18px 40px rgba(0,174,239,.35)}
+/* New: chips for Machine Type */
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{padding:6px 10px; border:1px solid var(--border); border-radius:999px; cursor:pointer;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); user-select:none}
+.chip.active{ background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); border-color: rgba(0,174,239,.55) }
 
-/* Case card */
-.case-card{
-  border:1px solid var(--border); border-radius:14px; padding:14px;
-  display:grid; grid-template-columns: auto 1fr auto; gap:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-  box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03);
-  transition:.25s ease;
+/* Part suggest dropdown */
+.partwrap{ position:relative }
+.part-suggest{
+  position:absolute; left:0; right:0; top:100%; z-index:15;
+  background:#0f1622; border:1px solid var(--border); border-radius:12px;
+  box-shadow:0 18px 40px rgba(0,0,0,.35); max-height:220px; overflow:auto; display:none
 }
-.case-card:hover{ box-shadow: 0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color: rgba(59,208,255,.35); transform: translateY(-1px) }
-.case-card .stripe{ width:6px; border-radius:8px; background: linear-gradient(180deg, var(--accent), var(--accent2)) }
-.case-card .title{ font-weight:600; opacity:.95 }
-.case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
-.case-card .actions{ display:flex; gap:8px; align-items:center }
-.case-card .files{ color:var(--muted) }
-.kv{ display:flex; gap:6px } .k{ color:var(--muted) } .v{ color:var(--text) }
+.part-suggest div{ padding:8px 12px; cursor:pointer }
+.part-suggest div:hover{ background:rgba(255,255,255,.06) }
 
-/* Modal */
-.modal-back{ position:fixed; inset:0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:1080 }
-.modal{
-  width:min(880px, 94vw); max-height:88vh; overflow:auto; border:1px solid var(--border); border-radius:16px; padding:18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
-  box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
-  animation: pop .22s ease;
-}
-@keyframes pop{ from{ transform:translateY(8px) scale(.98); opacity:0 } to{ transform:translateY(0) scale(1); opacity:1 } }
+/* Cases UI */
+.fab{ position: fixed; right:14px; bottom:18px; z-index:60; }
+.fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow: 0 18px 40px rgba(0,174,239,.35);}
+
+.case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns: auto 1fr auto; gap:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s}
+.case-card:hover{ box-shadow: 0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color: rgba(59,208,255,.35); transform: translateY(-1px); }
+.case-card .stripe{ width:6px; border-radius:8px; background: linear-gradient(180deg, var(--accent), var(--accent2)); }
+.case-card .title{ font-weight:600; opacity:.95 } .case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
+.case-card .actions{ display:flex; gap:8px; align-items:center } .case-card .files{ color:var(--muted); } .kv{ display:flex; gap:6px }
+.k{ color:var(--muted) } .v{ color:var(--text) }
+
+.modal-back{ position:fixed; inset:0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:140; }
+.modal{ width:min(880px, 94vw); max-height:88vh; overflow:auto; border:1px solid var(--border); border-radius:16px; padding:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)); box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
+  animation: pop .22s ease;} @keyframes pop{ from{ transform:translateY(8px) scale(.98); opacity:.0} to{ transform:translateY(0) scale(1); opacity:1 } }
 </style>
 </head>
 <body>
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- ===================== LOGIN ===================== -->
+<!-- ========== LOGIN ========== -->
 <section id="loginPage">
   <div class="auth panel center">
     <div class="logo">
-      <!-- Encoded Landa / Digital Printing (large) -->
+      <!-- Encoded Landa / Digital Printing SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" aria-label="Landa Digital Printing">
         <defs>
           <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
@@ -214,30 +221,30 @@ textarea{min-height:84px; resize:vertical}
   </div>
 </section>
 
-<!-- ===================== APP ===================== -->
+<!-- ========== APP ========== -->
 <div class="app hidden" id="appRoot">
-
-  <!-- Fixed Header -->
   <header class="header">
-    <div class="brand" id="logoHome" title="Back to Dashboard">
-      <!-- Approved inline logo: black square + cyan circle -->
-      <svg width="28" height="28" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.08)" />
-        <circle cx="20" cy="20" r="8" fill="#00aeef" filter="url(#glow)"/>
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-      </svg>
-      <h1>Landa Quantum – Troubleshoot Suite</h1>
+    <div class="header-left">
+      <button class="menu-btn btn small" id="btnMenu" aria-label="Toggle menu" title="Menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <div class="header-title" id="logoHome" title="Go to Dashboard" style="cursor:pointer">
+        <div class="logo-mini" aria-hidden="true">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(0,0,0,0.78)" stroke="rgba(255,255,255,0.08)"/>
+            <circle cx="20" cy="20" r="8" fill="#00aeef">
+              <animate attributeName="r" values="8;9;8" dur="2.6s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <h1>Landa Quantum – Troubleshoot Suite</h1>
+      </div>
     </div>
+    <span class="badge-env">V18.3-Final</span>
   </header>
 
-  <!-- Content under header -->
   <div class="wrap">
-    <aside class="aside">
+    <aside class="aside" id="aside">
       <nav class="nav">
         <a class="item active" href="#" data-route="dashboard"><span>Dashboard</span></a>
         <a class="item" href="#" data-route="create"><span>Create Case</span></a>
@@ -267,6 +274,7 @@ textarea{min-height:84px; resize:vertical}
             <div class="help">Most recent save</div>
           </div>
         </div>
+
         <div class="panel" style="margin-top:16px">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
             <div class="title">Quick Actions</div>
@@ -279,46 +287,131 @@ textarea{min-height:84px; resize:vertical}
         </div>
       </section>
 
-      <!-- Create Case -->
+      <!-- Create Case (UPDATED) -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
           <form id="caseForm" onsubmit="saveCase(event)">
             <div class="grid cols-2">
-              <div class="half"><label class="label v13">SF Case *</label><input class="input v13" id="sfCase"></div>
-              <div class="half"><label class="label v13">TFS Number</label><input class="input v13" id="tfsNumber"></div>
-              <div class="half"><label class="label v13">Machine Type *</label>
-                <select id="machineType" class="select"><option value="">Choose…</option><option>Simplex</option><option>Duplex</option></select></div>
-              <div class="half"><label class="label v13">Machine Number *</label><input class="input v13" id="machineNumber" placeholder="S3 / D5"></div>
-              <div class="half"><label class="label v13">System *</label>
-                <select id="system" class="select"><option value="">Choose…</option><option>BSS</option><option>PIP</option><option>Feeder</option><option>Engine</option><option>Finisher</option><option>IPS</option><option>IO</option><option>Vacuum</option><option>Drying</option><option>Ink Delivery</option></select>
+              <!-- widths: numbers narrower, text wider -->
+              <div class="half"><label class="label v13">SF Case *</label><input class="input v13" id="sfCase" inputmode="numeric" placeholder="e.g., 123456"></div>
+
+              <!-- TFS via checkbox -> reveal field -->
+              <div class="half">
+                <label class="label v13">TFS (optional)</label>
+                <div class="inline">
+                  <label class="inline" style="gap:8px"><input type="checkbox" id="tfsToggle"> <span>Use TFS number</span></label>
+                  <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
+                </div>
+                <div class="help">הפעל רק אם נדרש קישור ל-TFS</div>
               </div>
-              <div class="half"><label class="label v13">Sub-System</label><input class="input v13" id="subSystem" placeholder="Auto-suggest later"></div>
-              <div class="half"><label class="label v13">Software Version</label><input class="input v13" id="softwareVersion" placeholder="4.2.11"></div>
-              <div class="half"><label class="label v13">Firmware Revision</label><input class="input v13" id="firmwareRevision"></div>
+
+              <!-- Machine Type chips + Model select (S1–S50 / D1–D50) -->
+              <div class="half">
+                <label class="label v13">Machine Type *</label>
+                <div class="chips" id="machineTypeChips">
+                  <div class="chip active" data-type="Simplex">Simplex</div>
+                  <div class="chip" data-type="Duplex">Duplex</div>
+                </div>
+                <input type="hidden" id="machineType" value="Simplex">
+              </div>
+              <div class="half">
+                <label class="label v13">Model *</label>
+                <select id="model" class="select"></select>
+                <div class="help">נבנה מרשימת S1-S50 / D1-D50 לפי סוג המכונה</div>
+              </div>
+
+              <!-- System / Sub-System (dependent) -->
+              <div class="half">
+                <label class="label v13">System *</label>
+                <select id="system" class="select">
+                  <option value="">Choose…</option>
+                  <option>Machine</option><option>BSS</option><option>STS</option><option>IPS</option><option>BCU</option>
+                  <option>IRD</option><option>Hot Air</option><option>PSS</option><option>CWS</option><option>Ventilation</option>
+                  <option>MSPS</option><option>ITS</option><option>EC</option><option>DFE</option><option>PQ</option>
+                  <option>QCS</option><option>PC Cabinet</option><option>ICS</option>
+                </select>
+              </div>
+              <div class="half">
+                <label class="label v13">Sub-System</label>
+                <select id="subSystem" class="select" disabled>
+                  <option value="">Select subsystem…</option>
+                </select>
+                <div class="help">יופעל כאשר תבחר System (כרגע בלי רשימת משנה)</div>
+              </div>
+
+              <!-- Software Version (remain) -->
+              <div class="half">
+                <label class="label v13">Software Version</label>
+                <input class="input v13" id="softwareVersion" placeholder="4.2.11">
+              </div>
+
+              <!-- REMOVED (per request): firmware, Frequency, Environment, Reproduction steps, Measurements, Analysis notes, Attachment notes -->
+
               <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
-              <div class="full"><label class="label v13">Issue Summary *</label><input class="input v13" id="issueSummary" placeholder="One line summary"></div>
-              <div class="full"><label class="label v13">Symptoms / Error Messages</label><textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea></div>
-              <div class="half"><label class="label v13">Frequency</label><select id="frequency" class="select"><option>Once</option><option>Intermittent</option><option>Frequent</option><option>Constant</option></select></div>
-              <div class="half"><label class="label v13">Environment / Conditions</label><input id="environment" class="input v13" placeholder="paper/media, temp, job type…"></div>
-              <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
-              <div class="full"><label class="label v13">Reproduction Steps</label><textarea id="repro" class="input v13" placeholder="Step 1, Step 2, …"></textarea></div>
-              <div class="full"><label class="label v13">Measurements / Observations</label><textarea id="observations" class="input v13" placeholder="Logs, sensors, values…"></textarea></div>
-              <div class="full"><label class="label v13">Root Cause (identified)</label><textarea id="rootCause" class="input v13"></textarea></div>
-              <div class="full"><label class="label v13">Analysis Notes</label><textarea id="analysis" class="input v13"></textarea></div>
-              <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
-              <div class="full"><label class="label v13">Troubleshooting Steps</label><textarea id="troubleshooting" class="input v13"></textarea></div>
-              <div class="full"><label class="label v13">Parts / Service Actions</label><textarea id="parts" class="input v13"></textarea></div>
-              <div class="full"><label class="label v13">Solution Implemented *</label><textarea id="solution" class="input v13"></textarea></div>
-              <div class="full"><label class="label v13">Verification Method</label><input id="verification" class="input v13" placeholder="How did we verify the fix?"></div>
-              <div class="full"><label class="label v13">Final Remarks / Lessons Learned</label><textarea id="lessons" class="input v13"></textarea></div>
+
+              <!-- Issue Summary -->
+              <div class="full">
+                <label class="label v13">Issue Summary *</label>
+                <input class="input v13" id="issueSummary" placeholder="One line summary">
+              </div>
+
+              <!-- Symptoms (keep) -->
+              <div class="full">
+                <label class="label v13">Symptoms / Error Messages</label>
+                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
+              </div>
+
+              <!-- Troubleshooting (dynamic steps) -->
+              <div class="full">
+                <label class="label v13">Troubleshooting (steps)</label>
+                <div id="tsSteps"></div>
+                <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
+                <div class="help">ניתן להוסיף ולהסיר שלבים</div>
+              </div>
+
+              <!-- Part smart input -->
+              <div class="full">
+                <label class="label v13">Part (Catalog)</label>
+                <div class="partwrap">
+                  <input class="input v13" id="partInput" placeholder="Type to search part number (e.g., 12-34567)…">
+                  <div class="part-suggest" id="partSuggest"></div>
+                </div>
+                <div class="help">חיפוש חכם במקטים (ניתן להזין גם טקסט חופשי)</div>
+              </div>
+
+              <!-- Parts / Service Actions (keep text area) -->
+              <div class="full">
+                <label class="label v13">Parts / Service Actions</label>
+                <textarea id="parts" class="input v13" placeholder="List of parts or actions"></textarea>
+              </div>
+
+              <!-- Solution (required) -->
+              <div class="full">
+                <label class="label v13">Solution Implemented *</label>
+                <textarea id="solution" class="input v13" placeholder="What fixed the issue"></textarea>
+              </div>
+
+              <!-- Verification (keep) -->
+              <div class="full">
+                <label class="label v13">Verification Method</label>
+                <input id="verification" class="input v13" placeholder="How did we verify the fix?">
+              </div>
+
+              <!-- Lessons (keep) -->
+              <div class="full">
+                <label class="label v13">Final Remarks / Lessons Learned</label>
+                <textarea id="lessons" class="input v13" placeholder="Anything noteworthy for future cases"></textarea>
+              </div>
+
+              <!-- Attachments (keep), Attachment Notes removed -->
               <div class="full">
                 <label class="label v13">Attachments (multiple)</label>
                 <div id="filesWrap"></div>
                 <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
                 <div class="help">Accepted: pdf, doc, xls, png, jpg, jpeg, zip</div>
               </div>
-              <div class="full"><label class="label v13">Attachment Notes</label><input id="attachmentNotes" class="input v13"></div>
+
               <div class="inline full" style="margin-top:8px">
                 <button class="btn primary" type="submit">Save Case</button>
                 <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
@@ -333,8 +426,8 @@ textarea{min-height:84px; resize:vertical}
         <div class="panel">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
             <h2 style="margin:0">All Cases</h2>
-            <div class="inline">
-              <input id="searchBox" class="input v13" placeholder="Search text (Issue / Machine / System)">
+            <div class="inline" style="flex-wrap:wrap; gap:8px">
+              <input id="searchBox" class="input v13" placeholder="Search text (Issue / Model / System)" style="min-width:220px">
               <button class="btn" onclick="renderCases()">Apply</button>
               <button class="btn" onclick="exportCSV()">Export CSV</button>
             </div>
@@ -350,10 +443,8 @@ textarea{min-height:84px; resize:vertical}
     </main>
   </div>
 
-  <!-- FAB -->
   <div class="fab"><button class="btn primary" onclick="go('create')">+ New Case</button></div>
 
-  <!-- Modal -->
   <div class="modal-back" id="modalBack">
     <div class="modal" id="modal">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
@@ -375,10 +466,10 @@ function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updat
 const pages=['dashboard','create','cases','settings'];
 function go(route){
   pages.forEach(p=>document.getElementById('page-'+p).classList.add('hidden'));
-  document.getElementById('page-'+route).classList.remove('hidden');
+  const tgt=document.getElementById('page-'+route);
+  if(tgt) tgt.classList.remove('hidden');
   document.querySelectorAll('.nav .item').forEach(a=>{
-    const r=a.dataset.route;
-    a.classList.toggle('active', r===route);
+    const r=a.dataset.route; a.classList.toggle('active', r===route);
   });
   if(route==='dashboard') updateKPIs();
   if(route==='cases') renderCases();
@@ -387,14 +478,17 @@ function go(route){
 document.getElementById('logoHome').addEventListener('click', ()=> go('dashboard'));
 document.querySelectorAll('.nav .item').forEach(a=>{
   const r=a.getAttribute('data-route');
-  if(r){ a.addEventListener('click', (e)=>{ e.preventDefault(); go(r); }); }
+  if(r){ a.addEventListener('click', (e)=>{ e.preventDefault(); go(r); if (document.body.classList.contains('aside-open')) document.body.classList.remove('aside-open'); }); }
 });
+
+/* Mobile menu toggle */
+const btnMenu = document.getElementById('btnMenu');
+if (btnMenu) btnMenu.addEventListener('click', ()=> document.body.classList.toggle('aside-open'));
 
 /* ===== Auth ===== */
 const AUTH_KEY='landaAuth';
 const loginPage=document.getElementById('loginPage');
 const appRoot=document.getElementById('appRoot');
-
 function showApp(){ loginPage.classList.add('hidden'); appRoot.classList.remove('hidden'); go('dashboard'); updateKPIs(); }
 function showLogin(){ appRoot.classList.add('hidden'); loginPage.classList.remove('hidden'); }
 
@@ -405,14 +499,106 @@ document.getElementById('btnLogin').addEventListener('click', ()=>{
     toast('Welcome, Expert','ok'); localStorage.setItem(AUTH_KEY,'true'); setTimeout(showApp, 650);
   }else{ toast('Invalid credentials','err'); }
 });
-// Auto-login
 if(localStorage.getItem(AUTH_KEY)==='true'){ showApp(); }
-// Logout
+
 document.getElementById('btnLogout').addEventListener('click', e=>{
-  e.preventDefault(); toast('Logged out successfully','ok'); localStorage.removeItem(AUTH_KEY); setTimeout(showLogin, 750);
+  e.preventDefault(); toast('Logged out successfully','ok'); localStorage.removeItem(AUTH_KEY);
+  document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
 });
 
-/* ===== Cases (V13 logic) ===== */
+/* ===== Create Case – Enhancements ===== */
+
+/* TFS toggle */
+const tfsToggle = document.getElementById('tfsToggle');
+const tfsNumber = document.getElementById('tfsNumber');
+if(tfsToggle){
+  tfsToggle.addEventListener('change', ()=>{
+    if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
+    else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
+  });
+}
+
+/* Machine type chips + Model list */
+const machineTypeChips = document.getElementById('machineTypeChips');
+const hiddenType = document.getElementById('machineType');
+const modelSel = document.getElementById('model');
+
+function fillModels(kind){
+  modelSel.innerHTML='';
+  const ph=document.createElement('option'); ph.value=''; ph.textContent='Choose…'; modelSel.appendChild(ph);
+  const prefix = (kind==='Duplex') ? 'D' : 'S';
+  for(let i=1;i<=50;i++){
+    const opt=document.createElement('option');
+    opt.value = prefix + i;
+    opt.textContent = prefix + i;
+    modelSel.appendChild(opt);
+  }
+}
+fillModels(hiddenType.value||'Simplex');
+
+if(machineTypeChips){
+  machineTypeChips.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip'); if(!chip) return;
+    machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    hiddenType.value = chip.dataset.type;
+    fillModels(hiddenType.value);
+  });
+}
+
+/* System -> enable SubSystem placeholder only after selection */
+const systemSel = document.getElementById('system');
+const subSystemSel = document.getElementById('subSystem');
+if(systemSel && subSystemSel){
+  systemSel.addEventListener('change', ()=>{
+    const has = !!systemSel.value;
+    subSystemSel.disabled = !has;
+    if(!has){ subSystemSel.value=''; }
+  });
+}
+
+/* Part smart suggest (client-side demo) */
+const partInput = document.getElementById('partInput');
+const partSuggest = document.getElementById('partSuggest');
+if(partInput){
+  const parts = Array.from({length:160}, (_,i)=>{
+    const base = (i%2===0) ? '12' : '34';
+    const tail = String(10000+i).slice(-5);
+    return `${base}-${tail}`;
+  });
+  const filterParts = q => {
+    const v = String(q||'').trim().toLowerCase();
+    if(!v) return [];
+    return parts.filter(p=>p.toLowerCase().includes(v)).slice(0,30);
+  };
+  partInput.addEventListener('input', ()=>{
+    const list = filterParts(partInput.value);
+    partSuggest.innerHTML='';
+    if(!list.length){ partSuggest.style.display='none'; return; }
+    list.forEach(p=>{
+      const row=document.createElement('div'); row.textContent=p;
+      row.addEventListener('click', ()=>{ partInput.value=p; partSuggest.style.display='none'; });
+      partSuggest.appendChild(row);
+    });
+    partSuggest.style.display='block';
+  });
+  document.addEventListener('click',(e)=>{
+    if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none'; }
+  });
+}
+
+/* Troubleshooting steps dynamic */
+const tsSteps = document.getElementById('tsSteps');
+function addStep(val=''){
+  const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
+  const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
+  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
+  row.appendChild(inp); row.appendChild(rm); tsSteps.appendChild(row);
+}
+addStep('Check connections and sensors');
+addStep('Verify model-specific settings');
+
+/* Files */
 function addFileRow(){
   const w=document.getElementById('filesWrap');
   const row=document.createElement('div'); row.className='inline';
@@ -422,18 +608,35 @@ function addFileRow(){
 }
 addFileRow();
 
+/* ===== Save Case (updated fields) ===== */
 async function saveCase(e){
-  e.preventDefault(); const req=v=>v&&v.trim().length>0;
-  const data={ sfCase:val('sfCase'), tfsNumber:val('tfsNumber'), machineType:val('machineType'), machineNumber:val('machineNumber'),
-    system:val('system'), subSystem:val('subSystem'), softwareVersion:val('softwareVersion'), firmwareRevision:val('firmwareRevision'),
-    issueSummary:val('issueSummary'), symptoms:val('symptoms'), frequency:val('frequency'), environment:val('environment'),
-    repro:val('repro'), observations:val('observations'), rootCause:val('rootCause'), analysis:val('analysis'),
-    troubleshooting:val('troubleshooting'), parts:val('parts'), solution:val('solution'), verification:val('verification'),
-    lessons:val('lessons'), attachmentNotes:val('attachmentNotes'), createdAt:new Date().toISOString(), author:'Expert' };
-  const errors=[]; ['sfCase','machineType','machineNumber','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k)});
+  e.preventDefault();
+  const req=v=>v&&String(v).trim().length>0;
+  const data={
+    sfCase:val('sfCase'),
+    tfsNumber: tfsToggle && tfsToggle.checked ? val('tfsNumber') : '',
+    machineType: val('machineType'),
+    model: val('model'),
+    system: val('system'),
+    subSystem: val('subSystem'),
+    softwareVersion: val('softwareVersion'),
+    issueSummary: val('issueSummary'),
+    symptoms: val('symptoms'),
+    troubleshooting: collectSteps(),
+    partCatalog: val('partInput'),
+    parts: val('parts'),
+    solution: val('solution'),
+    verification: val('verification'),
+    lessons: val('lessons'),
+    createdAt: new Date().toISOString(),
+    author:'Expert'
+  };
+  const errors=[];
+  ['sfCase','machineType','model','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k) });
   if(errors.length){
     toast('Please fill required: '+errors.join(', '),'err');
-    errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'}); setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1800);
+    errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'});
+    setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1600);
     return;
   }
   const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
@@ -445,29 +648,56 @@ async function saveCase(e){
       data.attachments.push({name:f.name,type:f.type,data:base64});
     } }
   const arr=getCases(); arr.push(data); setCases(arr);
-  (document.getElementById('caseForm')).reset(); document.getElementById('filesWrap').innerHTML=''; addFileRow();
+  document.getElementById('caseForm').reset();
+  // reset dependent UI
+  hiddenType.value='Simplex';
+  machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
+  fillModels('Simplex');
+  subSystemSel.disabled = true; subSystemSel.value='';
+  document.getElementById('filesWrap').innerHTML=''; addFileRow();
+  tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
   toast('Case saved successfully','ok'); go('cases');
 }
+
+function collectSteps(){
+  const rows=[...tsSteps.querySelectorAll('.inline input')];
+  return rows.map(i=>i.value).filter(v=>String(v).trim().length>0).join('\n');
+}
+
 function val(id){ const el=document.getElementById(id); return el?el.value:''; }
 
+/* ===== Cases (render) ===== */
 function renderCases(){
   const list=document.getElementById('casesList');
-  const q=document.getElementById('searchBox').value?.toLowerCase()||'';
-  const arr=getCases().filter(c=> !q || (c.issueSummary||'').toLowerCase().includes(q) || (c.machineNumber||'').toLowerCase().includes(q) || (c.system||'').toLowerCase().includes(q));
-  document.getElementById('casesCount').textContent=String(arr.length);
-  list.innerHTML = arr.map((c,i)=>caseCard(c,i)).join('') || '<div class="panel">No cases yet.</div>';
+  const q=(document.getElementById('searchBox').value||'').toLowerCase();
+  const arr=getCases().filter(c=> !q ||
+    (c.issueSummary||'').toLowerCase().includes(q) ||
+    (c.model||'').toLowerCase().includes(q) ||
+    (c.system||'').toLowerCase().includes(q)
+  );
+  const badge=document.getElementById('casesCount'); if(badge) badge.textContent=String(arr.length);
+  list.innerHTML = arr.length ? arr.map((c,i)=>caseCard(c,i)).join('') : '<div class="panel">No cases yet.</div>';
 }
 function caseCard(c,i){
   const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)`: 'No attachments';
-  return `<div class="case-card"><div class="stripe"></div><div>
-    <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
-    <div class="meta"><span class="kv"><span class="k">Machine:</span><span class="v">${esc(c.machineNumber||'')}</span></span>
-      <span class="kv"><span class="k">Type:</span><span class="v">${esc(c.machineType||'')}</span></span>
-      <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem? ' / '+esc(c.subSystem):''}</span></span>
-      <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span></div>
-    <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
-    <div class="files" style="margin-top:4px">${files}</div></div>
-    <div class="actions"><button class="btn small" onclick="openCase(${i})">Details</button><button class="btn small danger" onclick="deleteCase(${i})">Delete</button></div></div>`;
+  return `<div class="case-card">
+    <div class="stripe"></div>
+    <div>
+      <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
+      <div class="meta">
+        <span class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></span>
+        <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem? ' / '+esc(c.subSystem):''}</span></span>
+        <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span>
+      </div>
+      <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
+      <div class="files" style="margin-top:4px">${files}</div>
+    </div>
+    <div class="actions">
+      <button class="btn small" onclick="openCase(${i})">Details</button>
+      <button class="btn small danger" onclick="deleteCase(${i})">Delete</button>
+    </div>
+  </div>`;
 }
 function openCase(i){
   const c=getCases()[i]; if(!c) return; document.getElementById('modalTitle').textContent=`Case #${i+1} — ${c.sfCase||''}`;
@@ -476,34 +706,35 @@ function openCase(i){
     : '<div class="attach-empty">No attachments</div>';
   document.getElementById('modalBody').innerHTML = `
     <div class="grid cols-2">
-      <div class="panel"><div class="kv"><span class="k">Machine:</span><span class="v">${esc(c.machineNumber||'')} (${esc(c.machineType||'')})</span></div>
+      <div class="panel">
+        <div class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></div>
         <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem?' / '+esc(c.subSystem):''}</span></div>
         <div class="kv"><span class="k">Software:</span><span class="v">${esc(c.softwareVersion||'')}</span></div>
-        <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div></div>
-      <div class="panel"><div class="kv"><span class="k">Opened:</span><span class="v">${new Date(c.createdAt).toLocaleString()}</span></div>
-        <div class="kv"><span class="k">Author:</span><span class="v">${esc(c.author||'')}</span></div></div></div>
+        <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div>
+      </div>
+      <div class="panel">
+        <div class="kv"><span class="k">Opened:</span><span class="v">${new Date(c.createdAt).toLocaleString()}</span></div>
+        <div class="kv"><span class="k">Author:</span><span class="v">${esc(c.author||'')}</span></div>
+      </div>
+    </div>
     <div class="panel" style="margin-top:12px"><h3>Problem</h3>
       <div class="kv"><span class="k">Summary:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
       <div class="kv"><span class="k">Symptoms:</span><span class="v">${nl(esc(c.symptoms||''))}</span></div>
-      <div class="kv"><span class="k">Frequency:</span><span class="v">${esc(c.frequency||'')}</span></div>
-      <div class="kv"><span class="k">Environment:</span><span class="v">${esc(c.environment||'')}</span></div></div>
-    <div class="panel" style="margin-top:12px"><h3>Diagnostics</h3>
-      <div class="kv"><span class="k">Reproduction:</span><span class="v">${nl(esc(c.repro||''))}</span></div>
-      <div class="kv"><span class="k">Observations:</span><span class="v">${nl(esc(c.observations||''))}</span></div>
-      <div class="kv"><span class="k">Root Cause:</span><span class="v">${nl(esc(c.rootCause||''))}</span></div>
-      <div class="kv"><span class="k">Analysis:</span><span class="v">${nl(esc(c.analysis||''))}</span></div></div>
+    </div>
     <div class="panel" style="margin-top:12px"><h3>Solution</h3>
       <div class="kv"><span class="k">Troubleshooting:</span><span class="v">${nl(esc(c.troubleshooting||''))}</span></div>
+      <div class="kv"><span class="k">Part (catalog):</span><span class="v">${esc(c.partCatalog||'')}</span></div>
       <div class="kv"><span class="k">Parts / Service:</span><span class="v">${nl(esc(c.parts||''))}</span></div>
       <div class="kv"><span class="k">Implemented:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
       <div class="kv"><span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span></div>
       <div class="kv"><span class="k">Lessons:</span><span class="v">${nl(esc(c.lessons||''))}</span></div>
-      <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div></div>`;
+      <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div>
+    </div>`;
   openModal();
 }
 function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok'); }
-function openModal(){ document.getElementById('modalBack').style.display='flex' }
-function closeModal(){ document.getElementById('modalBack').style.display='none' }
+function openModal(){ document.getElementById('modalBack').style.display='flex'; }
+function closeModal(){ document.getElementById('modalBack').style.display='none'; }
 function updateKPIs(){
   const arr=getCases(); document.getElementById('kpiTotal').textContent=arr.length;
   document.getElementById('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
@@ -513,25 +744,20 @@ function updateKPIs(){
 }
 function exportCSV(){
   const arr=getCases();
-  const cols=['sfCase','tfsNumber','machineType','machineNumber','system','subSystem','softwareVersion','firmwareRevision','issueSummary','symptoms','frequency','environment','repro','observations','rootCause','analysis','troubleshooting','parts','solution','verification','lessons','createdAt','author'];
+  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','parts','solution','verification','lessons','createdAt','author'];
   const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\n/g,' '))).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
 }
-function toast(msg,type='ok'){
-  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
-  const w=document.getElementById('toasts'); w.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1800);
-}
-function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
-function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
+function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-/* ===== Particles (all screens) ===== */
+/* ===== Particles ===== */
 (function(){
   const c=document.getElementById('particles'); if(!c) return;
   const ctx=c.getContext('2d'); let w,h;
   function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
   addEventListener('resize',resize); resize();
-  const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+0.5,vx:(Math.random()-.5)*0.3,vy:(Math.random()-.5)*0.3}));
+  const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.6,vx:(Math.random()-.5)*0.28,vy:(Math.random()-.5)*0.28}));
   function step(){
     ctx.clearRect(0,0,w,h);
     for(const d of dots){
