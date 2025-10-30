@@ -74,15 +74,28 @@ body{
 /* App Layout (glass + particles) */
 .app.hidden{ display:none !important }
 /* Header — thin, elegant */
-.header{
-  display:flex; align-items:center; justify-content:flex-start; gap:10px;
-  height:44px; padding:4px 16px;
-  background: linear-gradient(180deg, rgba(10,14,20,.7), rgba(10,14,20,.25));
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  height: 50px;
+  padding: 6px 18px;
+  background: linear-gradient(180deg, rgba(10,14,20,.8), rgba(10,14,20,.3));
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(10px) saturate(1.08);
+  backdrop-filter: blur(10px) saturate(1.1);
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  position: relative;
+  z-index: 20; /* מוודא שהכותרת מעל ה-sidebar */
 }
-.header .logo{display:flex; align-items:center; gap:8px; cursor:pointer}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
 .header h1{font-size:15px; letter-spacing:.4px; margin:0; opacity:.9; font-weight:600}
 
 .wrap{display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 44px)}
@@ -128,6 +141,26 @@ textarea{min-height:84px; resize:vertical}
 .modal{ width:min(880px, 94vw); max-height:88vh; overflow:auto; border:1px solid var(--border); border-radius:16px; padding:18px;
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)); box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
   animation: pop .22s ease;} @keyframes pop{ from{ transform:translateY(8px) scale(.98); opacity:.0} to{ transform:translateY(0) scale(1); opacity:1 } }
+  /* === לוגו Header – אנימציית נשימה עדינה === */
+.header .logo svg {
+  animation: pulseGlow 3.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(0,174,239,0));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(0,174,239,0.45));
+    transform: scale(1.05);
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(0,174,239,0));
+    transform: scale(1);
+  }
+}
 </style>
 </head>
 <body>
@@ -167,14 +200,14 @@ textarea{min-height:84px; resize:vertical}
 <!-- APP -->
 <div class="app hidden" id="appRoot">
   <div class="header">
-    <div class="logo" id="logoHome">
-      <!-- mini encoded emblem -->
-      <svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="13" cy="13" r="11" fill="#00aeef"/><circle cx="13" cy="13" r="6" fill="#3bd0ff" opacity=".6"/>
-      </svg>
-      <h1>Landa Quantum – Troubleshoot Suite</h1>
-    </div>
-  </div>
+   <div class="logo" id="logoHome">
+  <!-- mini encoded emblem -->
+  <svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="13" cy="13" r="11" fill="#00aeef"/>
+    <circle cx="13" cy="13" r="6" fill="#3bd0ff" opacity=".6"/>
+  </svg>
+  <h1>Landa Quantum – Troubleshoot Suite</h1>
+</div>
 
   <div class="wrap">
     <aside class="aside">
