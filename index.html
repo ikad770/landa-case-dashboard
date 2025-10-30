@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Case Management (V17)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%2300aeef'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -16,22 +16,39 @@ html,body{height:100%}
 body{
   margin:0; color:var(--text);
   font:14px/1.45 system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial;
+  /* animated breathing gradient bg (same palette as login) */
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(0,174,239,.18), transparent 60%),
     radial-gradient(1000px 500px at 110% 10%, rgba(59,208,255,.15), transparent 55%),
     linear-gradient(180deg, var(--bg), var(--bg2) 60%, #0a0f15);
+  animation: breathe 14s ease-in-out infinite;
   overflow:hidden;
 }
+@keyframes breathe{
+  0%,100%{ filter:brightness(1) saturate(1); }
+  50%{ filter:brightness(1.07) saturate(1.06); }
+}
 
-/* ------- Shared ------- */
+/* Shared */
 .hidden{ display:none !important }
-.panel{border:1px solid var(--border); border-radius:16px; padding:18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+.panel{
+  border:1px solid var(--border); border-radius:16px; padding:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
   box-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
   backdrop-filter: blur(14px) saturate(1.08);
+  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
 }
-.btn{ border:1px solid var(--border); color:var(--text); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  padding:10px 14px; border-radius:12px; cursor:pointer; transition:.18s transform ease, .18s box-shadow ease, .18s border-color ease;}
+.panel:hover{
+  box-shadow: 0 20px 46px rgba(0,174,239,.24), inset 0 0 0 1px rgba(59,208,255,.12);
+  border-color: rgba(59,208,255,.35);
+  transform: translateY(-1px);
+}
+.btn{
+  border:1px solid var(--border); color:var(--text);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  padding:10px 14px; border-radius:12px; cursor:pointer;
+  transition:.18s transform ease, .18s box-shadow ease, .18s border-color ease;
+}
 .btn:hover{ transform:translateY(-1px); box-shadow:0 16px 38px rgba(0,0,0,.36); border-color: rgba(59,208,255,.45);}
 .btn.primary{ border-color: var(--accent); background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); color:#fff; }
 .btn.ghost{ background:transparent } .btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px } .btn.danger{ border-color: rgba(255,73,103,.5); color:#fff }
@@ -40,7 +57,7 @@ body{
 .toast.ok{ border-color: rgba(74,222,128,.5); } .toast.err{ border-color: rgba(255,73,103,.55); }
 #particles{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
 
-/* ------- Login Page ------- */
+/* Login */
 #loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
 .auth{ width:min(460px, 92vw); }
 .logo{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:14px }
@@ -54,16 +71,27 @@ body{
 .helper{ color:var(--muted); font-size:12px; margin-top:6px; text-align:center }
 .btn.full{ width:100%; margin-top:14px }
 
-/* ------- App Layout (V13 preserved) ------- */
+/* App Layout (glass + particles) */
 .app.hidden{ display:none !important }
-.header{position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:14px; padding:12px 16px;
-  background:linear-gradient(180deg, rgba(10,14,20,.8), rgba(10,14,20,.35)); border-bottom:1px solid var(--border);
-  backdrop-filter: blur(14px) saturate(1.08);
+/* Header — thin, elegant */
+.header{
+  display:flex; align-items:center; justify-content:flex-start; gap:10px;
+  height:44px; padding:4px 16px;
+  background: linear-gradient(180deg, rgba(10,14,20,.7), rgba(10,14,20,.25));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px) saturate(1.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
-.header .logo{display:flex; align-items:center; gap:12px; cursor:pointer}
-.header h1{font-size:16px; letter-spacing:.4px; margin:0; opacity:.9}
-.wrap{display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 56px)}
-.aside{border-right:1px solid var(--border); background:linear-gradient(180deg, rgba(14,20,30,.6), rgba(14,20,30,.25)); backdrop-filter: blur(8px); padding:16px 14px;}
+.header .logo{display:flex; align-items:center; gap:8px; cursor:pointer}
+.header h1{font-size:15px; letter-spacing:.4px; margin:0; opacity:.9; font-weight:600}
+
+.wrap{display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 44px)}
+.aside{
+  border-right:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(14,20,30,.6), rgba(14,20,30,.25));
+  backdrop-filter: blur(8px);
+  padding:16px 14px;
+}
 .main{padding:20px 20px 60px; overflow:auto;}
 .nav{display:flex; flex-direction:column; gap:8px}
 .nav .item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border);
@@ -78,7 +106,7 @@ body{
 .grid.cols-2{grid-template-columns:1fr 1fr}
 .grid.cols-3{grid-template-columns:repeat(3,1fr)}
 @media (max-width: 1000px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
-@media (max-width: 720px){ .wrap{grid-template-columns:1fr} .aside{position:sticky; top:56px} .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
+@media (max-width: 720px){ .wrap{grid-template-columns:1fr} .aside{position:sticky; top:44px} .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
 
 .label.v13{display:block; color:var(--muted); margin:8px 2px 6px}
 .input.v13,.select,textarea,.file{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
@@ -89,7 +117,8 @@ textarea{min-height:84px; resize:vertical}
 .fab{ position: fixed; right:24px; bottom:24px; z-index:60; } .fab .btn{ padding:16px 18px; border-radius:20px; font-weight:600; box-shadow: 0 18px 40px rgba(0,174,239,.35);}
 
 .case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns: auto 1fr auto; gap:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03);}
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s ease;}
+.case-card:hover{ box-shadow: 0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color: rgba(59,208,255,.35); transform: translateY(-1px); }
 .case-card .stripe{ width:6px; border-radius:8px; background: linear-gradient(180deg, var(--accent), var(--accent2)); }
 .case-card .title{ font-weight:600; opacity:.95 } .case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
 .case-card .actions{ display:flex; gap:8px; align-items:center } .case-card .files{ color:var(--muted); } .kv{ display:flex; gap:6px }
@@ -105,7 +134,7 @@ textarea{min-height:84px; resize:vertical}
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- ================= LOGIN ================= -->
+<!-- LOGIN -->
 <section id="loginPage">
   <div class="auth panel center">
     <div class="logo">
@@ -116,19 +145,12 @@ textarea{min-height:84px; resize:vertical}
             <stop offset="0%" stop-color="#00aeef"/>
             <stop offset="100%" stop-color="#3bd0ff"/>
           </linearGradient>
-          <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
+          <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
         <text x="50%" y="50%" text-anchor="middle" fill="url(#lg)" filter="url(#g)"
-              font-family="Segoe UI, Inter, system-ui, sans-serif" font-weight="700" font-size="56" letter-spacing="1">
-          Landa
-        </text>
+              font-family="Segoe UI, Inter, system-ui, sans-serif" font-weight="700" font-size="56" letter-spacing="1">Landa</text>
         <text x="50%" y="82%" text-anchor="middle" fill="#9bb0d0"
-              font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">
-          Digital Printing
-        </text>
+              font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">Digital Printing</text>
       </svg>
       <div class="subtitle">Quantum Troubleshoot Suite</div>
     </div>
@@ -142,7 +164,7 @@ textarea{min-height:84px; resize:vertical}
   </div>
 </section>
 
-<!-- ================= APP (V13 preserved) ================= -->
+<!-- APP -->
 <div class="app hidden" id="appRoot">
   <div class="header">
     <div class="logo" id="logoHome">
@@ -197,7 +219,7 @@ textarea{min-height:84px; resize:vertical}
         </div>
       </section>
 
-      <!-- Create Case (V13 form) -->
+      <!-- Create Case -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
@@ -274,12 +296,12 @@ textarea{min-height:84px; resize:vertical}
 </div>
 
 <script>
-/* ======= Storage & Data (from V13) ======= */
+/* Storage */
 const LS_KEY='landa_cases_v13';
 function getCases(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return [] } }
 function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updateKPIs(); }
 
-/* ======= Routing ======= */
+/* Routing */
 const pages=['dashboard','create','cases','settings'];
 function go(route){
   pages.forEach(p=>document.getElementById('page-'+p).classList.add('hidden'));
@@ -298,46 +320,29 @@ document.querySelectorAll('.nav .item').forEach(a=>{
   if(r){ a.addEventListener('click', (e)=>{ e.preventDefault(); go(r); }); }
 });
 
-/* ======= Login / Logout ======= */
+/* Login / Logout */
 const AUTH_KEY='landaAuth';
 const loginPage=document.getElementById('loginPage');
 const appRoot=document.getElementById('appRoot');
 
-function showApp(){
-  loginPage.classList.add('hidden');
-  appRoot.classList.remove('hidden');
-  go('dashboard'); // default landing
-  updateKPIs();
-}
-function showLogin(){
-  appRoot.classList.add('hidden');
-  loginPage.classList.remove('hidden');
-}
+function showApp(){ loginPage.classList.add('hidden'); appRoot.classList.remove('hidden'); go('dashboard'); updateKPIs(); }
+function showLogin(){ appRoot.classList.add('hidden'); loginPage.classList.remove('hidden'); }
 
 document.getElementById('btnLogin').addEventListener('click', ()=>{
   const u=document.getElementById('authUser').value.trim();
   const p=document.getElementById('authPass').value.trim();
   if(u==='Expert' && p==='Landa123456'){
-    toast('Welcome, Expert','ok');
-    localStorage.setItem(AUTH_KEY,'true');
-    setTimeout(showApp, 700);
-  }else{
-    toast('Invalid credentials','err');
-  }
+    toast('Welcome, Expert','ok'); localStorage.setItem(AUTH_KEY,'true'); setTimeout(showApp, 650);
+  }else{ toast('Invalid credentials','err'); }
 });
-
-// Auto-login if session exists
+// Auto-login
 if(localStorage.getItem(AUTH_KEY)==='true'){ showApp(); }
-
-// Logout button
+// Logout
 document.getElementById('btnLogout').addEventListener('click', e=>{
-  e.preventDefault();
-  toast('Logged out successfully','ok');
-  localStorage.removeItem(AUTH_KEY);
-  setTimeout(showLogin, 800);
+  e.preventDefault(); toast('Logged out successfully','ok'); localStorage.removeItem(AUTH_KEY); setTimeout(showLogin, 750);
 });
 
-/* ======= Cases UI (from V13) ======= */
+/* Cases (V13) */
 function addFileRow(){
   const w=document.getElementById('filesWrap');
   const row=document.createElement('div'); row.className='inline';
@@ -358,11 +363,10 @@ async function saveCase(e){
   const errors=[]; ['sfCase','machineType','machineNumber','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k)});
   if(errors.length){
     toast('Please fill required: '+errors.join(', '),'err');
-    errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'});
-    setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1800);
+    errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'}); setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1800);
     return;
   }
-  const inputs=[...document.querySelectorAll('#filesWrap input[type=\"file\"]')];
+  const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
   const files=inputs.map(i=>i.files&&i.files[0]).filter(Boolean);
   if(files.length){ data.attachments=[]; for(const f of files){
       const ok=/\.(pdf|docx?|xlsx?|png|jpg|jpeg|zip)$/i.test(f.name);
@@ -374,7 +378,6 @@ async function saveCase(e){
   (document.getElementById('caseForm')).reset(); document.getElementById('filesWrap').innerHTML=''; addFileRow();
   toast('Case saved successfully','ok'); go('cases');
 }
-
 function val(id){ const el=document.getElementById(id); return el?el.value:''; }
 
 function renderCases(){
@@ -382,65 +385,55 @@ function renderCases(){
   const q=document.getElementById('searchBox').value?.toLowerCase()||'';
   const arr=getCases().filter(c=> !q || (c.issueSummary||'').toLowerCase().includes(q) || (c.machineNumber||'').toLowerCase().includes(q) || (c.system||'').toLowerCase().includes(q));
   document.getElementById('casesCount').textContent=String(arr.length);
-  list.innerHTML = arr.map((c,i)=>caseCard(c,i)).join('') || '<div class=\"panel\">No cases yet.</div>';
+  list.innerHTML = arr.map((c,i)=>caseCard(c,i)).join('') || '<div class="panel">No cases yet.</div>';
 }
-
 function caseCard(c,i){
   const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)`: 'No attachments';
-  return `<div class=\"case-card\"><div class=\"stripe\"></div><div>
-    <div class=\"title\">#${i+1} — ${esc(c.sfCase||'')}</div>
-    <div class=\"meta\"><span class=\"kv\"><span class=\"k\">Machine:</span><span class=\"v\">${esc(c.machineNumber||'')}</span></span>
-      <span class=\"kv\"><span class=\"k\">Type:</span><span class=\"v\">${esc(c.machineType||'')}</span></span>
-      <span class=\"kv\"><span class=\"k\">System:</span><span class=\"v\">${esc(c.system||'')}${c.subSystem? ' / '+esc(c.subSystem):''}</span></span>
-      <span class=\"kv\"><span class=\"k\">SW:</span><span class=\"v\">${esc(c.softwareVersion||'')}</span></span></div>
-    <div class=\"kv\" style=\"margin-top:8px\"><span class=\"k\">Issue:</span><span class=\"v\">${esc(c.issueSummary||'')}</span></div>
-    <div class=\"files\" style=\"margin-top:4px\">${files}</div></div>
-    <div class=\"actions\"><button class=\"btn small\" onclick=\"openCase(${i})\">Details</button><button class=\"btn small danger\" onclick=\"deleteCase(${i})\">Delete</button></div></div>`;
+  return `<div class="case-card"><div class="stripe"></div><div>
+    <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
+    <div class="meta"><span class="kv"><span class="k">Machine:</span><span class="v">${esc(c.machineNumber||'')}</span></span>
+      <span class="kv"><span class="k">Type:</span><span class="v">${esc(c.machineType||'')}</span></span>
+      <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem? ' / '+esc(c.subSystem):''}</span></span>
+      <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span></div>
+    <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
+    <div class="files" style="margin-top:4px">${files}</div></div>
+    <div class="actions"><button class="btn small" onclick="openCase(${i})">Details</button><button class="btn small danger" onclick="deleteCase(${i})">Delete</button></div></div>`;
 }
-
 function openCase(i){
-  const c=getCases()[i]; if(!c) return;
-  document.getElementById('modalTitle').textContent=`Case #${i+1} — ${c.sfCase||''}`;
+  const c=getCases()[i]; if(!c) return; document.getElementById('modalTitle').textContent=`Case #${i+1} — ${c.sfCase||''}`;
   const files=Array.isArray(c.attachments)&&c.attachments.length?
-    c.attachments.map(a=>`<div class=\"kv\"><span class=\"k\">•</span><a class=\"btn small\" href=\"${a.data}\" target=\"_blank\" rel=\"noopener\">View</a> <a class=\"btn small\" href=\"${a.data}\" download=\"${a.name}\">Download</a> <span class=\"v\">${esc(a.name)}</span></div>`).join('')
-    : '<div class=\"attach-empty\">No attachments</div>';
+    c.attachments.map(a=>`<div class="kv"><span class="k">•</span><a class="btn small" href="${a.data}" target="_blank" rel="noopener">View</a> <a class="btn small" href="${a.data}" download="${a.name}">Download</a> <span class="v">${esc(a.name)}</span></div>`).join('')
+    : '<div class="attach-empty">No attachments</div>';
   document.getElementById('modalBody').innerHTML = `
-    <div class=\"grid cols-2\">
-      <div class=\"panel\"><div class=\"kv\"><span class=\"k\">Machine:</span><span class=\"v\">${esc(c.machineNumber||'')} (${esc(c.machineType||'')})</span></div>
-        <div class=\"kv\"><span class=\"k\">System:</span><span class=\"v\">${esc(c.system||'')}${c.subSystem?' / '+esc(c.subSystem):''}</span></div>
-        <div class=\"kv\"><span class=\"k\">Software:</span><span class=\"v\">${esc(c.softwareVersion||'')}</span></div>
-        <div class=\"kv\"><span class=\"k\">TFS:</span><span class=\"v\">${esc(c.tfsNumber||'')}</span></div></div>
-      <div class=\"panel\"><div class=\"kv\"><span class=\"k\">Opened:</span><span class=\"v\">${new Date(c.createdAt).toLocaleString()}</span></div>
-        <div class=\"kv\"><span class=\"k\">Author:</span><span class=\"v\">${esc(c.author||'')}</span></div></div></div>
-    <div class=\"panel\" style=\"margin-top:12px\"><h3>Problem</h3>
-      <div class=\"kv\"><span class=\"k\">Summary:</span><span class=\"v\">${esc(c.issueSummary||'')}</span></div>
-      <div class=\"kv\"><span class=\"k\">Symptoms:</span><span class=\"v\">${nl(esc(c.symptoms||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Frequency:</span><span class=\"v\">${esc(c.frequency||'')}</span></div>
-      <div class=\"kv\"><span class=\"k\">Environment:</span><span class=\"v\">${esc(c.environment||'')}</span></div></div>
-    <div class=\"panel\" style=\"margin-top:12px\"><h3>Diagnostics</h3>
-      <div class=\"kv\"><span class=\"k\">Reproduction:</span><span class=\"v\">${nl(esc(c.repro||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Observations:</span><span class=\"v\">${nl(esc(c.observations||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Root Cause:</span><span class=\"v\">${nl(esc(c.rootCause||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Analysis:</span><span class=\"v\">${nl(esc(c.analysis||''))}</span></div></div>
-    <div class=\"panel\" style=\"margin-top:12px\"><h3>Solution</h3>
-      <div class=\"kv\"><span class=\"k\">Troubleshooting:</span><span class=\"v\">${nl(esc(c.troubleshooting||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Parts / Service:</span><span class=\"v\">${nl(esc(c.parts||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Implemented:</span><span class=\"v\">${nl(esc(c.solution||''))}</span></div>
-      <div class=\"kv\"><span class=\"k\">Verification:</span><span class=\"v\">${esc(c.verification||'')}</span></div>
-      <div class=\"kv\"><span class=\"k\">Lessons:</span><span class=\"v\">${nl(esc(c.lessons||''))}</span></div>
-      <div class=\"kv\" style=\"margin-top:12px\"><span class=\"k\">Files:</span><span class=\"v\">${files}</span></div></div>`;
+    <div class="grid cols-2">
+      <div class="panel"><div class="kv"><span class="k">Machine:</span><span class="v">${esc(c.machineNumber||'')} (${esc(c.machineType||'')})</span></div>
+        <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem?' / '+esc(c.subSystem):''}</span></div>
+        <div class="kv"><span class="k">Software:</span><span class="v">${esc(c.softwareVersion||'')}</span></div>
+        <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div></div>
+      <div class="panel"><div class="kv"><span class="k">Opened:</span><span class="v">${new Date(c.createdAt).toLocaleString()}</span></div>
+        <div class="kv"><span class="k">Author:</span><span class="v">${esc(c.author||'')}</span></div></div></div>
+    <div class="panel" style="margin-top:12px"><h3>Problem</h3>
+      <div class="kv"><span class="k">Summary:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
+      <div class="kv"><span class="k">Symptoms:</span><span class="v">${nl(esc(c.symptoms||''))}</span></div>
+      <div class="kv"><span class="k">Frequency:</span><span class="v">${esc(c.frequency||'')}</span></div>
+      <div class="kv"><span class="k">Environment:</span><span class="v">${esc(c.environment||'')}</span></div></div>
+    <div class="panel" style="margin-top:12px"><h3>Diagnostics</h3>
+      <div class="kv"><span class="k">Reproduction:</span><span class="v">${nl(esc(c.repro||''))}</span></div>
+      <div class="kv"><span class="k">Observations:</span><span class="v">${nl(esc(c.observations||''))}</span></div>
+      <div class="kv"><span class="k">Root Cause:</span><span class="v">${nl(esc(c.rootCause||''))}</span></div>
+      <div class="kv"><span class="k">Analysis:</span><span class="v">${nl(esc(c.analysis||''))}</span></div></div>
+    <div class="panel" style="margin-top:12px"><h3>Solution</h3>
+      <div class="kv"><span class="k">Troubleshooting:</span><span class="v">${nl(esc(c.troubleshooting||''))}</span></div>
+      <div class="kv"><span class="k">Parts / Service:</span><span class="v">${nl(esc(c.parts||''))}</span></div>
+      <div class="kv"><span class="k">Implemented:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
+      <div class="kv"><span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span></div>
+      <div class="kv"><span class="k">Lessons:</span><span class="v">${nl(esc(c.lessons||''))}</span></div>
+      <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div></div>`;
   openModal();
 }
-
-function deleteCase(i){
-  const arr=getCases(); if(!arr[i]) return;
-  if(!confirm('Delete this case?')) return;
-  arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok');
-}
-
+function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok'); }
 function openModal(){ document.getElementById('modalBack').style.display='flex'; }
 function closeModal(){ document.getElementById('modalBack').style.display='none'; }
-
 function updateKPIs(){
   const arr=getCases(); document.getElementById('kpiTotal').textContent=arr.length;
   document.getElementById('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
@@ -448,30 +441,33 @@ function updateKPIs(){
   document.getElementById('kpiUpdated').textContent=last;
   const pageCasesCount=document.getElementById('casesCount'); if(pageCasesCount) pageCasesCount.textContent=String(arr.length);
 }
-
 function exportCSV(){
   const arr=getCases();
   const cols=['sfCase','tfsNumber','machineType','machineNumber','system','subSystem','softwareVersion','firmwareRevision','issueSummary','symptoms','frequency','environment','repro','observations','rootCause','analysis','troubleshooting','parts','solution','verification','lessons','createdAt','author'];
-  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\\n/g,' '))).join(','))).join('\\n');
+  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\n/g,' '))).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
 }
+function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1800); }
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-function toast(msg,type='ok'){
-  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
-  const w=document.getElementById('toasts'); w.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1800);
-}
-
-function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c])) }
-function nl(s){ return String(s||'').replace(/\\n/g,'<br>') }
-
-/* ======= Particles background ======= */
+/* Particles (for ALL screens) */
 (function(){
-  const c=document.getElementById('particles'); if(!c) return; const ctx=c.getContext('2d'); let w,h;
-  function resize(){ w=c.width=window.innerWidth; h=c.height=window.innerHeight;} window.addEventListener('resize',resize); resize();
-  const dots=Array.from({length:60},()=>({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.5+0.5, vx:(Math.random()-.5)*0.3, vy:(Math.random()-.5)*0.3}));
-  function step(){ ctx.clearRect(0,0,w,h); for(const d of dots){ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill(); } requestAnimationFrame(step);} step();
+  const c=document.getElementById('particles'); if(!c) return;
+  const ctx=c.getContext('2d'); let w,h;
+  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
+  addEventListener('resize',resize); resize();
+  const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+0.5,vx:(Math.random()-.5)*0.3,vy:(Math.random()-.5)*0.3}));
+  function step(){
+    ctx.clearRect(0,0,w,h);
+    for(const d of dots){
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill();
+    }
+    requestAnimationFrame(step);
+  }
+  step();
 })();
 </script>
 </body>
