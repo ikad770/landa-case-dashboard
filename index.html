@@ -3,20 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.3-Final • Create-Case Upgraded)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.6)</title>
 
-<!-- Favicon: square + cyan circle -->
+<!-- Favicon -->
 <link rel="icon" type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
 
 <style>
 :root{
   --bg:#0b1016; --bg2:#0e1420; --panel:rgba(18,24,34,.6); --glass:rgba(22,30,45,.55);
   --text:#e8f0ff; --muted:#9bb0d0; --border:rgba(255,255,255,.08);
   --accent:#00aeef; --accent2:#3bd0ff; --ok:#4ade80; --err:#ff4967;
-  --header:56px;
-  --aside-w:260px;
-  --radius:16px;
+  --header:56px; --aside-w:260px; --radius:16px;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -30,137 +28,144 @@ body{
   animation: breathe 14s ease-in-out infinite;
   overflow:hidden;
 }
-@keyframes breathe{ 0%,100%{filter:brightness(1) saturate(1)} 50%{filter:brightness(1.07) saturate(1.06)} }
+@keyframes breathe{0%,100%{filter:brightness(1) saturate(1)}50%{filter:brightness(1.07) saturate(1.06)}}
 
-.hidden{ display:none !important }
+.hidden{display:none!important}
 
-/* ====== Glass / Buttons ====== */
+/* Panels / Buttons (as V18.3) */
 .panel{
   border:1px solid var(--border); border-radius:var(--radius); padding:18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-  box-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
-  backdrop-filter: blur(14px) saturate(1.08);
-  transition: box-shadow .25s, transform .25s, border-color .25s;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow:0 18px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+  backdrop-filter:blur(14px) saturate(1.08);
+  transition:box-shadow .25s, transform .25s, border-color .25s;
 }
-.panel:hover{
-  box-shadow: 0 20px 46px rgba(0,174,239,.24), inset 0 0 0 1px rgba(59,208,255,.12);
-  border-color: rgba(59,208,255,.35);
-  transform: translateY(-1px);
-}
+.panel:hover{ box-shadow:0 20px 46px rgba(0,174,239,.24), inset 0 0 0 1px rgba(59,208,255,.12); border-color:rgba(59,208,255,.35); transform:translateY(-1px) }
 .btn{
   border:1px solid var(--border); color:var(--text);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   padding:10px 14px; border-radius:12px; cursor:pointer;
-  transition:.18s transform, .18s box-shadow, .18s border-color;
+  transition:.18s transform,.18s box-shadow,.18s border-color;
 }
-.btn:hover{ transform:translateY(-1px); box-shadow:0 16px 38px rgba(0,0,0,.36); border-color: rgba(59,208,255,.45);}
-.btn.primary{ border-color: var(--accent); background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); color:#fff; }
+.btn:hover{ transform:translateY(-1px); box-shadow:0 16px 38px rgba(0,0,0,.36); border-color:rgba(59,208,255,.45) }
+.btn.primary{ border-color:var(--accent); background:linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); color:#fff }
 .btn.ghost{ background:transparent }
 .btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px }
-.btn.danger{ border-color: rgba(255,73,103,.5); color:#fff }
+.btn.danger{ border-color:rgba(255,73,103,.5); color:#fff }
 
-.toast-wrap{ position: fixed; right:16px; top: calc(var(--header) + 8px); display:flex; flex-direction:column; gap:8px; z-index:110 }
+.toast-wrap{ position:fixed; right:16px; top:calc(var(--header) + 8px); display:flex; flex-direction:column; gap:8px; z-index:110 }
 .toast{ padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(20,26,38,.85); box-shadow:0 14px 28px rgba(0,0,0,.35) }
-.toast.ok{ border-color: rgba(74,222,128,.5); } .toast.err{ border-color: rgba(255,73,103,.55); }
-#particles{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+.toast.ok{ border-color:rgba(74,222,128,.5) } .toast.err{ border-color:rgba(255,73,103,.55) }
+#particles{ position:fixed; inset:0; z-index:-1; pointer-events:none }
 
-/* ====== Login ====== */
-#loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
-.auth{ width:min(460px, 92vw); }
+/* Login */
+#loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px }
+.auth{ width:min(460px, 92vw) }
 .logo{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:14px }
-.logo svg{ height:80px; filter: drop-shadow(0 0 16px rgba(0,174,239,.4)); animation: pulse 2.8s ease-in-out infinite; }
+.logo svg{ height:80px; filter:drop-shadow(0 0 16px rgba(0,174,239,.4)); animation:pulse 2.8s ease-in-out infinite }
 .logo .subtitle{ color:var(--muted); font-size:12.5px; letter-spacing:.6px }
 @keyframes pulse{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}50%{filter:drop-shadow(0 0 18px rgba(0,174,239,.45))}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}}
 .auth h2{ margin:0 0 6px; font-size:18px; letter-spacing:.5px; opacity:.92; text-align:center }
-.label{display:block; color:var(--muted); margin:12px 2px 6px}
+.label{ display:block; color:var(--muted); margin:8px 2px 6px }
 .input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none;}
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none }
 .helper{ color:var(--muted); font-size:12px; margin-top:6px; text-align:center }
 .btn.full{ width:100%; margin-top:14px }
 
-/* ====== App Layout ====== */
-.app.hidden{ display:none !important }
-
-/* HEADER */
+/* App Layout */
+.app.hidden{display:none!important}
 .header{
-  position: sticky; top:0; z-index:100;
-  display:flex; align-items:center; justify-content:space-between;
-  gap:12px; height:var(--header); padding:8px 14px 8px 14px;
-  background: linear-gradient(180deg, rgba(10,14,20,.82), rgba(10,14,20,.34));
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  height:var(--header); padding:8px 14px;
+  background:linear-gradient(180deg, rgba(10,14,20,.82), rgba(10,14,20,.34));
   border-bottom:1px solid var(--border);
-  backdrop-filter: blur(10px) saturate(1.1);
-  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  backdrop-filter:blur(10px) saturate(1.1);
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
 .header-left{ display:flex; align-items:center; gap:10px; min-width:0 }
 .header-title{ display:flex; align-items:center; gap:10px; min-width:0 }
 .header-title h1{ font-size:16px; letter-spacing:.4px; margin:0; opacity:.95; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 .header .badge-env{ font-size:11px; color:#9bb0d0; border:1px solid var(--border); padding:2px 8px; border-radius:999px }
-.header .logo-mini svg{ width:28px; height:28px; animation: pulseGlow 3.2s ease-in-out infinite; transform-origin:center; }
+.header .logo-mini svg{ width:28px; height:28px; animation:pulseGlow 3.2s ease-in-out infinite; transform-origin:center }
 @keyframes pulseGlow{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0));transform:scale(1)}50%{filter:drop-shadow(0 0 12px rgba(0,174,239,.45));transform:scale(1.05)}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0));transform:scale(1)}}
 
-/* Mobile menu button */
 .header .menu-btn{ display:none; gap:8px; align-items:center }
 .header .menu-btn .bar{ width:18px; height:2px; background:#cfe7ff; border-radius:2px; box-shadow:0 0 8px rgba(0,174,239,.35) }
 
-/* GRID */
-.wrap{
-  display:grid; grid-template-columns: var(--aside-w) 1fr;
-  height: calc(100vh - var(--header));
-}
+.wrap{ display:grid; grid-template-columns:var(--aside-w) 1fr; height:calc(100vh - var(--header)) }
 .aside{
   border-right:1px solid var(--border);
   background:linear-gradient(180deg, rgba(14,20,30,.6), rgba(14,20,30,.25));
-  backdrop-filter: blur(8px);
-  padding:16px 14px;
-  position: sticky; top: var(--header);
-  height: calc(100vh - var(--header));
-  overflow:auto;
-  z-index: 10;
+  backdrop-filter:blur(8px); padding:16px 14px;
+  position:sticky; top:var(--header); height:calc(100vh - var(--header));
+  overflow:auto; z-index:10;
 }
-.main{ padding:20px 20px 60px; overflow:auto; }
+.main{ padding:18px 18px 60px; overflow:auto } /* tighter spacing */
 
 .nav{display:flex; flex-direction:column; gap:8px}
-.nav .item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border);
-  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+.nav .item{
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
   border-radius:10px; text-decoration:none; color:var(--text); opacity:.85;
-  transition:.18s transform, .18s box-shadow, .18s border-color;}
-.nav .item:hover{ transform: translateY(-1px); box-shadow: 0 14px 30px rgba(0,0,0,.35); border-color: rgba(59,208,255,.35); opacity:1}
-.nav .item.active{ border-color: var(--accent); box-shadow: 0 0 0 1px inset rgba(59,208,255,.25), 0 12px 28px rgba(0,174,239,.25);}
+  transition:.18s transform,.18s box-shadow,.18s border-color;
+}
+.nav .item:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(0,0,0,.35); border-color:rgba(59,208,255,.35); opacity:1}
+.nav .item.active{ border-color:var(--accent); box-shadow:0 0 0 1px inset rgba(59,208,255,.25), 0 12px 28px rgba(0,174,239,.25)}
 .nav .badge{ margin-left:auto; padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted)}
 
-.grid{display:grid; gap:16px}
+.grid{display:grid; gap:14px} /* tighter */
 .grid.cols-2{grid-template-columns:1fr 1fr}
 .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-@media (max-width: 1100px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
-@media (max-width: 780px){
-  .header{ padding:8px 10px }
-  .header .menu-btn{ display:flex }
-  .header-title h1{ font-size:15px; max-width: 62vw }
-  .wrap{ grid-template-columns: 1fr }
-  .aside{ position: fixed; top: var(--header); left:0; bottom:0; height:auto; width: min(82vw, 320px);
-          transform: translateX(-105%); transition: transform .25s ease; box-shadow: 16px 0 40px rgba(0,0,0,.45); z-index: 120; }
-  body.aside-open .aside{ transform: translateX(0) }
-  .main{ padding:14px 12px 72px }
+@media (max-width:1100px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
+@media (max-width:780px){
+  .header{padding:8px 10px}
+  .header .menu-btn{display:flex}
+  .header-title h1{font-size:15px; max-width:62vw}
+  .wrap{grid-template-columns:1fr}
+  .aside{position:fixed; top:var(--header); left:0; bottom:0; height:auto; width:min(82vw,320px);
+         transform:translateX(-105%); transition:transform .25s ease; box-shadow:16px 0 40px rgba(0,0,0,.45); z-index:120}
+  body.aside-open .aside{transform:translateX(0)}
+  .main{padding:14px 12px 72px}
   .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
 }
 
 /* Form controls */
-.label.v13{display:block; color:var(--muted); margin:8px 2px 6px}
-.input.v13,.select,textarea,.file{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;}
+.label.v13{display:block; color:var(--muted); margin:6px 2px 6px}  /* tighter */
+.input.v13,.select,textarea,.file{
+  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;
+}
 textarea{min-height:84px; resize:vertical}
-.inline{display:flex; gap:12px; align-items:center}
-.half{flex:1}
-.full{grid-column:1/-1}
+.inline{display:flex; gap:10px; align-items:center}
+.half{flex:1} .full{grid-column:1/-1}
 .help{color:var(--muted); font-size:12px; margin-top:6px}
 
-/* New: chips for Machine Type */
-.chips{display:flex; gap:8px; flex-wrap:wrap}
-.chip{padding:6px 10px; border:1px solid var(--border); border-radius:999px; cursor:pointer;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); user-select:none}
-.chip.active{ background: linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); border-color: rgba(0,174,239,.55) }
+/* Dropdowns styled */
+.select, select{
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)) padding-box,
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)) border-box;
+  border:1px solid var(--border);
+  background-repeat:no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  /* Chevron icon */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23bfe9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  padding-right:34px;
+}
+.select:focus, select:focus{ border-color:rgba(59,208,255,.45); box-shadow:0 0 0 3px rgba(59,208,255,.18) }
 
-/* Part suggest dropdown */
+/* Chips */
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  padding:6px 10px; border:1px solid var(--border); border-radius:999px; cursor:pointer; user-select:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+}
+.chip.active{ background:linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); border-color:rgba(0,174,239,.55) }
+
+/* Part suggest */
 .partwrap{ position:relative }
 .part-suggest{
   position:absolute; left:0; right:0; top:100%; z-index:15;
@@ -170,38 +175,41 @@ textarea{min-height:84px; resize:vertical}
 .part-suggest div{ padding:8px 12px; cursor:pointer }
 .part-suggest div:hover{ background:rgba(255,255,255,.06) }
 
-/* Cases UI */
-.fab{ position: fixed; right:14px; bottom:18px; z-index:60; }
-.fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow: 0 18px 40px rgba(0,174,239,.35);}
+/* Cards & Modal (as is) */
+.fab{ position:fixed; left:14px; bottom:18px; z-index:60 } /* moved to LEFT */
+.fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow:0 18px 40px rgba(0,174,239,.35)}
 
-.case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns: auto 1fr auto; gap:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s}
-.case-card:hover{ box-shadow: 0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color: rgba(59,208,255,.35); transform: translateY(-1px); }
-.case-card .stripe{ width:6px; border-radius:8px; background: linear-gradient(180deg, var(--accent), var(--accent2)); }
-.case-card .title{ font-weight:600; opacity:.95 } .case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
-.case-card .actions{ display:flex; gap:8px; align-items:center } .case-card .files{ color:var(--muted); } .kv{ display:flex; gap:6px }
-.k{ color:var(--muted) } .v{ color:var(--text) }
+.case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns:auto 1fr auto; gap:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow:0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s}
+.case-card:hover{ box-shadow:0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color:rgba(59,208,255,.35); transform:translateY(-1px) }
+.case-card .stripe{ width:6px; border-radius:8px; background:linear-gradient(180deg, var(--accent), var(--accent2)) }
+.case-card .title{ font-weight:600; opacity:.95 }
+.case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
+.case-card .actions{ display:flex; gap:8px; align-items:center }
+.case-card .files{ color:var(--muted) }
+.kv{ display:flex; gap:6px } .k{color:var(--muted)} .v{color:var(--text)}
 
-.modal-back{ position:fixed; inset:0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:140; }
-.modal{ width:min(880px, 94vw); max-height:88vh; overflow:auto; border:1px solid var(--border); border-radius:16px; padding:18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)); box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
-  animation: pop .22s ease;} @keyframes pop{ from{ transform:translateY(8px) scale(.98); opacity:.0} to{ transform:translateY(0) scale(1); opacity:1 } }
+.modal-back{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:140 }
+.modal{
+  width:min(880px, 94vw); max-height:88vh; overflow:auto; border:1px solid var(--border); border-radius:16px; padding:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)); box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
+  animation:pop .22s ease;
+}
+@keyframes pop{from{transform:translateY(8px) scale(.98); opacity:0}to{transform:translateY(0) scale(1); opacity:1}}
 </style>
 </head>
-<body>
+
+      <body>
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- ========== LOGIN ========== -->
+<!-- LOGIN -->
 <section id="loginPage">
   <div class="auth panel center">
     <div class="logo">
-      <!-- Encoded Landa / Digital Printing SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" aria-label="Landa Digital Printing">
         <defs>
-          <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#00aeef"/><stop offset="100%" stop-color="#3bd0ff"/>
-          </linearGradient>
+          <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00aeef"/><stop offset="100%" stop-color="#3bd0ff"/></linearGradient>
           <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
         <text x="50%" y="50%" text-anchor="middle" fill="url(#lg)" filter="url(#g)"
@@ -221,7 +229,7 @@ textarea{min-height:84px; resize:vertical}
   </div>
 </section>
 
-<!-- ========== APP ========== -->
+<!-- APP -->
 <div class="app hidden" id="appRoot">
   <header class="header">
     <div class="header-left">
@@ -240,7 +248,7 @@ textarea{min-height:84px; resize:vertical}
         <h1>Landa Quantum – Troubleshoot Suite</h1>
       </div>
     </div>
-    <span class="badge-env">V18.3-Final</span>
+    <span class="badge-env">V18.6</span>
   </header>
 
   <div class="wrap">
@@ -258,25 +266,12 @@ textarea{min-height:84px; resize:vertical}
       <!-- Dashboard -->
       <section id="page-dashboard" class="page">
         <div class="grid cols-3">
-          <div class="panel">
-            <div class="title">Total Cases</div>
-            <div style="font-size:28px; margin-top:6px" id="kpiTotal">0</div>
-            <div class="help">All cases saved locally</div>
-          </div>
-          <div class="panel">
-            <div class="title">With Attachments</div>
-            <div style="font-size:28px; margin-top:6px" id="kpiFiles">0</div>
-            <div class="help">Cases containing files</div>
-          </div>
-          <div class="panel">
-            <div class="title">Last Updated</div>
-            <div style="font-size:28px; margin-top:6px" id="kpiUpdated">—</div>
-            <div class="help">Most recent save</div>
-          </div>
+          <div class="panel"><div class="title">Total Cases</div><div style="font-size:28px;margin-top:6px" id="kpiTotal">0</div><div class="help">All cases saved locally</div></div>
+          <div class="panel"><div class="title">With Attachments</div><div style="font-size:28px;margin-top:6px" id="kpiFiles">0</div><div class="help">Cases containing files</div></div>
+          <div class="panel"><div class="title">Last Updated</div><div style="font-size:28px;margin-top:6px" id="kpiUpdated">—</div><div class="help">Most recent save</div></div>
         </div>
-
-        <div class="panel" style="margin-top:16px">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+        <div class="panel" style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
             <div class="title">Quick Actions</div>
             <div>
               <button class="btn" onclick="go('create')">+ New Case</button>
@@ -287,26 +282,25 @@ textarea{min-height:84px; resize:vertical}
         </div>
       </section>
 
-      <!-- Create Case (UPDATED) -->
+      <!-- Create Case (clean) -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
           <form id="caseForm" onsubmit="saveCase(event)">
             <div class="grid cols-2">
-              <!-- widths: numbers narrower, text wider -->
+              <!-- SF Case -->
               <div class="half"><label class="label v13">SF Case *</label><input class="input v13" id="sfCase" inputmode="numeric" placeholder="e.g., 123456"></div>
 
-              <!-- TFS via checkbox -> reveal field -->
+              <!-- TFS toggle (no 'TFS optional' text) -->
               <div class="half">
-                <label class="label v13">TFS (optional)</label>
+                <label class="label v13">TFS</label>
                 <div class="inline">
-                  <label class="inline" style="gap:8px"><input type="checkbox" id="tfsToggle"> <span>Use TFS number</span></label>
+                  <input type="checkbox" id="tfsToggle" title="Enable TFS">
                   <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
                 </div>
-                <div class="help">הפעל רק אם נדרש קישור ל-TFS</div>
               </div>
 
-              <!-- Machine Type chips + Model select (S1–S50 / D1–D50) -->
+              <!-- Machine Type + Model (adjacent) -->
               <div class="half">
                 <label class="label v13">Machine Type *</label>
                 <div class="chips" id="machineTypeChips">
@@ -318,10 +312,9 @@ textarea{min-height:84px; resize:vertical}
               <div class="half">
                 <label class="label v13">Model *</label>
                 <select id="model" class="select"></select>
-                <div class="help">נבנה מרשימת S1-S50 / D1-D50 לפי סוג המכונה</div>
               </div>
 
-              <!-- System / Sub-System (dependent) -->
+              <!-- System / Sub-System -->
               <div class="half">
                 <label class="label v13">System *</label>
                 <select id="system" class="select">
@@ -332,79 +325,48 @@ textarea{min-height:84px; resize:vertical}
                   <option>QCS</option><option>PC Cabinet</option><option>ICS</option>
                 </select>
               </div>
-              <div class="half">
+
+              <div class="half hidden" id="subSystemWrap">
                 <label class="label v13">Sub-System</label>
                 <select id="subSystem" class="select" disabled>
                   <option value="">Select subsystem…</option>
                 </select>
-                <div class="help">יופעל כאשר תבחר System (כרגע בלי רשימת משנה)</div>
               </div>
 
-              <!-- Software Version (remain) -->
+              <!-- Software -->
               <div class="half">
                 <label class="label v13">Software Version</label>
                 <input class="input v13" id="softwareVersion" placeholder="4.2.11">
               </div>
 
-              <!-- REMOVED (per request): firmware, Frequency, Environment, Reproduction steps, Measurements, Analysis notes, Attachment notes -->
-
               <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
 
-              <!-- Issue Summary -->
-              <div class="full">
-                <label class="label v13">Issue Summary *</label>
-                <input class="input v13" id="issueSummary" placeholder="One line summary">
-              </div>
+              <!-- Issue / Symptoms -->
+              <div class="full"><label class="label v13">Issue Summary *</label><input class="input v13" id="issueSummary" placeholder="One line summary"></div>
+              <div class="full"><label class="label v13">Symptoms / Error Messages</label><textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea></div>
 
-              <!-- Symptoms (keep) -->
-              <div class="full">
-                <label class="label v13">Symptoms / Error Messages</label>
-                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
-              </div>
-
-              <!-- Troubleshooting (dynamic steps) -->
+              <!-- Troubleshooting dynamic -->
               <div class="full">
                 <label class="label v13">Troubleshooting (steps)</label>
                 <div id="tsSteps"></div>
                 <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
-                <div class="help">ניתן להוסיף ולהסיר שלבים</div>
               </div>
 
-              <!-- Part smart input -->
+              <!-- Part catalog -->
               <div class="full">
                 <label class="label v13">Part (Catalog)</label>
                 <div class="partwrap">
                   <input class="input v13" id="partInput" placeholder="Type to search part number (e.g., 12-34567)…">
                   <div class="part-suggest" id="partSuggest"></div>
                 </div>
-                <div class="help">חיפוש חכם במקטים (ניתן להזין גם טקסט חופשי)</div>
               </div>
 
-              <!-- Parts / Service Actions (keep text area) -->
-              <div class="full">
-                <label class="label v13">Parts / Service Actions</label>
-                <textarea id="parts" class="input v13" placeholder="List of parts or actions"></textarea>
-              </div>
+              <!-- Solution / Verification / Notes -->
+              <div class="full"><label class="label v13">Solution Implemented *</label><textarea id="solution" class="input v13" placeholder="What fixed the issue"></textarea></div>
+              <div class="full"><label class="label v13">Verification Method</label><input id="verification" class="input v13" placeholder="How did we verify the fix?"></div>
+              <div class="full"><label class="label v13">Notes</label><textarea id="notes" class="input v13" placeholder="Anything noteworthy for future cases"></textarea></div>
 
-              <!-- Solution (required) -->
-              <div class="full">
-                <label class="label v13">Solution Implemented *</label>
-                <textarea id="solution" class="input v13" placeholder="What fixed the issue"></textarea>
-              </div>
-
-              <!-- Verification (keep) -->
-              <div class="full">
-                <label class="label v13">Verification Method</label>
-                <input id="verification" class="input v13" placeholder="How did we verify the fix?">
-              </div>
-
-              <!-- Lessons (keep) -->
-              <div class="full">
-                <label class="label v13">Final Remarks / Lessons Learned</label>
-                <textarea id="lessons" class="input v13" placeholder="Anything noteworthy for future cases"></textarea>
-              </div>
-
-              <!-- Attachments (keep), Attachment Notes removed -->
+              <!-- Attachments -->
               <div class="full">
                 <label class="label v13">Attachments (multiple)</label>
                 <div id="filesWrap"></div>
@@ -412,7 +374,7 @@ textarea{min-height:84px; resize:vertical}
                 <div class="help">Accepted: pdf, doc, xls, png, jpg, jpeg, zip</div>
               </div>
 
-              <div class="inline full" style="margin-top:8px">
+              <div class="inline full" style="margin-top:6px">
                 <button class="btn primary" type="submit">Save Case</button>
                 <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
               </div>
@@ -433,7 +395,7 @@ textarea{min-height:84px; resize:vertical}
             </div>
           </div>
         </div>
-        <div id="casesList" class="grid cols-1" style="margin-top:16px"></div>
+        <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
       </section>
 
       <!-- Settings -->
@@ -443,8 +405,10 @@ textarea{min-height:84px; resize:vertical}
     </main>
   </div>
 
-  <div class="fab"><button class="btn primary" onclick="go('create')">+ New Case</button></div>
+  <!-- FAB moved to LEFT; hidden on Create -->
+  <div class="fab" id="fabNew"><button class="btn primary" onclick="go('create')">+ New Case</button></div>
 
+  <!-- Modal -->
   <div class="modal-back" id="modalBack">
     <div class="modal" id="modal">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
@@ -456,23 +420,23 @@ textarea{min-height:84px; resize:vertical}
   </div>
 </div>
 
-<script>
-/* ===== Storage ===== */
+            <script>
+/* Storage */
 const LS_KEY='landa_cases_v13';
-function getCases(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return [] } }
-function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updateKPIs(); }
+function getCases(){ try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]')}catch(e){return[]} }
+function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updateKPIs() }
 
-/* ===== Routing ===== */
+/* Routing */
 const pages=['dashboard','create','cases','settings'];
+const fabNew=document.getElementById('fabNew');
 function go(route){
   pages.forEach(p=>document.getElementById('page-'+p).classList.add('hidden'));
-  const tgt=document.getElementById('page-'+route);
-  if(tgt) tgt.classList.remove('hidden');
-  document.querySelectorAll('.nav .item').forEach(a=>{
-    const r=a.dataset.route; a.classList.toggle('active', r===route);
-  });
+  const tgt=document.getElementById('page-'+route); if(tgt) tgt.classList.remove('hidden');
+  document.querySelectorAll('.nav .item').forEach(a=>a.classList.toggle('active', a.dataset.route===route));
   if(route==='dashboard') updateKPIs();
   if(route==='cases') renderCases();
+  // FAB visible only on dashboard & cases
+  if(fabNew) fabNew.style.display = (route==='create') ? 'none' : 'block';
   window.scrollTo({top:0, behavior:'smooth'});
 }
 document.getElementById('logoHome').addEventListener('click', ()=> go('dashboard'));
@@ -481,114 +445,92 @@ document.querySelectorAll('.nav .item').forEach(a=>{
   if(r){ a.addEventListener('click', (e)=>{ e.preventDefault(); go(r); if (document.body.classList.contains('aside-open')) document.body.classList.remove('aside-open'); }); }
 });
 
-/* Mobile menu toggle */
-const btnMenu = document.getElementById('btnMenu');
-if (btnMenu) btnMenu.addEventListener('click', ()=> document.body.classList.toggle('aside-open'));
+/* Mobile menu */
+const btnMenu=document.getElementById('btnMenu');
+if(btnMenu) btnMenu.addEventListener('click', ()=> document.body.classList.toggle('aside-open'));
 
-/* ===== Auth ===== */
+/* Auth */
 const AUTH_KEY='landaAuth';
 const loginPage=document.getElementById('loginPage');
 const appRoot=document.getElementById('appRoot');
-function showApp(){ loginPage.classList.add('hidden'); appRoot.classList.remove('hidden'); go('dashboard'); updateKPIs(); }
-function showLogin(){ appRoot.classList.add('hidden'); loginPage.classList.remove('hidden'); }
-
+function showApp(){ loginPage.classList.add('hidden'); appRoot.classList.remove('hidden'); go('dashboard'); updateKPIs() }
+function showLogin(){ appRoot.classList.add('hidden'); loginPage.classList.remove('hidden') }
 document.getElementById('btnLogin').addEventListener('click', ()=>{
   const u=document.getElementById('authUser').value.trim();
   const p=document.getElementById('authPass').value.trim();
-  if(u==='Expert' && p==='Landa123456'){
-    toast('Welcome, Expert','ok'); localStorage.setItem(AUTH_KEY,'true'); setTimeout(showApp, 650);
-  }else{ toast('Invalid credentials','err'); }
+  if(u==='Expert' && p==='Landa123456'){ toast('Welcome, Expert','ok'); localStorage.setItem(AUTH_KEY,'true'); setTimeout(showApp, 650) }
+  else{ toast('Invalid credentials','err') }
 });
-if(localStorage.getItem(AUTH_KEY)==='true'){ showApp(); }
-
+if(localStorage.getItem(AUTH_KEY)==='true'){ showApp() }
 document.getElementById('btnLogout').addEventListener('click', e=>{
   e.preventDefault(); toast('Logged out successfully','ok'); localStorage.removeItem(AUTH_KEY);
   document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
 });
 
-/* ===== Create Case – Enhancements ===== */
-
-/* TFS toggle */
-const tfsToggle = document.getElementById('tfsToggle');
-const tfsNumber = document.getElementById('tfsNumber');
+/* Create Case – logic */
+// TFS toggle
+const tfsToggle=document.getElementById('tfsToggle');
+const tfsNumber=document.getElementById('tfsNumber');
 if(tfsToggle){
   tfsToggle.addEventListener('change', ()=>{
-    if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
-    else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
+    if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus() }
+    else { tfsNumber.classList.add('hidden'); tfsNumber.value='' }
   });
 }
 
-/* Machine type chips + Model list */
-const machineTypeChips = document.getElementById('machineTypeChips');
-const hiddenType = document.getElementById('machineType');
-const modelSel = document.getElementById('model');
-
+// Machine type chips + Model list
+const machineTypeChips=document.getElementById('machineTypeChips');
+const hiddenType=document.getElementById('machineType');
+const modelSel=document.getElementById('model');
 function fillModels(kind){
   modelSel.innerHTML='';
   const ph=document.createElement('option'); ph.value=''; ph.textContent='Choose…'; modelSel.appendChild(ph);
-  const prefix = (kind==='Duplex') ? 'D' : 'S';
-  for(let i=1;i<=50;i++){
-    const opt=document.createElement('option');
-    opt.value = prefix + i;
-    opt.textContent = prefix + i;
-    modelSel.appendChild(opt);
-  }
+  const prefix=(kind==='Duplex')?'D':'S';
+  for(let i=1;i<=50;i++){ const opt=document.createElement('option'); opt.value=prefix+i; opt.textContent=prefix+i; modelSel.appendChild(opt) }
 }
 fillModels(hiddenType.value||'Simplex');
-
 if(machineTypeChips){
   machineTypeChips.addEventListener('click', (e)=>{
-    const chip = e.target.closest('.chip'); if(!chip) return;
+    const chip=e.target.closest('.chip'); if(!chip) return;
     machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-    chip.classList.add('active');
-    hiddenType.value = chip.dataset.type;
-    fillModels(hiddenType.value);
+    chip.classList.add('active'); hiddenType.value=chip.dataset.type; fillModels(hiddenType.value);
   });
 }
 
-/* System -> enable SubSystem placeholder only after selection */
-const systemSel = document.getElementById('system');
-const subSystemSel = document.getElementById('subSystem');
+// System -> Subsystem (placeholder; hidden until system chosen)
+const systemSel=document.getElementById('system');
+const subSystemWrap=document.getElementById('subSystemWrap');
+const subSystemSel=document.getElementById('subSystem');
 if(systemSel && subSystemSel){
   systemSel.addEventListener('change', ()=>{
-    const has = !!systemSel.value;
-    subSystemSel.disabled = !has;
-    if(!has){ subSystemSel.value=''; }
+    if(systemSel.value){
+      subSystemSel.disabled=false;
+      subSystemWrap.classList.remove('hidden');
+    }else{
+      subSystemSel.disabled=true;
+      subSystemWrap.classList.add('hidden');
+      subSystemSel.value='';
+    }
   });
 }
 
-/* Part smart suggest (client-side demo) */
-const partInput = document.getElementById('partInput');
-const partSuggest = document.getElementById('partSuggest');
+// Part smart suggest
+const partInput=document.getElementById('partInput');
+const partSuggest=document.getElementById('partSuggest');
 if(partInput){
-  const parts = Array.from({length:160}, (_,i)=>{
-    const base = (i%2===0) ? '12' : '34';
-    const tail = String(10000+i).slice(-5);
-    return `${base}-${tail}`;
-  });
-  const filterParts = q => {
-    const v = String(q||'').trim().toLowerCase();
-    if(!v) return [];
-    return parts.filter(p=>p.toLowerCase().includes(v)).slice(0,30);
-  };
+  const parts=Array.from({length:160},(_,i)=> ((i%2===0)?'12':'34') + '-' + String(10000+i).slice(-5));
+  const filterParts=q=>{const v=String(q||'').trim().toLowerCase(); if(!v) return []; return parts.filter(p=>p.toLowerCase().includes(v)).slice(0,30)};
   partInput.addEventListener('input', ()=>{
-    const list = filterParts(partInput.value);
-    partSuggest.innerHTML='';
-    if(!list.length){ partSuggest.style.display='none'; return; }
-    list.forEach(p=>{
-      const row=document.createElement('div'); row.textContent=p;
-      row.addEventListener('click', ()=>{ partInput.value=p; partSuggest.style.display='none'; });
-      partSuggest.appendChild(row);
-    });
+    const list=filterParts(partInput.value); partSuggest.innerHTML='';
+    if(!list.length){ partSuggest.style.display='none'; return }
+    list.forEach(p=>{ const row=document.createElement('div'); row.textContent=p; row.addEventListener('click',()=>{partInput.value=p; partSuggest.style.display='none'}); partSuggest.appendChild(row) });
     partSuggest.style.display='block';
   });
-  document.addEventListener('click',(e)=>{
-    if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none'; }
-  });
+  document.addEventListener('click',(e)=>{ if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none' }});
 }
 
-/* Troubleshooting steps dynamic */
-const tsSteps = document.getElementById('tsSteps');
+// Troubleshooting steps
+const tsSteps=document.getElementById('tsSteps');
 function addStep(val=''){
   const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
   const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
@@ -598,7 +540,7 @@ function addStep(val=''){
 addStep('Check connections and sensors');
 addStep('Verify model-specific settings');
 
-/* Files */
+// Files
 function addFileRow(){
   const w=document.getElementById('filesWrap');
   const row=document.createElement('div'); row.className='inline';
@@ -608,13 +550,13 @@ function addFileRow(){
 }
 addFileRow();
 
-/* ===== Save Case (updated fields) ===== */
+/* Save Case */
 async function saveCase(e){
   e.preventDefault();
   const req=v=>v&&String(v).trim().length>0;
   const data={
     sfCase:val('sfCase'),
-    tfsNumber: tfsToggle && tfsToggle.checked ? val('tfsNumber') : '',
+    tfsNumber: (tfsToggle && tfsToggle.checked) ? val('tfsNumber') : '',
     machineType: val('machineType'),
     model: val('model'),
     system: val('system'),
@@ -624,50 +566,46 @@ async function saveCase(e){
     symptoms: val('symptoms'),
     troubleshooting: collectSteps(),
     partCatalog: val('partInput'),
-    parts: val('parts'),
     solution: val('solution'),
     verification: val('verification'),
-    lessons: val('lessons'),
+    notes: val('notes'),
     createdAt: new Date().toISOString(),
     author:'Expert'
   };
-  const errors=[];
-  ['sfCase','machineType','model','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k) });
+  const errors=[]; ['sfCase','machineType','model','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k) });
   if(errors.length){
     toast('Please fill required: '+errors.join(', '),'err');
     errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'});
     setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1600);
     return;
   }
+  // files
   const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
   const files=inputs.map(i=>i.files&&i.files[0]).filter(Boolean);
   if(files.length){ data.attachments=[]; for(const f of files){
       const ok=/\.(pdf|docx?|xlsx?|png|jpg|jpeg|zip)$/i.test(f.name);
-      if(!ok){ toast('Unsupported file: '+f.name,'err'); continue;}
-      const base64=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f); });
+      if(!ok){ toast('Unsupported file: '+f.name,'err'); continue }
+      const base64=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f) });
       data.attachments.push({name:f.name,type:f.type,data:base64});
     } }
   const arr=getCases(); arr.push(data); setCases(arr);
+
+  // reset form
   document.getElementById('caseForm').reset();
-  // reset dependent UI
   hiddenType.value='Simplex';
   machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
   fillModels('Simplex');
-  subSystemSel.disabled = true; subSystemSel.value='';
+  subSystemSel.disabled=true; subSystemWrap.classList.add('hidden'); subSystemSel.value='';
   document.getElementById('filesWrap').innerHTML=''; addFileRow();
   tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
+
   toast('Case saved successfully','ok'); go('cases');
 }
+function collectSteps(){ return [...tsSteps.querySelectorAll('.inline input')].map(i=>i.value).filter(v=>String(v).trim()).join('\n') }
+function val(id){ const el=document.getElementById(id); return el?el.value:'' }
 
-function collectSteps(){
-  const rows=[...tsSteps.querySelectorAll('.inline input')];
-  return rows.map(i=>i.value).filter(v=>String(v).trim().length>0).join('\n');
-}
-
-function val(id){ const el=document.getElementById(id); return el?el.value:''; }
-
-/* ===== Cases (render) ===== */
+/* Cases listing */
 function renderCases(){
   const list=document.getElementById('casesList');
   const q=(document.getElementById('searchBox').value||'').toLowerCase();
@@ -680,7 +618,7 @@ function renderCases(){
   list.innerHTML = arr.length ? arr.map((c,i)=>caseCard(c,i)).join('') : '<div class="panel">No cases yet.</div>';
 }
 function caseCard(c,i){
-  const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)`: 'No attachments';
+  const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)` : 'No attachments';
   return `<div class="case-card">
     <div class="stripe"></div>
     <div>
@@ -724,17 +662,16 @@ function openCase(i){
     <div class="panel" style="margin-top:12px"><h3>Solution</h3>
       <div class="kv"><span class="k">Troubleshooting:</span><span class="v">${nl(esc(c.troubleshooting||''))}</span></div>
       <div class="kv"><span class="k">Part (catalog):</span><span class="v">${esc(c.partCatalog||'')}</span></div>
-      <div class="kv"><span class="k">Parts / Service:</span><span class="v">${nl(esc(c.parts||''))}</span></div>
       <div class="kv"><span class="k">Implemented:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
       <div class="kv"><span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span></div>
-      <div class="kv"><span class="k">Lessons:</span><span class="v">${nl(esc(c.lessons||''))}</span></div>
+      <div class="kv"><span class="k">Notes:</span><span class="v">${nl(esc(c.notes||''))}</span></div>
       <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div>
     </div>`;
   openModal();
 }
-function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok'); }
-function openModal(){ document.getElementById('modalBack').style.display='flex'; }
-function closeModal(){ document.getElementById('modalBack').style.display='none'; }
+function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok') }
+function openModal(){ document.getElementById('modalBack').style.display='flex' }
+function closeModal(){ document.getElementById('modalBack').style.display='none' }
 function updateKPIs(){
   const arr=getCases(); document.getElementById('kpiTotal').textContent=arr.length;
   document.getElementById('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
@@ -744,32 +681,29 @@ function updateKPIs(){
 }
 function exportCSV(){
   const arr=getCases();
-  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','parts','solution','verification','lessons','createdAt','author'];
+  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','createdAt','author'];
   const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\n/g,' '))).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
 }
-function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
-function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
+function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600) }
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-/* ===== Particles ===== */
+/* Particles */
 (function(){
   const c=document.getElementById('particles'); if(!c) return;
   const ctx=c.getContext('2d'); let w,h;
-  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
-  addEventListener('resize',resize); resize();
+  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight } addEventListener('resize',resize); resize();
   const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.6,vx:(Math.random()-.5)*0.28,vy:(Math.random()-.5)*0.28}));
-  function step(){
-    ctx.clearRect(0,0,w,h);
-    for(const d of dots){
-      d.x+=d.vx; d.y+=d.vy;
-      if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill();
-    }
+  function step(){ ctx.clearRect(0,0,w,h);
+    for(const d of dots){ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill(); }
     requestAnimationFrame(step);
-  }
-  step();
+  } step();
 })();
+
+// init
+go('dashboard');
 </script>
 </body>
 </html>
