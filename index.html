@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.6)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.6-Refined)</title>
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml"
@@ -32,7 +32,7 @@ body{
 
 .hidden{display:none!important}
 
-/* Panels / Buttons (as V18.3) */
+/* Panels / Buttons */
 .panel{
   border:1px solid var(--border); border-radius:var(--radius); padding:18px;
   background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -66,7 +66,7 @@ body{
 .logo .subtitle{ color:var(--muted); font-size:12.5px; letter-spacing:.6px }
 @keyframes pulse{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}50%{filter:drop-shadow(0 0 18px rgba(0,174,239,.45))}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}}
 .auth h2{ margin:0 0 6px; font-size:18px; letter-spacing:.5px; opacity:.92; text-align:center }
-.label{ display:block; color:var(--muted); margin:8px 2px 6px }
+.label{ display:block; color:var(--muted); margin:6px 2px 6px } /* tighter */
 .input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none }
 .helper{ color:var(--muted); font-size:12px; margin-top:6px; text-align:center }
@@ -101,7 +101,7 @@ body{
   position:sticky; top:var(--header); height:calc(100vh - var(--header));
   overflow:auto; z-index:10;
 }
-.main{ padding:18px 18px 60px; overflow:auto } /* tighter spacing */
+.main{ padding:16px 16px 60px; overflow:auto } /* tighter main padding */
 
 .nav{display:flex; flex-direction:column; gap:8px}
 .nav .item{
@@ -114,7 +114,7 @@ body{
 .nav .item.active{ border-color:var(--accent); box-shadow:0 0 0 1px inset rgba(59,208,255,.25), 0 12px 28px rgba(0,174,239,.25)}
 .nav .badge{ margin-left:auto; padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted)}
 
-.grid{display:grid; gap:14px} /* tighter */
+.grid{display:grid; gap:12px} /* even tighter for OCD layout */
 .grid.cols-2{grid-template-columns:1fr 1fr}
 .grid.cols-3{grid-template-columns:repeat(3,1fr)}
 @media (max-width:1100px){ .grid.cols-3{grid-template-columns:1fr 1fr} }
@@ -131,31 +131,44 @@ body{
 }
 
 /* Form controls */
-.label.v13{display:block; color:var(--muted); margin:6px 2px 6px}  /* tighter */
+.label.v13{display:block; color:var(--muted); margin:6px 2px 6px}
 .input.v13,.select,textarea,.file{
   width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;
 }
-textarea{min-height:84px; resize:vertical}
-.inline{display:flex; gap:10px; align-items:center}
-.half{flex:1} .full{grid-column:1/-1}
-.help{color:var(--muted); font-size:12px; margin-top:6px}
 
-/* Dropdowns styled */
+/* OCD sizing utilities (keep site look, limit width elegantly) */
+.field-sf{ max-width: 180px }
+.field-model{ max-width: 130px }
+.field-system{ max-width: 240px }
+.field-subsystem{ max-width: 260px }
+.field-sw{ max-width: 160px }
+.field-troubles{ max-width: 520px }
+
+/* Make narrow fields not stretch to full column */
+.fit-inline{ display:inline-flex; gap:10px; align-items:center; flex-wrap:wrap }
+
+/* Select (dropdown) – glass, precise */
 .select, select{
   appearance:none; -webkit-appearance:none; -moz-appearance:none;
   background:
     linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)) padding-box,
     linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)) border-box;
   border:1px solid var(--border);
+  border-radius:10px;
   background-repeat:no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-  /* Chevron icon */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23bfe9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-position:right 10px center;
+  background-size:14px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23bfe9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   padding-right:34px;
 }
-.select:focus, select:focus{ border-color:rgba(59,208,255,.45); box-shadow:0 0 0 3px rgba(59,208,255,.18) }
+.select:focus, select:focus{
+  border-color:rgba(59,208,255,.45);
+  box-shadow:0 0 0 3px rgba(59,208,255,.18);
+}
+
+/* Textarea */
+textarea{ min-height:84px; resize:vertical }
 
 /* Chips */
 .chips{display:flex; gap:8px; flex-wrap:wrap}
@@ -175,8 +188,8 @@ textarea{min-height:84px; resize:vertical}
 .part-suggest div{ padding:8px 12px; cursor:pointer }
 .part-suggest div:hover{ background:rgba(255,255,255,.06) }
 
-/* Cards & Modal (as is) */
-.fab{ position:fixed; left:14px; bottom:18px; z-index:60 } /* moved to LEFT */
+/* Cards & Modal */
+.fab{ position:fixed; left:14px; bottom:18px; z-index:60 }
 .fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow:0 18px 40px rgba(0,174,239,.35)}
 
 .case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns:auto 1fr auto; gap:12px;
@@ -199,7 +212,7 @@ textarea{min-height:84px; resize:vertical}
 </style>
 </head>
 
-      <body>
+<body>
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
@@ -224,7 +237,7 @@ textarea{min-height:84px; resize:vertical}
     <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
     <label class="label" for="authPass">Password</label>
     <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-    <div class="helper">Demo credentials → <b>User:</b> Expert &nbsp; <b>Password:</b> Landa123456</div>
+    <!-- Removed demo credentials line per request -->
     <button class="btn primary full" id="btnLogin">Login</button>
   </div>
 </section>
@@ -282,26 +295,35 @@ textarea{min-height:84px; resize:vertical}
         </div>
       </section>
 
-      <!-- Create Case (clean) -->
+      <!-- Create Case (Refined OCD layout) -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
-          <form id="caseForm" onsubmit="saveCase(event)">
+          <form id="caseForm" class="form-narrow" onsubmit="saveCase(event)">
             <div class="grid cols-2">
-              <!-- SF Case -->
-              <div class="half"><label class="label v13">SF Case *</label><input class="input v13" id="sfCase" inputmode="numeric" placeholder="e.g., 123456"></div>
-
-              <!-- TFS toggle (no 'TFS optional' text) -->
-              <div class="half">
-                <label class="label v13">TFS</label>
-                <div class="inline">
-                  <input type="checkbox" id="tfsToggle" title="Enable TFS">
-                  <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
+              <!-- Row 1: SF + TFS -->
+              <div class="fit-inline">
+                <div>
+                  <label class="label v13">SF Case *</label>
+                  <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
+                </div>
+                <div>
+                  <label class="label v13">TFS</label>
+                  <div class="fit-inline">
+                    <input type="checkbox" id="tfsToggle" title="Enable TFS">
+                    <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
+                  </div>
                 </div>
               </div>
 
-              <!-- Machine Type + Model (adjacent) -->
-              <div class="half">
+              <!-- Row 1B: Software (compact) -->
+              <div>
+                <label class="label v13">Software Version</label>
+                <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
+              </div>
+
+              <!-- Row 2: Machine Type + Model (adjacent, compact) -->
+              <div>
                 <label class="label v13">Machine Type *</label>
                 <div class="chips" id="machineTypeChips">
                   <div class="chip active" data-type="Simplex">Simplex</div>
@@ -309,15 +331,15 @@ textarea{min-height:84px; resize:vertical}
                 </div>
                 <input type="hidden" id="machineType" value="Simplex">
               </div>
-              <div class="half">
+              <div>
                 <label class="label v13">Model *</label>
-                <select id="model" class="select"></select>
+                <select id="model" class="select field-model"></select>
               </div>
 
-              <!-- System / Sub-System -->
-              <div class="half">
+              <!-- Row 3: System + Sub-System (Sub-System hidden until System chosen) -->
+              <div>
                 <label class="label v13">System *</label>
-                <select id="system" class="select">
+                <select id="system" class="select field-system">
                   <option value="">Choose…</option>
                   <option>Machine</option><option>BSS</option><option>STS</option><option>IPS</option><option>BCU</option>
                   <option>IRD</option><option>Hot Air</option><option>PSS</option><option>CWS</option><option>Ventilation</option>
@@ -325,46 +347,54 @@ textarea{min-height:84px; resize:vertical}
                   <option>QCS</option><option>PC Cabinet</option><option>ICS</option>
                 </select>
               </div>
-
-              <div class="half hidden" id="subSystemWrap">
+              <div id="subSystemWrap" class="hidden">
                 <label class="label v13">Sub-System</label>
-                <select id="subSystem" class="select" disabled>
+                <select id="subSystem" class="select field-subsystem" disabled>
                   <option value="">Select subsystem…</option>
                 </select>
-              </div>
-
-              <!-- Software -->
-              <div class="half">
-                <label class="label v13">Software Version</label>
-                <input class="input v13" id="softwareVersion" placeholder="4.2.11">
               </div>
 
               <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
 
               <!-- Issue / Symptoms -->
-              <div class="full"><label class="label v13">Issue Summary *</label><input class="input v13" id="issueSummary" placeholder="One line summary"></div>
-              <div class="full"><label class="label v13">Symptoms / Error Messages</label><textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea></div>
+              <div class="full">
+                <label class="label v13">Issue Summary *</label>
+                <input class="input v13" id="issueSummary" placeholder="One line summary">
+              </div>
+              <div class="full">
+                <label class="label v13">Symptoms / Error Messages</label>
+                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
+              </div>
 
-              <!-- Troubleshooting dynamic -->
+              <!-- Troubleshooting (narrow max width) -->
               <div class="full">
                 <label class="label v13">Troubleshooting (steps)</label>
-                <div id="tsSteps"></div>
+                <div id="tsSteps" class="field-troubles"></div>
                 <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
               </div>
 
               <!-- Part catalog -->
               <div class="full">
                 <label class="label v13">Part (Catalog)</label>
-                <div class="partwrap">
+                <div class="partwrap field-troubles">
                   <input class="input v13" id="partInput" placeholder="Type to search part number (e.g., 12-34567)…">
                   <div class="part-suggest" id="partSuggest"></div>
                 </div>
               </div>
 
               <!-- Solution / Verification / Notes -->
-              <div class="full"><label class="label v13">Solution Implemented *</label><textarea id="solution" class="input v13" placeholder="What fixed the issue"></textarea></div>
-              <div class="full"><label class="label v13">Verification Method</label><input id="verification" class="input v13" placeholder="How did we verify the fix?"></div>
-              <div class="full"><label class="label v13">Notes</label><textarea id="notes" class="input v13" placeholder="Anything noteworthy for future cases"></textarea></div>
+              <div class="full">
+                <label class="label v13">Solution Implemented *</label>
+                <textarea id="solution" class="input v13 field-troubles" placeholder="What fixed the issue"></textarea>
+              </div>
+              <div class="full">
+                <label class="label v13">Verification Method</label>
+                <input id="verification" class="input v13 field-troubles" placeholder="How did we verify the fix?">
+              </div>
+              <div class="full">
+                <label class="label v13">Notes</label>
+                <textarea id="notes" class="input v13 field-troubles" placeholder="Anything noteworthy for future cases"></textarea>
+              </div>
 
               <!-- Attachments -->
               <div class="full">
@@ -405,7 +435,7 @@ textarea{min-height:84px; resize:vertical}
     </main>
   </div>
 
-  <!-- FAB moved to LEFT; hidden on Create -->
+  <!-- FAB left; hidden on Create via JS (כבר קיים בסקריפט שלך) -->
   <div class="fab" id="fabNew"><button class="btn primary" onclick="go('create')">+ New Case</button></div>
 
   <!-- Modal -->
