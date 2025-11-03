@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.7-Refined)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.8 – Custom Glass Dropdowns)</title>
 
 <link rel="icon" type="image/svg+xml"
   href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
@@ -67,11 +67,9 @@ body{
 .label{ display:block; color:var(--muted); margin:6px 2px 6px }
 .input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none }
-.helper{ color:var(--muted); font-size:12px; margin-top:6px; text-align:center }
 .btn.full{ width:100%; margin-top:14px }
 
 /* App Layout */
-.app.hidden{display:none!important}
 .header{
   position:sticky; top:0; z-index:100;
   display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -129,10 +127,11 @@ body{
 
 /* Form controls */
 .label.v13{display:block; color:var(--muted); margin:6px 2px 6px}
-.input.v13,.select,textarea,.file{
+.input.v13, textarea, .file{
   width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;
 }
+textarea{ min-height:84px; resize:vertical }
 
 /* OCD sizing */
 .field-sf{ max-width: 180px }
@@ -143,30 +142,6 @@ body{
 .field-troubles{ max-width: 520px }
 .fit-inline{ display:inline-flex; gap:10px; align-items:center; flex-wrap:wrap }
 
-/* Glassy Select (control) */
-.select, select{
-  appearance:none; -webkit-appearance:none; -moz-appearance:none;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)) padding-box,
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)) border-box;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background-repeat:no-repeat;
-  background-position:right 10px center;
-  background-size:14px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23bfe9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  padding-right:34px;
-}
-.select:focus, select:focus{
-  border-color:rgba(59,208,255,.45);
-  box-shadow:0 0 0 3px rgba(59,208,255,.18);
-}
-
-/* (הערה: דפדפנים לא נותנים לעצב את רשימת ה-options עצמה בלי קומפוננטה מותאמת.
-  לכן עיצבנו את ה-control עצמו כך שייראה זהה לשאר השדות.) */
-
-textarea{ min-height:84px; resize:vertical }
-
 /* Chips */
 .chips{display:flex; gap:8px; flex-wrap:wrap}
 .chip{
@@ -175,15 +150,50 @@ textarea{ min-height:84px; resize:vertical }
 }
 .chip.active{ background:linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); border-color:rgba(0,174,239,.55) }
 
-/* Part suggest panel */
-.partwrap{ position:relative }
-.part-suggest{
-  position:absolute; left:0; right:0; top:100%; z-index:15;
-  background:#0f1622; border:1px solid var(--border); border-radius:12px;
-  box-shadow:0 18px 40px rgba(0,0,0,.35); max-height:220px; overflow:auto; display:none
+/* ===== Custom Glass Dropdown ===== */
+.dd{ position:relative; display:inline-block; width:100%; max-width:100% }
+.dd-btn{
+  width:100%; padding:10px 38px 10px 12px; border:1px solid var(--border); border-radius:10px;
+  color:var(--text);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  backdrop-filter:blur(10px);
+  text-align:left; cursor:pointer;
+  transition:border-color .18s, box-shadow .18s, transform .18s;
 }
-.part-suggest div{ padding:8px 12px; cursor:pointer }
-.part-suggest div:hover{ background:rgba(255,255,255,.06) }
+.dd-btn:hover{ transform:translateY(-1px); box-shadow:0 16px 38px rgba(0,0,0,.28); border-color:rgba(59,208,255,.35) }
+.dd-btn:focus{ outline:none; border-color:rgba(59,208,255,.45); box-shadow:0 0 0 3px rgba(59,208,255,.18) }
+.dd-arrow{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  width:16px; height:16px; pointer-events:none; opacity:.9;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bfe9ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") center/16px 16px no-repeat;
+  filter:drop-shadow(0 0 6px rgba(0,174,239,.35));
+}
+.dd-list{
+  position:absolute; left:0; right:0; top:calc(100% + 6px);
+  border:1px solid var(--border); border-radius:12px;
+  background:linear-gradient(180deg, rgba(18,24,34,.96), rgba(18,24,34,.88));
+  backdrop-filter:blur(12px) saturate(1.05);
+  box-shadow:0 22px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.03);
+  max-height:260px; overflow:auto; padding:6px 0; display:none; z-index:30;
+}
+.dd.open .dd-list{ display:block }
+.dd-item{
+  padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:8px;
+  transition:background .12s, transform .12s, color .12s;
+}
+.dd-item:hover{ background:rgba(59,208,255,.12) }
+.dd-item[aria-selected="true"]::before{
+  content:""; width:8px; height:8px; border-radius:2px; background:linear-gradient(180deg, var(--accent), var(--accent2));
+  box-shadow:0 0 12px rgba(0,174,239,.5);
+}
+.dd-empty{ padding:8px 12px; color:var(--muted) }
+.dd.disabled .dd-btn{ opacity:.6; pointer-events:none }
+
+/* Scrollbar (WebKit) */
+.dd-list::-webkit-scrollbar{ width:10px }
+.dd-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08); border:3px solid transparent; border-radius:10px; background-clip:padding-box }
+.dd-list::-webkit-scrollbar-thumb:hover{ background:rgba(59,208,255,.4); border-color:transparent }
 
 /* Cards & Modal & FAB */
 .fab{ position:fixed; left:14px; bottom:18px; z-index:60 }
@@ -234,7 +244,6 @@ textarea{ min-height:84px; resize:vertical }
     <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
     <label class="label" for="authPass">Password</label>
     <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-    <!-- demo credentials line removed -->
     <button class="btn primary full" id="btnLogin">Login</button>
   </div>
 </section>
@@ -258,7 +267,7 @@ textarea{ min-height:84px; resize:vertical }
         <h1>Landa Quantum – Troubleshoot Suite</h1>
       </div>
     </div>
-    <span class="badge-env">V18.7</span>
+    <span class="badge-env">V18.8</span>
   </header>
 
   <div class="wrap">
@@ -292,7 +301,7 @@ textarea{ min-height:84px; resize:vertical }
         </div>
       </section>
 
-      <!-- Create Case – ordered, compact -->
+      <!-- Create Case – ordered, compact, custom dropdowns -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
@@ -310,7 +319,7 @@ textarea{ min-height:84px; resize:vertical }
               </div>
               <div>
                 <label class="label v13">Model *</label>
-                <select id="model" class="select field-model"></select>
+                <div id="dd-model" class="dd field-model"></div>
               </div>
 
               <!-- 2) SF Case / Software -->
@@ -323,22 +332,14 @@ textarea{ min-height:84px; resize:vertical }
                 <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
               </div>
 
-              <!-- 3) System / Sub-System (hidden until System chosen) -->
+              <!-- 3) System / Sub-System (Sub hidden until System chosen) -->
               <div>
                 <label class="label v13">System *</label>
-                <select id="system" class="select field-system">
-                  <option value="">Choose…</option>
-                  <option>Machine</option><option>BSS</option><option>STS</option><option>IPS</option><option>BCU</option>
-                  <option>IRD</option><option>Hot Air</option><option>PSS</option><option>CWS</option><option>Ventilation</option>
-                  <option>MSPS</option><option>ITS</option><option>EC</option><option>DFE</option><option>PQ</option>
-                  <option>QCS</option><option>PC Cabinet</option><option>ICS</option>
-                </select>
+                <div id="dd-system" class="dd field-system"></div>
               </div>
               <div id="subSystemWrap" class="hidden">
                 <label class="label v13">Sub-System</label>
-                <select id="subSystem" class="select field-subsystem" disabled>
-                  <option value="">Select subsystem…</option>
-                </select>
+                <div id="dd-subsystem" class="dd field-subsystem"></div>
               </div>
 
               <!-- 4) TFS (toggle) -->
@@ -364,7 +365,7 @@ textarea{ min-height:84px; resize:vertical }
                 <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
               </div>
 
-              <!-- 6) Troubleshooting / Parts -->
+              <!-- 6) Troubleshooting / Part -->
               <div class="full">
                 <label class="label v13">Troubleshooting (steps)</label>
                 <div id="tsSteps" class="field-troubles"></div>
@@ -424,6 +425,7 @@ textarea{ min-height:84px; resize:vertical }
         <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
       </section>
 
+      <!-- Settings -->
       <section id="page-settings" class="page hidden">
         <div class="panel"><h2 style="margin:0 0 10px">Settings</h2><div class="help">Coming soon…</div></div>
       </section>
@@ -458,7 +460,6 @@ function go(route){
   document.querySelectorAll('.nav .item').forEach(a=>a.classList.toggle('active', a.dataset.route===route));
   if(route==='dashboard') updateKPIs();
   if(route==='cases') renderCases();
-  // FAB only on dashboard & cases
   if(fabNew) fabNew.style.display = (route==='create') ? 'none' : 'block';
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -489,8 +490,184 @@ document.getElementById('btnLogout').addEventListener('click', e=>{
   document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
 });
 
-/* ===== Create Case Logic ===== */
-/* TFS toggle */
+/* ===== Custom Dropdown Engine =====
+   Usage:
+   const dd = makeDropdown(containerEl, {placeholder, options:[{value,label},...], onChange:(v,l)=>{}});
+   Methods: dd.setOptions(list), dd.setValue(value), dd.disable(bool)
+*/
+function makeDropdown(container, { placeholder='Choose…', options=[], onChange=()=>{}, maxHeight=260 }){
+  container.classList.add('dd');
+  container.innerHTML = `
+    <button type="button" class="dd-btn"><span class="dd-label">${placeholder}</span></button>
+    <span class="dd-arrow" aria-hidden="true"></span>
+    <div class="dd-list" style="max-height:${maxHeight}px"></div>
+    <input type="hidden" class="dd-value" value="">
+  `;
+  const btn = container.querySelector('.dd-btn');
+  const list = container.querySelector('.dd-list');
+  const label = container.querySelector('.dd-label');
+  const input = container.querySelector('.dd-value');
+
+  let state = { open:false, opts:options, index:-1 };
+
+  function render(){
+    list.innerHTML = '';
+    if(!state.opts || !state.opts.length){
+      list.innerHTML = `<div class="dd-empty">No options</div>`;
+      return;
+    }
+    state.opts.forEach((o,i)=>{
+      const it = document.createElement('div');
+      it.className='dd-item';
+      it.setAttribute('data-value', o.value);
+      it.setAttribute('data-index', i);
+      if(String(input.value)===String(o.value)) it.setAttribute('aria-selected','true');
+      it.textContent = o.label ?? o.value;
+      it.addEventListener('click', ()=> selectIndex(i));
+      list.appendChild(it);
+    });
+  }
+  function open(){
+    if(container.classList.contains('disabled')) return;
+    container.classList.add('open'); state.open=true;
+    // focus current or first
+    const idx = Math.max(0, state.opts.findIndex(o=> String(o.value)===String(input.value)));
+    highlight(idx);
+    adjustInView();
+    window.addEventListener('click', outside);
+    window.addEventListener('keydown', keys);
+  }
+  function close(){
+    container.classList.remove('open'); state.open=false;
+    window.removeEventListener('click', outside);
+    window.removeEventListener('keydown', keys);
+  }
+  function outside(e){ if(!container.contains(e.target)) close(); }
+  function keys(e){
+    if(!state.open) return;
+    if(e.key==='Escape'){ close(); btn.focus(); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); highlight(Math.min(state.index+1, state.opts.length-1)); adjustInView(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); highlight(Math.max(state.index-1, 0)); adjustInView(); }
+    else if(e.key==='Enter'){ e.preventDefault(); if(state.index>=0) selectIndex(state.index); }
+  }
+  function highlight(i){
+    state.index = i;
+    [...list.children].forEach(c=>c.classList.remove('hover'));
+    if(list.children[i]) list.children[i].classList.add('hover');
+  }
+  function adjustInView(){
+    const el = list.children[state.index];
+    if(!el) return;
+    const r = el.getBoundingClientRect();
+    const L = list.getBoundingClientRect();
+    if(r.top < L.top) list.scrollTop -= (L.top - r.top) + 6;
+    if(r.bottom > L.bottom) list.scrollTop += (r.bottom - L.bottom) + 6;
+  }
+  function selectIndex(i){
+    const o = state.opts[i]; if(!o) return;
+    input.value = o.value;
+    label.textContent = o.label ?? o.value;
+    [...list.children].forEach(x=>x.removeAttribute('aria-selected'));
+    if(list.children[i]) list.children[i].setAttribute('aria-selected','true');
+    onChange(o.value, o.label ?? o.value);
+    close();
+  }
+
+  btn.addEventListener('click', ()=> state.open ? close() : open());
+
+  // API
+  const api = {
+    setOptions(newOpts){
+      state.opts = newOpts || [];
+      render();
+      // reset selection if not found
+      if(!state.opts.some(o=> String(o.value)===String(input.value))){
+        input.value=''; label.textContent=placeholder;
+      }
+    },
+    setValue(v){
+      const i = state.opts.findIndex(o=> String(o.value)===String(v));
+      if(i>=0){ selectIndex(i); }
+      else { input.value=''; label.textContent=placeholder; }
+    },
+    value(){ return input.value },
+    disable(flag){
+      container.classList.toggle('disabled', !!flag);
+    }
+  };
+  render();
+  return api;
+}
+
+/* ===== Form: chips + custom dropdowns data ===== */
+const machineTypeChips=document.getElementById('machineTypeChips');
+const hiddenType=document.getElementById('machineType');
+
+const ddModelEl = document.getElementById('dd-model');
+const ddSystemEl = document.getElementById('dd-system');
+const ddSubEl   = document.getElementById('dd-subsystem');
+const subSystemWrap = document.getElementById('subSystemWrap');
+
+/* Options */
+const SYSTEMS = [
+  'Machine','BSS','STS','IPS','BCU','IRD','Hot Air','PSS','CWS','Ventilation',
+  'MSPS','ITS','EC','DFE','PQ','QCS','PC Cabinet','ICS'
+].map(x=>({value:x,label:x}));
+
+/* Example subs (placeholder – תחליף כשתספק קובץ מלא) */
+const SUBS = {
+  'Machine':['Main Frame','Safety','Power'].map(x=>({value:x,label:x})),
+  'BSS':['Motors','Belts','Sensors'].map(x=>({value:x,label:x})),
+  'STS':['Rails','Carriage','Encoders'].map(x=>({value:x,label:x})),
+  'IPS':['Controller','IO','PSU'].map(x=>({value:x,label:x})),
+  'DFE':['RIP','Network','Licenses'].map(x=>({value:x,label:x}))
+};
+
+/* Build dropdowns */
+const ddModel = makeDropdown(ddModelEl, { placeholder:'Choose…', options:[] });
+const ddSystem = makeDropdown(ddSystemEl, {
+  placeholder:'Choose…',
+  options:SYSTEMS,
+  onChange:(val)=>{
+    // toggle Sub-System visibility
+    const opts = SUBS[val] || [];
+    if(opts.length){
+      ddSub.setOptions(opts);
+      ddSub.setValue('');
+      ddSubEl.parentElement.classList.remove('disabled');
+      subSystemWrap.classList.remove('hidden');
+    }else{
+      ddSub.setOptions([]);
+      ddSub.setValue('');
+      subSystemWrap.classList.add('hidden');
+    }
+  }
+});
+const ddSub = makeDropdown(ddSubEl, { placeholder:'Select subsystem…', options:[] });
+
+/* Machine Type chips -> fill Model list */
+function fillModels(kind){
+  const prefix = (kind==='Duplex') ? 'D' : 'S';
+  const max = (prefix==='D') ? 19 : 9;
+  const opts = Array.from({length:max},(_,i)=> ({ value: `${prefix}${i+1}`, label: `${prefix}${i+1}` }));
+  ddModel.setOptions(opts);
+  ddModel.setValue(''); // reset
+}
+fillModels(hiddenType.value||'Simplex');
+
+if(machineTypeChips){
+  machineTypeChips.addEventListener('click', (e)=>{
+    const chip=e.target.closest('.chip'); if(!chip) return;
+    machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    hiddenType.value = chip.dataset.type;
+    fillModels(hiddenType.value);
+  });
+}
+
+/* ===== Subsystem enable/disable handled inside ddSystem.onChange ===== */
+
+/* ===== TFS toggle ===== */
 const tfsToggle=document.getElementById('tfsToggle');
 const tfsNumber=document.getElementById('tfsNumber');
 if(tfsToggle){
@@ -500,44 +677,18 @@ if(tfsToggle){
   });
 }
 
-/* Machine Type chips + Model auto-fill */
-const machineTypeChips=document.getElementById('machineTypeChips');
-const hiddenType=document.getElementById('machineType');
-const modelSel=document.getElementById('model');
-function fillModels(kind){
-  modelSel.innerHTML='';
-  const ph=document.createElement('option'); ph.value=''; ph.textContent='Choose…'; modelSel.appendChild(ph);
-  const prefix=(kind==='Duplex')?'D':'S';
-  const max=(prefix==='D')?19:9;                 // D1–D19, S1–S9
-  for(let i=1;i<=max;i++){ const opt=document.createElement('option'); opt.value=prefix+i; opt.textContent=prefix+i; modelSel.appendChild(opt); }
+/* ===== Troubleshooting steps ===== */
+const tsSteps=document.getElementById('tsSteps');
+function addStep(val=''){
+  const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
+  const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
+  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
+  row.appendChild(inp); row.appendChild(rm); tsSteps.appendChild(row);
 }
-fillModels(hiddenType.value||'Simplex');
-if(machineTypeChips){
-  machineTypeChips.addEventListener('click', (e)=>{
-    const chip=e.target.closest('.chip'); if(!chip) return;
-    machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-    chip.classList.add('active'); hiddenType.value=chip.dataset.type; fillModels(hiddenType.value);
-  });
-}
+addStep('Check connections and sensors');
+addStep('Verify model-specific settings');
 
-/* System -> SubSystem visibility */
-const systemSel=document.getElementById('system');
-const subSystemWrap=document.getElementById('subSystemWrap');
-const subSystemSel=document.getElementById('subSystem');
-if(systemSel && subSystemSel){
-  systemSel.addEventListener('change', ()=>{
-    if(systemSel.value){
-      subSystemSel.disabled=false;
-      subSystemWrap.classList.remove('hidden');
-    }else{
-      subSystemSel.disabled=true;
-      subSystemWrap.classList.add('hidden');
-      subSystemSel.value='';
-    }
-  });
-}
-
-/* Part smart suggest (static demo list) */
+/* ===== Part smart suggest (demo static) ===== */
 const partInput=document.getElementById('partInput');
 const partSuggest=document.getElementById('partSuggest');
 if(partInput){
@@ -552,18 +703,7 @@ if(partInput){
   document.addEventListener('click',(e)=>{ if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none' }});
 }
 
-/* Troubleshooting steps */
-const tsSteps=document.getElementById('tsSteps');
-function addStep(val=''){
-  const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
-  const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
-  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
-  row.appendChild(inp); row.appendChild(rm); tsSteps.appendChild(row);
-}
-addStep('Check connections and sensors');
-addStep('Verify model-specific settings');
-
-/* Files */
+/* ===== Files ===== */
 function addFileRow(){
   const w=document.getElementById('filesWrap');
   const row=document.createElement('div'); row.className='inline';
@@ -573,17 +713,18 @@ function addFileRow(){
 }
 addFileRow();
 
-/* Save Case */
+/* ===== Save Case ===== */
 async function saveCase(e){
   e.preventDefault();
   const req=v=>v&&String(v).trim().length>0;
+
   const data={
     sfCase:val('sfCase'),
     tfsNumber: (tfsToggle && tfsToggle.checked) ? val('tfsNumber') : '',
     machineType: val('machineType'),
-    model: val('model'),
-    system: val('system'),
-    subSystem: val('subSystem'),
+    model: ddModel.value(),
+    system: ddSystem.value(),
+    subSystem: ddSub.value(),
     softwareVersion: val('softwareVersion'),
     issueSummary: val('issueSummary'),
     symptoms: val('symptoms'),
@@ -592,34 +733,44 @@ async function saveCase(e){
     solution: val('solution'),
     verification: val('verification'),
     notes: val('notes'),
+    attachments: [],
     createdAt: new Date().toISOString(),
     author:'Expert'
   };
-  const errors=[]; ['sfCase','machineType','model','system','issueSummary','solution'].forEach(k=>{ if(!req(data[k])) errors.push(k) });
+
+  const errors=[]; if(!req(data.sfCase))errors.push('sfCase');
+  if(!req(data.machineType))errors.push('machineType');
+  if(!req(data.model))errors.push('model');
+  if(!req(data.system))errors.push('system');
+  if(!req(data.issueSummary))errors.push('issueSummary');
+  if(!req(data.solution))errors.push('solution');
+
   if(errors.length){
     toast('Please fill required: '+errors.join(', '),'err');
-    errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='rgba(255,73,103,.6)'});
-    setTimeout(()=> errors.forEach(id=>{const el=document.getElementById(id); if(el) el.style.borderColor='var(--border)'}), 1600);
     return;
   }
+
   // files
   const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
   const files=inputs.map(i=>i.files&&i.files[0]).filter(Boolean);
-  if(files.length){ data.attachments=[]; for(const f of files){
+  if(files.length){ for(const f of files){
       const ok=/\.(pdf|docx?|xlsx?|png|jpg|jpeg|zip)$/i.test(f.name);
       if(!ok){ toast('Unsupported file: '+f.name,'err'); continue }
       const base64=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f) });
       data.attachments.push({name:f.name,type:f.type,data:base64});
     } }
+
   const arr=getCases(); arr.push(data); setCases(arr);
 
   // reset
   document.getElementById('caseForm').reset();
+  // reset chips/type
   hiddenType.value='Simplex';
   machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
   fillModels('Simplex');
-  subSystemSel.disabled=true; subSystemWrap.classList.add('hidden'); subSystemSel.value='';
+  ddSystem.setValue('');
+  ddSub.setOptions([]); ddSub.setValue(''); subSystemWrap.classList.add('hidden');
   document.getElementById('filesWrap').innerHTML=''; addFileRow();
   tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
 
@@ -628,7 +779,7 @@ async function saveCase(e){
 function collectSteps(){ return [...tsSteps.querySelectorAll('.inline input')].map(i=>i.value).filter(v=>String(v).trim()).join('\n') }
 function val(id){ const el=document.getElementById(id); return el?el.value:'' }
 
-/* Cases */
+/* ===== Cases list/render ===== */
 function renderCases(){
   const list=document.getElementById('casesList');
   const q=(document.getElementById('searchBox').value||'').toLowerCase();
@@ -704,14 +855,14 @@ function updateKPIs(){
 }
 function exportCSV(){
   const arr=getCases();
-  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','createdAt','author'];
-  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\n/g,' '))).join(','))).join('\n');
+  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','attachments','createdAt','author'];
+  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((Array.isArray(o[k])? o[k].length+' file(s)' : (o[k]||'')).toString().replace(/\n/g,' '))).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
 }
 function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
 function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-/* Particles */
+/* ===== Particles ===== */
 (function(){
   const c=document.getElementById('particles'); if(!c) return;
   const ctx=c.getContext('2d'); let w,h;
@@ -730,6 +881,8 @@ function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','
   }
   step();
 })();
+
+/* Init */
 go('dashboard');
 </script>
 </body>
