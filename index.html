@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.8 – Custom Glass Dropdowns)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.8-Dynamic)</title>
 
 <link rel="icon" type="image/svg+xml"
   href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
@@ -138,6 +138,8 @@ textarea{ min-height:84px; resize:vertical }
 .field-model{ max-width: 130px }
 .field-system{ max-width: 240px }
 .field-subsystem{ max-width: 260px }
+.field-category{ max-width: 220px }
+.field-item{ max-width: 260px }
 .field-sw{ max-width: 160px }
 .field-troubles{ max-width: 520px }
 .fit-inline{ display:inline-flex; gap:10px; align-items:center; flex-wrap:wrap }
@@ -155,8 +157,7 @@ textarea{ min-height:84px; resize:vertical }
 .dd-btn{
   width:100%; padding:10px 38px 10px 12px; border:1px solid var(--border); border-radius:10px;
   color:var(--text);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
   backdrop-filter:blur(10px);
   text-align:left; cursor:pointer;
   transition:border-color .18s, box-shadow .18s, transform .18s;
@@ -189,24 +190,19 @@ textarea{ min-height:84px; resize:vertical }
 }
 .dd-empty{ padding:8px 12px; color:var(--muted) }
 .dd.disabled .dd-btn{ opacity:.6; pointer-events:none }
-
-/* Scrollbar (WebKit) */
 .dd-list::-webkit-scrollbar{ width:10px }
 .dd-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08); border:3px solid transparent; border-radius:10px; background-clip:padding-box }
 .dd-list::-webkit-scrollbar-thumb:hover{ background:rgba(59,208,255,.4); border-color:transparent }
 
-/* Cards & Modal & FAB */
+/* Cards/Modal/FAB */
 .fab{ position:fixed; left:14px; bottom:18px; z-index:60 }
 .fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow:0 18px 40px rgba(0,174,239,.35)}
-
 .case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns:auto 1fr auto; gap:12px;
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow:0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s}
 .case-card:hover{ box-shadow:0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color:rgba(59,208,255,.35); transform:translateY(-1px) }
 .case-card .stripe{ width:6px; border-radius:8px; background:linear-gradient(180deg, var(--accent), var(--accent2)) }
-.case-card .title{ font-weight:600; opacity:.95 }
-.case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
-.case-card .actions{ display:flex; gap:8px; align-items:center }
-.case-card .files{ color:var(--muted) }
+.case-card .title{ font-weight:600; opacity:.95 } .case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
+.case-card .actions{ display:flex; gap:8px; align-items:center } .case-card .files{ color:var(--muted) }
 .kv{ display:flex; gap:6px } .k{color:var(--muted)} .v{color:var(--text)}
 
 .modal-back{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:140 }
@@ -267,7 +263,7 @@ textarea{ min-height:84px; resize:vertical }
         <h1>Landa Quantum – Troubleshoot Suite</h1>
       </div>
     </div>
-    <span class="badge-env">V18.8</span>
+    <span class="badge-env">V18.8-Dynamic</span>
   </header>
 
   <div class="wrap">
@@ -301,14 +297,14 @@ textarea{ min-height:84px; resize:vertical }
         </div>
       </section>
 
-      <!-- Create Case – ordered, compact, custom dropdowns -->
+      <!-- Create Case -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
           <form id="caseForm" onsubmit="saveCase(event)">
             <div class="grid cols-2">
 
-              <!-- 1) Machine Type / Model -->
+              <!-- Machine Type / Model -->
               <div>
                 <label class="label v13">Machine Type *</label>
                 <div class="chips" id="machineTypeChips">
@@ -322,7 +318,7 @@ textarea{ min-height:84px; resize:vertical }
                 <div id="dd-model" class="dd field-model"></div>
               </div>
 
-              <!-- 2) SF Case / Software -->
+              <!-- SF Case / Software -->
               <div>
                 <label class="label v13">SF Case *</label>
                 <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
@@ -332,17 +328,28 @@ textarea{ min-height:84px; resize:vertical }
                 <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
               </div>
 
-              <!-- 3) System / Sub-System (Sub hidden until System chosen) -->
+              <!-- Dynamic hierarchy: System → Sub-System → Category → Item -->
               <div>
                 <label class="label v13">System *</label>
                 <div id="dd-system" class="dd field-system"></div>
               </div>
-              <div id="subSystemWrap" class="hidden">
-                <label class="label v13">Sub-System</label>
-                <div id="dd-subsystem" class="dd field-subsystem"></div>
+
+              <div id="wrap-sub" class="hidden">
+                <label class="label v13">Sub-System *</label>
+                <div id="dd-sub" class="dd field-subsystem"></div>
               </div>
 
-              <!-- 4) TFS (toggle) -->
+              <div id="wrap-cat" class="hidden">
+                <label class="label v13">Category *</label>
+                <div id="dd-cat" class="dd field-category"></div>
+              </div>
+
+              <div id="wrap-item" class="hidden">
+                <label class="label v13">Item *</label>
+                <div id="dd-item" class="dd field-item"></div>
+              </div>
+
+              <!-- TFS -->
               <div class="fit-inline full">
                 <div>
                   <label class="label v13">TFS</label>
@@ -355,7 +362,7 @@ textarea{ min-height:84px; resize:vertical }
 
               <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
 
-              <!-- 5) Issue / Symptoms -->
+              <!-- Issue / Symptoms -->
               <div class="full">
                 <label class="label v13">Issue Summary *</label>
                 <input class="input v13" id="issueSummary" placeholder="One line summary">
@@ -365,7 +372,7 @@ textarea{ min-height:84px; resize:vertical }
                 <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
               </div>
 
-              <!-- 6) Troubleshooting / Part -->
+              <!-- Troubleshooting / Part -->
               <div class="full">
                 <label class="label v13">Troubleshooting (steps)</label>
                 <div id="tsSteps" class="field-troubles"></div>
@@ -379,7 +386,7 @@ textarea{ min-height:84px; resize:vertical }
                 </div>
               </div>
 
-              <!-- 7) Solution / Verification / Notes -->
+              <!-- Solution / Verification / Notes -->
               <div class="full">
                 <label class="label v13">Solution Implemented *</label>
                 <textarea id="solution" class="input v13 field-troubles" placeholder="What fixed the issue"></textarea>
@@ -393,7 +400,7 @@ textarea{ min-height:84px; resize:vertical }
                 <textarea id="notes" class="input v13 field-troubles" placeholder="Anything noteworthy for future cases"></textarea>
               </div>
 
-              <!-- 8) Attachments -->
+              <!-- Attachments -->
               <div class="full">
                 <label class="label v13">Attachments (multiple)</label>
                 <div id="filesWrap"></div>
@@ -425,7 +432,6 @@ textarea{ min-height:84px; resize:vertical }
         <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
       </section>
 
-      <!-- Settings -->
       <section id="page-settings" class="page hidden">
         <div class="panel"><h2 style="margin:0 0 10px">Settings</h2><div class="help">Coming soon…</div></div>
       </section>
@@ -490,11 +496,7 @@ document.getElementById('btnLogout').addEventListener('click', e=>{
   document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
 });
 
-/* ===== Custom Dropdown Engine =====
-   Usage:
-   const dd = makeDropdown(containerEl, {placeholder, options:[{value,label},...], onChange:(v,l)=>{}});
-   Methods: dd.setOptions(list), dd.setValue(value), dd.disable(bool)
-*/
+/* ===== Custom Dropdown Engine ===== */
 function makeDropdown(container, { placeholder='Choose…', options=[], onChange=()=>{}, maxHeight=260 }){
   container.classList.add('dd');
   container.innerHTML = `
@@ -507,175 +509,136 @@ function makeDropdown(container, { placeholder='Choose…', options=[], onChange
   const list = container.querySelector('.dd-list');
   const label = container.querySelector('.dd-label');
   const input = container.querySelector('.dd-value');
-
   let state = { open:false, opts:options, index:-1 };
 
   function render(){
     list.innerHTML = '';
-    if(!state.opts || !state.opts.length){
-      list.innerHTML = `<div class="dd-empty">No options</div>`;
-      return;
-    }
+    if(!state.opts || !state.opts.length){ list.innerHTML = `<div class="dd-empty">No options</div>`; return; }
     state.opts.forEach((o,i)=>{
-      const it = document.createElement('div');
-      it.className='dd-item';
-      it.setAttribute('data-value', o.value);
-      it.setAttribute('data-index', i);
+      const it=document.createElement('div'); it.className='dd-item';
+      it.setAttribute('data-value',o.value); it.setAttribute('data-index',i);
       if(String(input.value)===String(o.value)) it.setAttribute('aria-selected','true');
-      it.textContent = o.label ?? o.value;
+      it.textContent=o.label ?? o.value;
       it.addEventListener('click', ()=> selectIndex(i));
       list.appendChild(it);
     });
   }
-  function open(){
-    if(container.classList.contains('disabled')) return;
+  function open(){ if(container.classList.contains('disabled')) return;
     container.classList.add('open'); state.open=true;
-    // focus current or first
-    const idx = Math.max(0, state.opts.findIndex(o=> String(o.value)===String(input.value)));
-    highlight(idx);
-    adjustInView();
-    window.addEventListener('click', outside);
-    window.addEventListener('keydown', keys);
+    const idx=Math.max(0, state.opts.findIndex(o=> String(o.value)===String(input.value)));
+    highlight(idx); adjustInView();
+    window.addEventListener('click', outside); window.addEventListener('keydown', keys);
   }
-  function close(){
-    container.classList.remove('open'); state.open=false;
-    window.removeEventListener('click', outside);
-    window.removeEventListener('keydown', keys);
-  }
+  function close(){ container.classList.remove('open'); state.open=false;
+    window.removeEventListener('click', outside); window.removeEventListener('keydown', keys); }
   function outside(e){ if(!container.contains(e.target)) close(); }
   function keys(e){
     if(!state.open) return;
     if(e.key==='Escape'){ close(); btn.focus(); }
     else if(e.key==='ArrowDown'){ e.preventDefault(); highlight(Math.min(state.index+1, state.opts.length-1)); adjustInView(); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); highlight(Math.max(state.index-1, 0)); adjustInView(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); highlight(Math.max(state.index-1,0)); adjustInView(); }
     else if(e.key==='Enter'){ e.preventDefault(); if(state.index>=0) selectIndex(state.index); }
   }
-  function highlight(i){
-    state.index = i;
-    [...list.children].forEach(c=>c.classList.remove('hover'));
-    if(list.children[i]) list.children[i].classList.add('hover');
-  }
-  function adjustInView(){
-    const el = list.children[state.index];
-    if(!el) return;
-    const r = el.getBoundingClientRect();
-    const L = list.getBoundingClientRect();
-    if(r.top < L.top) list.scrollTop -= (L.top - r.top) + 6;
-    if(r.bottom > L.bottom) list.scrollTop += (r.bottom - L.bottom) + 6;
-  }
-  function selectIndex(i){
-    const o = state.opts[i]; if(!o) return;
-    input.value = o.value;
-    label.textContent = o.label ?? o.value;
-    [...list.children].forEach(x=>x.removeAttribute('aria-selected'));
-    if(list.children[i]) list.children[i].setAttribute('aria-selected','true');
-    onChange(o.value, o.label ?? o.value);
-    close();
-  }
-
-  btn.addEventListener('click', ()=> state.open ? close() : open());
-
-  // API
-  const api = {
-    setOptions(newOpts){
-      state.opts = newOpts || [];
-      render();
-      // reset selection if not found
-      if(!state.opts.some(o=> String(o.value)===String(input.value))){
-        input.value=''; label.textContent=placeholder;
-      }
-    },
-    setValue(v){
-      const i = state.opts.findIndex(o=> String(o.value)===String(v));
-      if(i>=0){ selectIndex(i); }
-      else { input.value=''; label.textContent=placeholder; }
-    },
-    value(){ return input.value },
-    disable(flag){
-      container.classList.toggle('disabled', !!flag);
-    }
-  };
-  render();
-  return api;
+  function highlight(i){ state.index=i; [...list.children].forEach(c=>c.classList.remove('hover')); if(list.children[i]) list.children[i].classList.add('hover'); }
+  function adjustInView(){ const el=list.children[state.index]; if(!el) return; const r=el.getBoundingClientRect(); const L=list.getBoundingClientRect();
+    if(r.top<L.top) list.scrollTop -= (L.top-r.top)+6; if(r.bottom>L.bottom) list.scrollTop += (r.bottom-L.bottom)+6; }
+  function selectIndex(i){ const o=state.opts[i]; if(!o) return;
+    input.value=o.value; label.textContent=o.label ?? o.value;
+    [...list.children].forEach(x=>x.removeAttribute('aria-selected')); if(list.children[i]) list.children[i].setAttribute('aria-selected','true');
+    onChange(o.value, o.label ?? o.value); close(); }
+  btn.addEventListener('click', ()=> state.open?close():open());
+  const api={ setOptions(newOpts){ state.opts=newOpts||[]; render(); if(!state.opts.some(o=> String(o.value)===String(input.value))){ input.value=''; label.textContent=placeholder; } },
+              setValue(v){ const i=state.opts.findIndex(o=> String(o.value)===String(v)); if(i>=0){ selectIndex(i); } else { input.value=''; label.textContent=placeholder; } },
+              value(){ return input.value }, disable(flag){ container.classList.toggle('disabled', !!flag); } };
+  render(); return api;
 }
 
-/* ===== Form: chips + custom dropdowns data ===== */
+/* ===== Machine Type / Model ===== */
 const machineTypeChips=document.getElementById('machineTypeChips');
 const hiddenType=document.getElementById('machineType');
+const ddModel = makeDropdown(document.getElementById('dd-model'), { placeholder:'Choose…', options:[] });
 
-const ddModelEl = document.getElementById('dd-model');
-const ddSystemEl = document.getElementById('dd-system');
-const ddSubEl   = document.getElementById('dd-subsystem');
-const subSystemWrap = document.getElementById('subSystemWrap');
-
-/* Options */
-const SYSTEMS = [
-  'Machine','BSS','STS','IPS','BCU','IRD','Hot Air','PSS','CWS','Ventilation',
-  'MSPS','ITS','EC','DFE','PQ','QCS','PC Cabinet','ICS'
-].map(x=>({value:x,label:x}));
-
-/* Example subs (placeholder – תחליף כשתספק קובץ מלא) */
-const SUBS = {
-  'Machine':['Main Frame','Safety','Power'].map(x=>({value:x,label:x})),
-  'BSS':['Motors','Belts','Sensors'].map(x=>({value:x,label:x})),
-  'STS':['Rails','Carriage','Encoders'].map(x=>({value:x,label:x})),
-  'IPS':['Controller','IO','PSU'].map(x=>({value:x,label:x})),
-  'DFE':['RIP','Network','Licenses'].map(x=>({value:x,label:x}))
-};
-
-/* Build dropdowns */
-const ddModel = makeDropdown(ddModelEl, { placeholder:'Choose…', options:[] });
-const ddSystem = makeDropdown(ddSystemEl, {
-  placeholder:'Choose…',
-  options:SYSTEMS,
-  onChange:(val)=>{
-    // toggle Sub-System visibility
-    const opts = SUBS[val] || [];
-    if(opts.length){
-      ddSub.setOptions(opts);
-      ddSub.setValue('');
-      ddSubEl.parentElement.classList.remove('disabled');
-      subSystemWrap.classList.remove('hidden');
-    }else{
-      ddSub.setOptions([]);
-      ddSub.setValue('');
-      subSystemWrap.classList.add('hidden');
-    }
-  }
-});
-const ddSub = makeDropdown(ddSubEl, { placeholder:'Select subsystem…', options:[] });
-
-/* Machine Type chips -> fill Model list */
 function fillModels(kind){
-  const prefix = (kind==='Duplex') ? 'D' : 'S';
-  const max = (prefix==='D') ? 19 : 9;
-  const opts = Array.from({length:max},(_,i)=> ({ value: `${prefix}${i+1}`, label: `${prefix}${i+1}` }));
-  ddModel.setOptions(opts);
-  ddModel.setValue(''); // reset
+  const prefix=(kind==='Duplex')?'D':'S';
+  const max=(prefix==='D')?19:9;
+  const opts=Array.from({length:max},(_,i)=>({value:`${prefix}${i+1}`,label:`${prefix}${i+1}`}));
+  ddModel.setOptions(opts); ddModel.setValue('');
 }
 fillModels(hiddenType.value||'Simplex');
+machineTypeChips.addEventListener('click', (e)=>{
+  const chip=e.target.closest('.chip'); if(!chip) return;
+  machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active'); hiddenType.value=chip.dataset.type; fillModels(hiddenType.value);
+});
 
-if(machineTypeChips){
-  machineTypeChips.addEventListener('click', (e)=>{
-    const chip=e.target.closest('.chip'); if(!chip) return;
-    machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-    chip.classList.add('active');
-    hiddenType.value = chip.dataset.type;
-    fillModels(hiddenType.value);
-  });
+/* ===== Hierarchical data (from your image – BSS) ===== */
+const HIER = {
+  "BSS": {
+    subSystems: [
+      "LIB","BCU","BCD&BTD Motors","BACS","Fly-Off","Air Knife","Hot Plate","Dancer","BCLS","Vacuum Box"
+    ],
+    categories: {
+      "HW": ["Rollers","Sensors","Motors","Brackets","Gaskets","Spare Parts","Pipes","Encoders","Valves"],
+      "SW": ["LIA","RTC","OPC","Parameters","Inverters Version"],
+      "EC": ["Inverters","Cables","SSR","CB's","FEC's"]
+    }
+  }
+};
+// Add other systems here as they arrive:
+const SYSTEMS = Object.keys(HIER).map(x=>({value:x,label:x}));
+
+/* ===== Build dynamic dropdowns: System → Sub → Category → Item ===== */
+const ddSystem = makeDropdown(document.getElementById('dd-system'), { placeholder:'Choose…', options:SYSTEMS, onChange:onSystem });
+const wrapSub = document.getElementById('wrap-sub');
+const wrapCat = document.getElementById('wrap-cat');
+const wrapItem= document.getElementById('wrap-item');
+
+const ddSub = makeDropdown(document.getElementById('dd-sub'), { placeholder:'Select sub-system…', options:[], onChange:onSub });
+const ddCat = makeDropdown(document.getElementById('dd-cat'), { placeholder:'HW / SW / EC', options:[], onChange:onCat });
+const ddItem= makeDropdown(document.getElementById('dd-item'), { placeholder:'Select item…', options:[] });
+
+function onSystem(val){
+  // Reset downstream
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
+  wrapSub.classList.add('hidden'); ddSub.setOptions([]); ddSub.setValue('');
+
+  const node = HIER[val];
+  if(!node){ return; }
+
+  // Fill Sub-Systems
+  ddSub.setOptions(node.subSystems.map(s=>({value:s,label:s})));
+  wrapSub.classList.remove('hidden');
 }
+function onSub(){
+  // Reset deeper levels
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
 
-/* ===== Subsystem enable/disable handled inside ddSystem.onChange ===== */
+  const sys = ddSystem.value();
+  if(!sys || !HIER[sys]) return;
+
+  // Fill Categories
+  const cats = Object.keys(HIER[sys].categories);
+  ddCat.setOptions(cats.map(c=>({value:c,label:c})));
+  wrapCat.classList.remove('hidden');
+}
+function onCat(catVal){
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  const sys = ddSystem.value();
+  if(!sys || !catVal) return;
+  const items = (HIER[sys].categories[catVal] || []).map(x=>({value:x,label:x}));
+  ddItem.setOptions(items);
+  wrapItem.classList.remove('hidden');
+}
 
 /* ===== TFS toggle ===== */
 const tfsToggle=document.getElementById('tfsToggle');
 const tfsNumber=document.getElementById('tfsNumber');
-if(tfsToggle){
-  tfsToggle.addEventListener('change', ()=>{
-    if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
-    else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
-  });
-}
+tfsToggle.addEventListener('change', ()=>{
+  if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
+  else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
+});
 
 /* ===== Troubleshooting steps ===== */
 const tsSteps=document.getElementById('tsSteps');
@@ -688,7 +651,7 @@ function addStep(val=''){
 addStep('Check connections and sensors');
 addStep('Verify model-specific settings');
 
-/* ===== Part smart suggest (demo static) ===== */
+/* ===== Part smart suggest (demo) ===== */
 const partInput=document.getElementById('partInput');
 const partSuggest=document.getElementById('partSuggest');
 if(partInput){
@@ -720,11 +683,13 @@ async function saveCase(e){
 
   const data={
     sfCase:val('sfCase'),
-    tfsNumber: (tfsToggle && tfsToggle.checked) ? val('tfsNumber') : '',
+    tfsNumber: tfsToggle.checked ? val('tfsNumber') : '',
     machineType: val('machineType'),
     model: ddModel.value(),
     system: ddSystem.value(),
     subSystem: ddSub.value(),
+    category: ddCat.value(),
+    item: ddItem.value(),
     softwareVersion: val('softwareVersion'),
     issueSummary: val('issueSummary'),
     symptoms: val('symptoms'),
@@ -738,17 +703,17 @@ async function saveCase(e){
     author:'Expert'
   };
 
-  const errors=[]; if(!req(data.sfCase))errors.push('sfCase');
-  if(!req(data.machineType))errors.push('machineType');
+  const errors=[];
+  if(!req(data.sfCase))errors.push('sfCase');
   if(!req(data.model))errors.push('model');
   if(!req(data.system))errors.push('system');
+  if(!req(data.subSystem))errors.push('subSystem');
+  if(!req(data.category))errors.push('category');
+  if(!req(data.item))errors.push('item');
   if(!req(data.issueSummary))errors.push('issueSummary');
   if(!req(data.solution))errors.push('solution');
 
-  if(errors.length){
-    toast('Please fill required: '+errors.join(', '),'err');
-    return;
-  }
+  if(errors.length){ toast('Please fill required: '+errors.join(', '),'err'); return; }
 
   // files
   const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
@@ -764,13 +729,15 @@ async function saveCase(e){
 
   // reset
   document.getElementById('caseForm').reset();
-  // reset chips/type
   hiddenType.value='Simplex';
   machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
   fillModels('Simplex');
-  ddSystem.setValue('');
-  ddSub.setOptions([]); ddSub.setValue(''); subSystemWrap.classList.add('hidden');
+
+  ddSystem.setValue(''); ddSub.setOptions([]); ddSub.setValue('');
+  ddCat.setOptions([]); ddCat.setValue(''); ddItem.setOptions([]); ddItem.setValue('');
+  wrapSub.classList.add('hidden'); wrapCat.classList.add('hidden'); wrapItem.classList.add('hidden');
+
   document.getElementById('filesWrap').innerHTML=''; addFileRow();
   tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
 
@@ -779,14 +746,15 @@ async function saveCase(e){
 function collectSteps(){ return [...tsSteps.querySelectorAll('.inline input')].map(i=>i.value).filter(v=>String(v).trim()).join('\n') }
 function val(id){ const el=document.getElementById(id); return el?el.value:'' }
 
-/* ===== Cases list/render ===== */
+/* ===== Cases render ===== */
 function renderCases(){
   const list=document.getElementById('casesList');
   const q=(document.getElementById('searchBox').value||'').toLowerCase();
   const arr=getCases().filter(c=> !q ||
     (c.issueSummary||'').toLowerCase().includes(q) ||
     (c.model||'').toLowerCase().includes(q) ||
-    (c.system||'').toLowerCase().includes(q)
+    (c.system||'').toLowerCase().includes(q) ||
+    (c.item||'').toLowerCase().includes(q)
   );
   const badge=document.getElementById('casesCount'); if(badge) badge.textContent=String(arr.length);
   list.innerHTML = arr.length ? arr.map((c,i)=>caseCard(c,i)).join('') : '<div class="panel">No cases yet.</div>';
@@ -799,7 +767,8 @@ function caseCard(c,i){
       <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
       <div class="meta">
         <span class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></span>
-        <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem? ' / '+esc(c.subSystem):''}</span></span>
+        <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></span>
+        <span class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></span>
         <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span>
       </div>
       <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
@@ -820,7 +789,8 @@ function openCase(i){
     <div class="grid cols-2">
       <div class="panel">
         <div class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></div>
-        <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')}${c.subSystem?' / '+esc(c.subSystem):''}</span></div>
+        <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></div>
+        <div class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></div>
         <div class="kv"><span class="k">Software:</span><span class="v">${esc(c.softwareVersion||'')}</span></div>
         <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div>
       </div>
@@ -855,7 +825,7 @@ function updateKPIs(){
 }
 function exportCSV(){
   const arr=getCases();
-  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','attachments','createdAt','author'];
+  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','category','item','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','attachments','createdAt','author'];
   const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((Array.isArray(o[k])? o[k].length+' file(s)' : (o[k]||'')).toString().replace(/\n/g,' '))).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
 }
@@ -864,8 +834,7 @@ function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','
 
 /* ===== Particles ===== */
 (function(){
-  const c=document.getElementById('particles'); if(!c) return;
-  const ctx=c.getContext('2d'); let w,h;
+  const c=document.getElementById('particles'); if(!c) return; const ctx=c.getContext('2d'); let w,h;
   function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
   addEventListener('resize',resize); resize();
   const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.6,vx:(Math.random()-.5)*0.28,vy:(Math.random()-.5)*0.28}));
@@ -881,8 +850,6 @@ function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','
   }
   step();
 })();
-
-/* Init */
 go('dashboard');
 </script>
 </body>
