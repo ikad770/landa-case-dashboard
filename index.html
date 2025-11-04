@@ -440,6 +440,18 @@ textarea{ min-height:84px; resize:vertical }
     <p class="help">Follow the guided diagnostic to identify the source of a problem step-by-step.</p>
 
     <div id="diagContainer">
+      <!-- Step 0 – Problem selection -->
+<div id="diagSelect" class="panel" style="margin-top:10px">
+  <h3 style="margin:0 0 10px">Select Issue to Diagnose</h3>
+  <p class="help">Choose the problem type to start the guided analysis:</p>
+
+  <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px">
+    <button class="btn" onclick="startDiagnosis('scratches')">Scratches</button>
+    <button class="btn" onclick="startDiagnosis('uniformity')">Uniformity</button>
+    <button class="btn" onclick="startDiagnosis('jetting')">Jetting</button>
+    <button class="btn" onclick="startDiagnosis('transfer')">Transfer</button>
+  </div>
+</div>
       <!-- Step 1 -->
       <div id="diagStep1" class="panel" style="margin-top:10px">
         <h3>Problem: <span style="color:var(--accent)">SetOff</span></h3>
@@ -950,6 +962,22 @@ function loadDiagnosis(){
   }
 }
 loadDiagnosis();
+  function startDiagnosis(type){
+  localStorage.setItem('landa_diag_issue', type);
+  document.getElementById('diagSelect').classList.add('hidden');
+  document.getElementById('diagStep1').classList.remove('hidden');
+
+  // התאמה לטקסט הכותרת
+  const issueMap = {
+    scratches: 'Scratches',
+    uniformity: 'Uniformity',
+    jetting: 'Jetting',
+    transfer: 'Transfer'
+  };
+  const issueName = issueMap[type] || 'General';
+  document.querySelector('#diagStep1 h3 span').textContent = issueName;
+}
+
   
 go('dashboard');
 </script>
