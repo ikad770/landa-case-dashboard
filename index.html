@@ -272,6 +272,7 @@ textarea{ min-height:84px; resize:vertical }
         <a class="item active" href="#" data-route="dashboard"><span>Dashboard</span></a>
         <a class="item" href="#" data-route="create"><span>Create Case</span></a>
         <a class="item" href="#" data-route="cases"><span>All Cases</span><span class="badge" id="casesCount">0</span></a>
+        <a class="item" href="#" data-route="diagnosis"><span>Root Cause Analyzer</span></a>
         <a class="item" href="#" data-route="settings"><span>Settings</span></a>
         <a class="item" href="#" id="btnLogout"><span>Logout</span></a>
       </nav>
@@ -431,6 +432,30 @@ textarea{ min-height:84px; resize:vertical }
         </div>
         <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
       </section>
+
+      <!-- Root Cause Analyzer -->
+<section id="page-diagnosis" class="page hidden">
+  <div class="panel">
+    <h2 style="margin:0 0 10px">Root Cause Analyzer – Fishbone Troubleshooter</h2>
+    <p class="help">Follow the guided diagnostic to identify the source of a problem step-by-step.</p>
+
+    <div id="diagContainer">
+      <!-- Step 1 -->
+      <div id="diagStep1" class="panel" style="margin-top:10px">
+        <h3>Problem: <span style="color:var(--accent)">SetOff</span></h3>
+        <p>Perform a print of the same job <b>with</b> and <b>without coating</b>, then examine the drying of both samples.</p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
+          <button class="btn" onclick="selectDiagnosis('drying')">Job without coating is NOT properly dried</button>
+          <button class="btn" onclick="selectDiagnosis('coating')">Job with coating is NOT properly dried</button>
+          <button class="btn" onclick="selectDiagnosis('both')">Both samples are NOT properly dried</button>
+        </div>
+      </div>
+
+      <!-- Step 2 – dynamic -->
+      <div id="diagStep2" class="hidden" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
 
       <section id="page-settings" class="page hidden">
         <div class="panel"><h2 style="margin:0 0 10px">Settings</h2><div class="help">Coming soon…</div></div>
@@ -850,6 +875,82 @@ function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','
   }
   step();
 })();
+
+  /* ===== Root Cause Analyzer logic ===== */
+function selectDiagnosis(type){
+  const step1 = document.getElementById('diagStep1');
+  const step2 = document.getElementById('diagStep2');
+  step2.classList.remove('hidden');
+  step2.innerHTML = renderChecklist(type);
+  step1.scrollIntoView({behavior:'smooth'});
+  localStorage.setItem('landa_diag_state', type);
+}
+function renderChecklist(type){
+  let title='', checks=[];
+  if(type==='drying'){
+    title='Drying System Diagnostic';
+    checks=[
+      'Check IR lamp status and operation',
+      'Verify temperature sensor readings',
+      'Inspect airflow and exhaust levels',
+      'Confirm paper transport speed',
+      'Ensure drying rollers are clean and rotating'
+    ];
+  }else if(type==='coating'){
+    title='Coating System Diagnostic';
+    checks=[
+      'Verify coating pump pressure',
+      'Check coating viscosity and level',
+      'Inspect applicator alignment',
+      'Ensure UV lamps are operational',
+      'Confirm correct coating profile is loaded'
+    ];
+  }else if(type==='both'){
+    title='Full Machine Diagnostic';
+    checks=[
+      'Inspect both drying and coating systems',
+      'Run humidity calibration',
+      'Verify general temperature sensors',
+      'Check overall machine ventilation',
+      'Review latest software parameters for SetOff issue'
+    ];
+  }
+  return `
+  <div class="panel">
+    <h3>${title}</h3>
+    <p>Mark each step as completed:</p>
+    <div id="checklist" class="grid cols-1" style="gap:6px;margin-top:6px">
+      ${checks.map((c,i)=>`
+        <label style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="chk${i}" onchange="saveChecklist()">
+          <span>${c}</span>
+        </label>`).join('')}
+    </div>
+    <button class="btn small" style="margin-top:12px" onclick="restartDiagnosis()">Restart Diagnosis</button>
+  </div>`;
+}
+function saveChecklist(){
+  const boxes=[...document.querySelectorAll('#checklist input[type="checkbox"]')];
+  const done=boxes.map(b=>b.checked);
+  localStorage.setItem('landa_diag_checklist', JSON.stringify(done));
+}
+function restartDiagnosis(){
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
+  const step2=document.getElementById('diagStep2');
+  step2.innerHTML=''; step2.classList.add('hidden');
+  toast('Diagnosis restarted','ok');
+}
+function loadDiagnosis(){
+  const type=localStorage.getItem('landa_diag_state');
+  if(type){ document.getElementById('diagStep2').innerHTML=renderChecklist(type);
+    document.getElementById('diagStep2').classList.remove('hidden');
+    const saved=JSON.parse(localStorage.getItem('landa_diag_checklist')||'[]');
+    saved.forEach((v,i)=>{ const el=document.getElementById('chk'+i); if(el) el.checked=v; });
+  }
+}
+loadDiagnosis();
+  
 go('dashboard');
 </script>
 </body>
