@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.9-Fishbone)</title>
+<title>Landa Quantum – Troubleshoot Suite (V18.8-Dynamic)</title>
 
 <link rel="icon" type="image/svg+xml"
   href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
@@ -12,7 +12,7 @@
 :root{
   --bg:#0b1016; --bg2:#0e1420; --panel:rgba(18,24,34,.6); --glass:rgba(22,30,45,.55);
   --text:#e8f0ff; --muted:#9bb0d0; --border:rgba(255,255,255,.08);
-  --accent:#00aeef; --accent2:#3bd0ff; --ok:#4ade80; --warn:#f8c537; --err:#ff4967;
+  --accent:#00aeef; --accent2:#3bd0ff; --ok:#4ade80; --err:#ff4967;
   --header:56px; --aside-w:260px; --radius:16px;
 }
 *{box-sizing:border-box}
@@ -51,18 +51,25 @@ body{
 .btn.small{ padding:6px 10px; border-radius:9px; font-size:12.5px }
 .btn.danger{ border-color:rgba(255,73,103,.5); color:#fff }
 
-.badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted) }
-.badge.ok{ color:#0e1; border-color:rgba(74,222,128,.45) }
-.badge.err{ color:#ff889e; border-color:rgba(255,73,103,.55) }
-.badge.dim{ opacity:.8 }
-.kv{ display:flex; gap:6px } .k{color:var(--muted)} .v{color:var(--text)}
-
 .toast-wrap{ position:fixed; right:16px; top:calc(var(--header) + 8px); display:flex; flex-direction:column; gap:8px; z-index:110 }
 .toast{ padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(20,26,38,.85); box-shadow:0 14px 28px rgba(0,0,0,.35) }
 .toast.ok{ border-color:rgba(74,222,128,.5) } .toast.err{ border-color:rgba(255,73,103,.55) }
 #particles{ position:fixed; inset:0; z-index:-1; pointer-events:none }
 
-/* Layout */
+/* Login */
+#loginPage{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px }
+.auth{ width:min(460px, 92vw) }
+.logo{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:14px }
+.logo svg{ height:80px; filter:drop-shadow(0 0 16px rgba(0,174,239,.4)); animation:pulse 2.8s ease-in-out infinite }
+.logo .subtitle{ color:var(--muted); font-size:12.5px; letter-spacing:.6px }
+@keyframes pulse{0%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}50%{filter:drop-shadow(0 0 18px rgba(0,174,239,.45))}100%{filter:drop-shadow(0 0 0 rgba(0,174,239,0))}}
+.auth h2{ margin:0 0 6px; font-size:18px; letter-spacing:.5px; opacity:.92; text-align:center }
+.label{ display:block; color:var(--muted); margin:6px 2px 6px }
+.input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); outline:none }
+.btn.full{ width:100%; margin-top:14px }
+
+/* App Layout */
 .header{
   position:sticky; top:0; z-index:100;
   display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -118,15 +125,26 @@ body{
   .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
 }
 
-/* Inputs */
-.label{ display:block; color:var(--muted); margin:6px 2px 6px }
-.input, textarea, .file{
+/* Form controls */
+.label.v13{display:block; color:var(--muted); margin:6px 2px 6px}
+.input.v13, textarea, .file{
   width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text);
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); outline:none;
 }
 textarea{ min-height:84px; resize:vertical }
 
-/* Chips & Pills */
+/* OCD sizing */
+.field-sf{ max-width: 180px }
+.field-model{ max-width: 130px }
+.field-system{ max-width: 240px }
+.field-subsystem{ max-width: 260px }
+.field-category{ max-width: 220px }
+.field-item{ max-width: 260px }
+.field-sw{ max-width: 160px }
+.field-troubles{ max-width: 520px }
+.fit-inline{ display:inline-flex; gap:10px; align-items:center; flex-wrap:wrap }
+
+/* Chips */
 .chips{display:flex; gap:8px; flex-wrap:wrap}
 .chip{
   padding:6px 10px; border:1px solid var(--border); border-radius:999px; cursor:pointer; user-select:none;
@@ -134,7 +152,7 @@ textarea{ min-height:84px; resize:vertical }
 }
 .chip.active{ background:linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); border-color:rgba(0,174,239,.55) }
 
-/* Dropdown (glass) */
+/* ===== Custom Glass Dropdown ===== */
 .dd{ position:relative; display:inline-block; width:100%; max-width:100% }
 .dd-btn{
   width:100%; padding:10px 38px 10px 12px; border:1px solid var(--border); border-radius:10px;
@@ -161,15 +179,22 @@ textarea{ min-height:84px; resize:vertical }
   max-height:260px; overflow:auto; padding:6px 0; display:none; z-index:30;
 }
 .dd.open .dd-list{ display:block }
-.dd-item{ padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .12s }
+.dd-item{
+  padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:8px;
+  transition:background .12s, transform .12s, color .12s;
+}
 .dd-item:hover{ background:rgba(59,208,255,.12) }
 .dd-item[aria-selected="true"]::before{
   content:""; width:8px; height:8px; border-radius:2px; background:linear-gradient(180deg, var(--accent), var(--accent2));
   box-shadow:0 0 12px rgba(0,174,239,.5);
 }
 .dd-empty{ padding:8px 12px; color:var(--muted) }
+.dd.disabled .dd-btn{ opacity:.6; pointer-events:none }
+.dd-list::-webkit-scrollbar{ width:10px }
+.dd-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08); border:3px solid transparent; border-radius:10px; background-clip:padding-box }
+.dd-list::-webkit-scrollbar-thumb:hover{ background:rgba(59,208,255,.4); border-color:transparent }
 
-/* Issue selection cards (dashboard-ish) */
+  /* Issue selection cards */
 .issue-grid{display:flex;flex-wrap:wrap;gap:12px}
 .issue-card{
   flex:1 1 180px; min-width:180px; max-width:260px;
@@ -182,38 +207,16 @@ textarea{ min-height:84px; resize:vertical }
 .issue-card .title{font-weight:600;margin-bottom:6px}
 .issue-card .sub{color:var(--muted);font-size:12.5px}
 
-/* RCA new UI */
-.rca-steps{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px }
-.rca-step{ padding:6px 10px; border:1px solid var(--border); border-radius:999px; font-size:12.5px; opacity:.9 }
-.rca-step.active{ border-color:var(--accent); background:linear-gradient(180deg, rgba(0,174,239,.28), rgba(0,174,239,.08)); color:#fff }
-.rca-bar{ display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap }
-.rca-tabs{ display:flex; gap:8px; flex-wrap:wrap }
-.rca-tab{ padding:8px 10px; border:1px solid var(--border); border-radius:10px; cursor:pointer; opacity:.92; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)) }
-.rca-tab.active{ border-color:rgba(0,174,239,.6); background:linear-gradient(180deg, rgba(0,174,239,.24), rgba(0,174,239,.06)); color:#fff }
-.rca-spec{ display:grid; grid-template-columns: 1.2fr .9fr .9fr .9fr; gap:8px; align-items:center }
-@media (max-width:820px){ .rca-spec{ grid-template-columns: 1fr; } }
-.spec-pill{ padding:6px 8px; border:1px solid var(--border); border-radius:9px; font-size:12.5px; color:var(--muted) }
-.dev-pill{ padding:6px 8px; border:1px solid var(--border); border-radius:9px; font-size:12.5px }
-.dev-ok{ border-color:rgba(74,222,128,.5); color:#d7ffe1; background:linear-gradient(180deg, rgba(74,222,128,.18), rgba(74,222,128,.06)) }
-.dev-err{ border-color:rgba(255,73,103,.55); color:#ffd4db; background:linear-gradient(180deg, rgba(255,73,103,.18), rgba(255,73,103,.06)) }
-.dev-na { border-color:rgba(255,255,255,.18); color:#c9d5e8; background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)) }
-
-.rca-row{
-  border:1px solid var(--border); border-radius:14px; padding:12px;
-  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
-}
-.rca-row + .rca-row{ margin-top:10px }
-.role-badges{ display:flex; gap:6px; flex-wrap:wrap }
-.role{ font-size:11.5px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; color:#bcd0ea }
-.role.op{ border-color:rgba(74,222,128,.35) }
-.role.adv{ border-color:rgba(248,197,55,.38) }
-.role.fse{ border-color:rgba(0,174,239,.45) }
-
-/* Modal/KPI etc inherited */
+/* Cards/Modal/FAB */
+.fab{ position:fixed; left:14px; bottom:18px; z-index:60 }
+.fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow:0 18px 40px rgba(0,174,239,.35)}
 .case-card{ border:1px solid var(--border); border-radius:14px; padding:14px; display:grid; grid-template-columns:auto 1fr auto; gap:12px;
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow:0 14px 34px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.03); transition:.25s}
 .case-card:hover{ box-shadow:0 18px 40px rgba(0,174,239,.2), inset 0 0 0 1px rgba(59,208,255,.12); border-color:rgba(59,208,255,.35); transform:translateY(-1px) }
 .case-card .stripe{ width:6px; border-radius:8px; background:linear-gradient(180deg, var(--accent), var(--accent2)) }
+.case-card .title{ font-weight:600; opacity:.95 } .case-card .meta{ color:var(--muted); font-size:12.5px; display:flex; gap:10px; flex-wrap:wrap }
+.case-card .actions{ display:flex; gap:8px; align-items:center } .case-card .files{ color:var(--muted) }
+.kv{ display:flex; gap:6px } .k{color:var(--muted)} .v{color:var(--text)}
 
 .modal-back{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:140 }
 .modal{
@@ -231,8 +234,8 @@ textarea{ min-height:84px; resize:vertical }
 
 <!-- LOGIN -->
 <section id="loginPage">
-  <div class="auth panel center" style="width:min(460px, 92vw)">
-    <div class="logo" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px">
+  <div class="auth panel center">
+    <div class="logo">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" aria-label="Landa Digital Printing">
         <defs>
           <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00aeef"/><stop offset="100%" stop-color="#3bd0ff"/></linearGradient>
@@ -243,14 +246,14 @@ textarea{ min-height:84px; resize:vertical }
         <text x="50%" y="82%" text-anchor="middle" fill="#9bb0d0"
               font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">Digital Printing</text>
       </svg>
-      <div class="subtitle" style="color:var(--muted);font-size:12.5px;letter-spacing:.6px">Quantum Troubleshoot Suite</div>
+      <div class="subtitle">Quantum Troubleshoot Suite</div>
     </div>
-    <h2 style="margin:0 0 6px; font-size:18px; letter-spacing:.5px; opacity:.92; text-align:center">Sign in to continue</h2>
+    <h2>Sign in to continue</h2>
     <label class="label" for="authUser">Username</label>
     <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
     <label class="label" for="authPass">Password</label>
     <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-    <button class="btn primary" style="width:100%;margin-top:14px" id="btnLogin">Login</button>
+    <button class="btn primary full" id="btnLogin">Login</button>
   </div>
 </section>
 
@@ -273,7 +276,7 @@ textarea{ min-height:84px; resize:vertical }
         <h1>Landa Quantum – Troubleshoot Suite</h1>
       </div>
     </div>
-    <span class="badge badge-env">V18.9-Fishbone</span>
+    <span class="badge-env">V18.8-Dynamic</span>
   </header>
 
   <div class="wrap">
@@ -308,14 +311,16 @@ textarea{ min-height:84px; resize:vertical }
         </div>
       </section>
 
-      <!-- Create Case (unchanged structurally, kept short here for focus) -->
+      <!-- Create Case -->
       <section id="page-create" class="page hidden">
         <div class="panel">
           <h2 style="margin:0 0 10px">Create New Case</h2>
           <form id="caseForm" onsubmit="saveCase(event)">
             <div class="grid cols-2">
+
+              <!-- Machine Type / Model -->
               <div>
-                <label class="label">Machine Type *</label>
+                <label class="label v13">Machine Type *</label>
                 <div class="chips" id="machineTypeChips">
                   <div class="chip active" data-type="Simplex">Simplex</div>
                   <div class="chip" data-type="Duplex">Duplex</div>
@@ -323,39 +328,98 @@ textarea{ min-height:84px; resize:vertical }
                 <input type="hidden" id="machineType" value="Simplex">
               </div>
               <div>
-                <label class="label">Model *</label>
-                <div id="dd-model" class="dd" style="max-width:130px"></div>
+                <label class="label v13">Model *</label>
+                <div id="dd-model" class="dd field-model"></div>
               </div>
 
+              <!-- SF Case / Software -->
               <div>
-                <label class="label">SF Case *</label>
-                <input class="input" id="sfCase" inputmode="numeric" placeholder="123456" style="max-width:180px">
+                <label class="label v13">SF Case *</label>
+                <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
               </div>
               <div>
-                <label class="label">Software Version</label>
-                <input class="input" id="softwareVersion" placeholder="4.2.11" style="max-width:160px">
+                <label class="label v13">Software Version</label>
+                <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
+              </div>
+
+              <!-- Dynamic hierarchy: System → Sub-System → Category → Item -->
+              <div>
+                <label class="label v13">System *</label>
+                <div id="dd-system" class="dd field-system"></div>
+              </div>
+
+              <div id="wrap-sub" class="hidden">
+                <label class="label v13">Sub-System *</label>
+                <div id="dd-sub" class="dd field-subsystem"></div>
+              </div>
+
+              <div id="wrap-cat" class="hidden">
+                <label class="label v13">Category *</label>
+                <div id="dd-cat" class="dd field-category"></div>
+              </div>
+
+              <div id="wrap-item" class="hidden">
+                <label class="label v13">Item *</label>
+                <div id="dd-item" class="dd field-item"></div>
+              </div>
+
+              <!-- TFS -->
+              <div class="fit-inline full">
+                <div>
+                  <label class="label v13">TFS</label>
+                  <div class="fit-inline">
+                    <input type="checkbox" id="tfsToggle" title="Enable TFS">
+                    <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
+                  </div>
+                </div>
               </div>
 
               <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
 
+              <!-- Issue / Symptoms -->
               <div class="full">
-                <label class="label">Issue Summary *</label>
-                <input class="input" id="issueSummary" placeholder="One line summary">
+                <label class="label v13">Issue Summary *</label>
+                <input class="input v13" id="issueSummary" placeholder="One line summary">
               </div>
               <div class="full">
-                <label class="label">Symptoms / Error Messages</label>
-                <textarea id="symptoms" class="input" placeholder="Short bullets or error codes"></textarea>
+                <label class="label v13">Symptoms / Error Messages</label>
+                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
               </div>
 
+              <!-- Troubleshooting / Part -->
               <div class="full">
-                <label class="label">Troubleshooting (steps)</label>
-                <div id="tsSteps"></div>
+                <label class="label v13">Troubleshooting (steps)</label>
+                <div id="tsSteps" class="field-troubles"></div>
                 <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
               </div>
-
               <div class="full">
-                <label class="label">Solution Implemented *</label>
-                <textarea id="solution" class="input" placeholder="What fixed the issue"></textarea>
+                <label class="label v13">Part (Catalog)</label>
+                <div class="partwrap field-troubles">
+                  <input class="input v13" id="partInput" placeholder="Type to search part number (e.g., 12-34567)…">
+                  <div class="part-suggest" id="partSuggest"></div>
+                </div>
+              </div>
+
+              <!-- Solution / Verification / Notes -->
+              <div class="full">
+                <label class="label v13">Solution Implemented *</label>
+                <textarea id="solution" class="input v13 field-troubles" placeholder="What fixed the issue"></textarea>
+              </div>
+              <div class="full">
+                <label class="label v13">Verification Method</label>
+                <input id="verification" class="input v13 field-troubles" placeholder="How did we verify the fix?">
+              </div>
+              <div class="full">
+                <label class="label v13">Notes</label>
+                <textarea id="notes" class="input v13 field-troubles" placeholder="Anything noteworthy for future cases"></textarea>
+              </div>
+
+              <!-- Attachments -->
+              <div class="full">
+                <label class="label v13">Attachments (multiple)</label>
+                <div id="filesWrap"></div>
+                <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
+                <div class="help">Accepted: pdf, doc, xls, png, jpg, jpeg, zip</div>
               </div>
 
               <div class="inline full" style="margin-top:6px">
@@ -373,7 +437,7 @@ textarea{ min-height:84px; resize:vertical }
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
             <h2 style="margin:0">All Cases</h2>
             <div class="inline" style="flex-wrap:wrap; gap:8px">
-              <input id="searchBox" class="input" placeholder="Search text (Issue / Model / System)" style="min-width:220px">
+              <input id="searchBox" class="input v13" placeholder="Search text (Issue / Model / System)" style="min-width:220px">
               <button class="btn" onclick="renderCases()">Apply</button>
               <button class="btn" onclick="exportCSV()">Export CSV</button>
             </div>
@@ -382,77 +446,55 @@ textarea{ min-height:84px; resize:vertical }
         <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
       </section>
 
-      <!-- Root Cause Analyzer – NEW -->
-      <section id="page-diagnosis" class="page hidden">
-        <div class="panel">
-          <h2 style="margin:0 0 10px">Root Cause Analyzer – Fishbone Troubleshooter</h2>
-          <p class="help">Follow the guided diagnostic to identify the source of a problem step-by-step.</p>
+      <!-- Root Cause Analyzer -->
+<section id="page-diagnosis" class="page hidden">
+  <div class="panel">
+    <h2 style="margin:0 0 10px">Root Cause Analyzer – Fishbone Troubleshooter</h2>
+    <p class="help">Follow the guided diagnostic to identify the source of a problem step-by-step.</p>
 
-          <div class="rca-steps">
-            <span class="rca-step active" id="rcaStep1">1) Select issue</span>
-            <span class="rca-step" id="rcaStep2">2) Classify</span>
-            <span class="rca-step" id="rcaStep3">3) Checklists & Specs</span>
-            <span class="rca-step" id="rcaStep4">4) Summary</span>
-          </div>
+    <div id="diagContainer">
+<!-- Step 0 – Problem selection -->
+<div id="diagSelect" class="panel" style="margin-top:10px">
+  <h3 style="margin:0 0 10px">Select Issue to Diagnose</h3>
+  <p class="help">Choose the problem type to start the guided analysis:</p>
+  <div class="issue-grid">
+  <div class="issue-card" onclick="startDiagnosis('setoff')">
+    <div class="title">SetOff</div><div class="sub">Drying / Coating</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('scratches')">
+    <div class="title">Scratches</div><div class="sub">Print / Blanket</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('uniformity')">
+    <div class="title">Uniformity</div><div class="sub">Density / Bands</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('jetting')">
+    <div class="title">Jetting</div><div class="sub">Nozzles / Missing</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('transfer')">
+    <div class="title">Transfer</div><div class="sub">Media / Adhesion</div>
+  </div>
+</div>
+      <!-- Step 1 -->
+      <div id="diagStep1" class="panel hidden" style="margin-top:10px">
+         <h3>Problem: <span id="issueName" style="color:var(--accent)">—</span></h3>
+         <p>Perform a print of the same job <b>with</b> and <b>without coating</b>, then examine the drying of both samples.</p>
+        <!-- back button -->
+  <div class="inline" style="justify-content:flex-end;margin:6px 0 10px">
+    <button class="btn small" type="button" onclick="backToIssueSelect()">← Change issue</button>
+  </div>
 
-          <!-- Step 0 – Select Issue -->
-          <div id="diagSelect" class="panel" style="margin-top:10px">
-            <h3 style="margin:0 0 10px">Select Issue to Diagnose</h3>
-            <p class="help">Choose the problem type to start the guided analysis:</p>
-            <div class="issue-grid">
-              <div class="issue-card" onclick="startDiagnosis('setoff')">
-                <div class="title">SetOff</div><div class="sub">Drying / Coating</div>
-              </div>
-              <div class="issue-card" onclick="startDiagnosis('scratches')">
-                <div class="title">Scratches</div><div class="sub">Print / Blanket</div>
-              </div>
-              <div class="issue-card" onclick="startDiagnosis('uniformity')">
-                <div class="title">Uniformity</div><div class="sub">Density / Bands</div>
-              </div>
-              <div class="issue-card" onclick="startDiagnosis('jetting')">
-                <div class="title">Jetting</div><div class="sub">Nozzles / Missing</div>
-              </div>
-              <div class="issue-card" onclick="startDiagnosis('transfer')">
-                <div class="title">Transfer</div><div class="sub">Media / Adhesion</div>
-              </div>
-            </div>
-          </div>
+  <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
+    <button class="btn" onclick="selectDiagnosis('drying')">Job without coating is NOT properly dried</button>
+    <button class="btn" onclick="selectDiagnosis('coating')">Job with coating is NOT properly dried</button>
+    <button class="btn" onclick="selectDiagnosis('both')">Both samples are NOT properly dried</button>
+  </div>
+</div>
 
-          <!-- Step 1 – SetOff branching -->
-          <div id="diagStep1" class="panel hidden" style="margin-top:10px">
-            <h3 style="margin:0 0 6px">Problem: <span id="issueName" style="color:var(--accent)">—</span></h3>
-            <div class="help">Print same job <b>with</b> & <b>without coating</b> and examine drying. Select what you observe:</div>
-
-            <div class="inline" style="justify-content:flex-end;margin:6px 0 10px">
-              <button class="btn small" type="button" onclick="backToIssueSelect()">← Change issue</button>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
-              <button class="btn" onclick="selectBranch('drying')">Job without coating is NOT properly dried</button>
-              <button class="btn" onclick="selectBranch('coating')">Job with coating is NOT properly dried</button>
-              <button class="btn" onclick="selectBranch('both')">Both samples are NOT properly dried</button>
-            </div>
-          </div>
-
-          <!-- Step 2 – Tabs / Checklists -->
-          <div id="diagStep2" class="panel hidden" style="margin-top:14px">
-            <div class="rca-bar">
-              <div class="rca-tabs" id="rcaTabs"></div>
-              <div class="inline" style="display:flex; gap:8px; align-items:center">
-                <input id="rcaSearch" class="input" placeholder="Search checks…" style="min-width:200px">
-                <button class="btn small" onclick="rcaApplySearch()">Filter</button>
-                <button class="btn small ghost" onclick="rcaClearSearch()">Clear</button>
-                <button class="btn small" onclick="rcaMarkAll()">Mark All</button>
-                <button class="btn small primary" onclick="rcaGoSummary()">Generate Summary</button>
-              </div>
-            </div>
-            <div id="rcaList" style="margin-top:12px"></div>
-          </div>
-
-          <!-- Step 3 – Summary -->
-          <div id="diagSummary" class="panel hidden" style="margin-top:14px"></div>
-        </div>
-      </section>
+      <!-- Step 2 – dynamic -->
+      <div id="diagStep2" class="hidden" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
 
       <section id="page-settings" class="page hidden">
         <div class="panel"><h2 style="margin:0 0 10px">Settings</h2><div class="help">Coming soon…</div></div>
@@ -474,66 +516,12 @@ textarea{ min-height:84px; resize:vertical }
 </div>
 
 <script>
-/* ========= DATA (converted from SetOff Check List.xlsx) ========= */
-const SET_OFF_DATA = {
-  issue: "SetOff",
-  subsystems: {
-    "IPS": [
-      {"check":"Ink Viscocity Messurments","spec":["K AD21 - 7.2-8.2","K AO21/22 - 7.4-8.4"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Ink Type","spec":["V2 Or V3"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Ink Expiray Date","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "BCU": [
-      {"check":"NPD Mechanical/Pressure","spec":[],"roles":{"operator":false,"advanced_operator":false,"fse_expert":true},"impact":""}
-    ],
-    "IRD": [
-      {"check":"Lamps Power","spec":["50-100%"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Fans","spec":["60-100%"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"IPU 1","spec":["~25"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"IPU 2-7","spec":["~15"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Lamps Visual Validation (both coils working each lamp)","spec":["2 Coils Activated Each Lamp"],"roles":{"operator":false,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "ICS": [
-      {"check":"Coating Viscosity / Level / Pump","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Applicator Alignment","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"UV Lamps Operational","spec":[],"roles":{"operator":false,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Correct Coating Profile","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "Powder": [
-      {"check":"Powder System Settings","spec":["Coating / Powder recipe as job spec"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Powder Quality / Flow","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Powder Coverage Pattern","spec":[],"roles":{"operator":false,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "BCS": [
-      {"check":"Back Cylinder Speed / Registration","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Cooling / Ventilation around BCS","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Surface Cleanliness","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "STS": [
-      {"check":"Paper Transport Speed","spec":["As job spec / media spec"],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Nip / Pressure","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Offset between sheets","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""},
-      {"check":"Dancer behavior","spec":[],"roles":{"operator":true,"advanced_operator":true,"fse_expert":true},"impact":""}
-    ],
-    "DFE": [
-      {"check":"Color Profile / Ink Limits","spec":[],"roles":{"operator":false,"advanced_operator":false,"fse_expert":true},"impact":""}
-    ]
-  }
-};
-
-/* Map which subsystems to show per branch */
-const BRANCH_MAP = {
-  drying:  ["IRD","STS","Powder"],
-  coating: ["ICS","BCS"],
-  both:    ["IPS","BCU","IRD","ICS","Powder","BCS","STS","DFE"]
-};
-
-/* ========= Storage ========= */
+/* ===== Storage ===== */
 const LS_KEY='landa_cases_v13';
 function getCases(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return [] } }
 function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updateKPIs(); }
 
-/* ========= Routing ========= */
+/* ===== Routing ===== */
 const pages=['dashboard','create','cases','diagnosis','settings'];
 const fabNew=document.getElementById('fabNew');
 function go(route){
@@ -553,7 +541,7 @@ document.querySelectorAll('.nav .item').forEach(a=>{
 const btnMenu=document.getElementById('btnMenu');
 if(btnMenu) btnMenu.addEventListener('click', ()=> document.body.classList.toggle('aside-open'));
 
-/* ========= Auth ========= */
+/* ===== Auth ===== */
 const AUTH_KEY='landaAuth';
 const loginPage=document.getElementById('loginPage');
 const appRoot=document.getElementById('appRoot');
@@ -572,130 +560,343 @@ document.getElementById('btnLogout').addEventListener('click', e=>{
   document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
 });
 
-/* ========= Minimal dropdown helper (models) ========= */
-function makeDropdown(container, { placeholder='Choose…', options=[], onChange=()=>{} }){
+/* ===== Custom Dropdown Engine ===== */
+function makeDropdown(container, { placeholder='Choose…', options=[], onChange=()=>{}, maxHeight=260 }){
   container.classList.add('dd');
   container.innerHTML = `
     <button type="button" class="dd-btn"><span class="dd-label">${placeholder}</span></button>
     <span class="dd-arrow" aria-hidden="true"></span>
-    <div class="dd-list"></div>
+    <div class="dd-list" style="max-height:${maxHeight}px"></div>
     <input type="hidden" class="dd-value" value="">
   `;
   const btn = container.querySelector('.dd-btn');
   const list = container.querySelector('.dd-list');
   const label = container.querySelector('.dd-label');
   const input = container.querySelector('.dd-value');
-  let state = { open:false, opts:options };
+  let state = { open:false, opts:options, index:-1 };
 
   function render(){
     list.innerHTML = '';
     if(!state.opts || !state.opts.length){ list.innerHTML = `<div class="dd-empty">No options</div>`; return; }
     state.opts.forEach((o,i)=>{
       const it=document.createElement('div'); it.className='dd-item';
-      it.setAttribute('data-value',o.value); it.textContent=o.label ?? o.value;
-      it.addEventListener('click', ()=>{ input.value=o.value; label.textContent=o.label??o.value; onChange(o.value); container.classList.remove('open'); });
+      it.setAttribute('data-value',o.value); it.setAttribute('data-index',i);
+      if(String(input.value)===String(o.value)) it.setAttribute('aria-selected','true');
+      it.textContent=o.label ?? o.value;
+      it.addEventListener('click', ()=> selectIndex(i));
       list.appendChild(it);
     });
   }
-  btn.addEventListener('click', ()=> container.classList.toggle('open'));
-  window.addEventListener('click', e=>{ if(!container.contains(e.target)) container.classList.remove('open') });
-  const api={ setOptions(newOpts){ state.opts=newOpts||[]; render(); input.value=''; label.textContent=placeholder; },
-              value(){ return input.value } };
+  function open(){ if(container.classList.contains('disabled')) return;
+    container.classList.add('open'); state.open=true;
+    const idx=Math.max(0, state.opts.findIndex(o=> String(o.value)===String(input.value)));
+    highlight(idx); adjustInView();
+    window.addEventListener('click', outside); window.addEventListener('keydown', keys);
+  }
+  function close(){ container.classList.remove('open'); state.open=false;
+    window.removeEventListener('click', outside); window.removeEventListener('keydown', keys); }
+  function outside(e){ if(!container.contains(e.target)) close(); }
+  function keys(e){
+    if(!state.open) return;
+    if(e.key==='Escape'){ close(); btn.focus(); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); highlight(Math.min(state.index+1, state.opts.length-1)); adjustInView(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); highlight(Math.max(state.index-1,0)); adjustInView(); }
+    else if(e.key==='Enter'){ e.preventDefault(); if(state.index>=0) selectIndex(state.index); }
+  }
+  function highlight(i){ state.index=i; [...list.children].forEach(c=>c.classList.remove('hover')); if(list.children[i]) list.children[i].classList.add('hover'); }
+  function adjustInView(){ const el=list.children[state.index]; if(!el) return; const r=el.getBoundingClientRect(); const L=list.getBoundingClientRect();
+    if(r.top<L.top) list.scrollTop -= (L.top-r.top)+6; if(r.bottom>L.bottom) list.scrollTop += (r.bottom-L.bottom)+6; }
+  function selectIndex(i){ const o=state.opts[i]; if(!o) return;
+    input.value=o.value; label.textContent=o.label ?? o.value;
+    [...list.children].forEach(x=>x.removeAttribute('aria-selected')); if(list.children[i]) list.children[i].setAttribute('aria-selected','true');
+    onChange(o.value, o.label ?? o.value); close(); }
+  btn.addEventListener('click', ()=> state.open?close():open());
+  const api={ setOptions(newOpts){ state.opts=newOpts||[]; render(); if(!state.opts.some(o=> String(o.value)===String(input.value))){ input.value=''; label.textContent=placeholder; } },
+              setValue(v){ const i=state.opts.findIndex(o=> String(o.value)===String(v)); if(i>=0){ selectIndex(i); } else { input.value=''; label.textContent=placeholder; } },
+              value(){ return input.value }, disable(flag){ container.classList.toggle('disabled', !!flag); } };
   render(); return api;
 }
 
-/* ========= Models / Machine type ========= */
+/* ===== Machine Type / Model ===== */
 const machineTypeChips=document.getElementById('machineTypeChips');
 const hiddenType=document.getElementById('machineType');
 const ddModel = makeDropdown(document.getElementById('dd-model'), { placeholder:'Choose…', options:[] });
+
 function fillModels(kind){
   const prefix=(kind==='Duplex')?'D':'S';
   const max=(prefix==='D')?19:9;
   const opts=Array.from({length:max},(_,i)=>({value:`${prefix}${i+1}`,label:`${prefix}${i+1}`}));
-  ddModel.setOptions(opts);
+  ddModel.setOptions(opts); ddModel.setValue('');
 }
-fillModels('Simplex');
+fillModels(hiddenType.value||'Simplex');
 machineTypeChips.addEventListener('click', (e)=>{
   const chip=e.target.closest('.chip'); if(!chip) return;
   machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   chip.classList.add('active'); hiddenType.value=chip.dataset.type; fillModels(hiddenType.value);
 });
 
-/* ========= Troubleshooting steps (create case) ========= */
+/* ===== Hierarchical data (from your image – BSS) ===== */
+const HIER = {
+  "BSS": {
+    subSystems: [
+      "LIB","BCU","BCD&BTD Motors","BACS","Fly-Off","Air Knife","Hot Plate","Dancer","BCLS","Vacuum Box"
+    ],
+    categories: {
+      "HW": ["Rollers","Sensors","Motors","Brackets","Gaskets","Spare Parts","Pipes","Encoders","Valves"],
+      "SW": ["LIA","RTC","OPC","Parameters","Inverters Version"],
+      "EC": ["Inverters","Cables","SSR","CB's","FEC's"]
+    }
+  }
+};
+// Add other systems here as they arrive:
+const SYSTEMS = Object.keys(HIER).map(x=>({value:x,label:x}));
+
+/* ===== Build dynamic dropdowns: System → Sub → Category → Item ===== */
+const ddSystem = makeDropdown(document.getElementById('dd-system'), { placeholder:'Choose…', options:SYSTEMS, onChange:onSystem });
+const wrapSub = document.getElementById('wrap-sub');
+const wrapCat = document.getElementById('wrap-cat');
+const wrapItem= document.getElementById('wrap-item');
+
+const ddSub = makeDropdown(document.getElementById('dd-sub'), { placeholder:'Select sub-system…', options:[], onChange:onSub });
+const ddCat = makeDropdown(document.getElementById('dd-cat'), { placeholder:'HW / SW / EC', options:[], onChange:onCat });
+const ddItem= makeDropdown(document.getElementById('dd-item'), { placeholder:'Select item…', options:[] });
+
+function onSystem(val){
+  // Reset downstream
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
+  wrapSub.classList.add('hidden'); ddSub.setOptions([]); ddSub.setValue('');
+
+  const node = HIER[val];
+  if(!node){ return; }
+
+  // Fill Sub-Systems
+  ddSub.setOptions(node.subSystems.map(s=>({value:s,label:s})));
+  wrapSub.classList.remove('hidden');
+}
+function onSub(){
+  // Reset deeper levels
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
+
+  const sys = ddSystem.value();
+  if(!sys || !HIER[sys]) return;
+
+  // Fill Categories
+  const cats = Object.keys(HIER[sys].categories);
+  ddCat.setOptions(cats.map(c=>({value:c,label:c})));
+  wrapCat.classList.remove('hidden');
+}
+function onCat(catVal){
+  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
+  const sys = ddSystem.value();
+  if(!sys || !catVal) return;
+  const items = (HIER[sys].categories[catVal] || []).map(x=>({value:x,label:x}));
+  ddItem.setOptions(items);
+  wrapItem.classList.remove('hidden');
+}
+
+/* ===== TFS toggle ===== */
+const tfsToggle=document.getElementById('tfsToggle');
+const tfsNumber=document.getElementById('tfsNumber');
+tfsToggle.addEventListener('change', ()=>{
+  if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
+  else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
+});
+
+/* ===== Troubleshooting steps ===== */
 const tsSteps=document.getElementById('tsSteps');
 function addStep(val=''){
   const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
-  const inp=document.createElement('input'); inp.className='input'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
+  const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
   const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
   row.appendChild(inp); row.appendChild(rm); tsSteps.appendChild(row);
 }
 addStep('Check connections and sensors');
 addStep('Verify model-specific settings');
 
-/* ========= Files/Cases/CSV — same logic trimmed for brevity ========= */
-function saveCase(e){
+/* ===== Part smart suggest (demo) ===== */
+const partInput=document.getElementById('partInput');
+const partSuggest=document.getElementById('partSuggest');
+if(partInput){
+  const parts=Array.from({length:160},(_,i)=> ((i%2===0)?'12':'34') + '-' + String(10000+i).slice(-5));
+  const filterParts=q=>{const v=String(q||'').trim().toLowerCase(); if(!v) return []; return parts.filter(p=>p.toLowerCase().includes(v)).slice(0,30)};
+  partInput.addEventListener('input', ()=>{
+    const list=filterParts(partInput.value); partSuggest.innerHTML='';
+    if(!list.length){ partSuggest.style.display='none'; return }
+    list.forEach(p=>{ const row=document.createElement('div'); row.textContent=p; row.addEventListener('click',()=>{partInput.value=p; partSuggest.style.display='none'}); partSuggest.appendChild(row) });
+    partSuggest.style.display='block';
+  });
+  document.addEventListener('click',(e)=>{ if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none' }});
+}
+
+/* ===== Files ===== */
+function addFileRow(){
+  const w=document.getElementById('filesWrap');
+  const row=document.createElement('div'); row.className='inline';
+  const inp=document.createElement('input'); inp.type='file'; inp.className='file'; inp.accept='.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip';
+  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
+  row.appendChild(inp); row.appendChild(rm); w.appendChild(row);
+}
+addFileRow();
+
+/* ===== Save Case ===== */
+async function saveCase(e){
   e.preventDefault();
+  const req=v=>v&&String(v).trim().length>0;
+
   const data={
     sfCase:val('sfCase'),
-    tfsNumber:'', machineType:val('machineType'), model:ddModel.value(),
+    tfsNumber: tfsToggle.checked ? val('tfsNumber') : '',
+    machineType: val('machineType'),
+    model: ddModel.value(),
+    system: ddSystem.value(),
+    subSystem: ddSub.value(),
+    category: ddCat.value(),
+    item: ddItem.value(),
     softwareVersion: val('softwareVersion'),
     issueSummary: val('issueSummary'),
     symptoms: val('symptoms'),
     troubleshooting: collectSteps(),
+    partCatalog: val('partInput'),
     solution: val('solution'),
-    attachments: [], createdAt: new Date().toISOString(), author:'Expert'
+    verification: val('verification'),
+    notes: val('notes'),
+    attachments: [],
+    createdAt: new Date().toISOString(),
+    author:'Expert'
   };
-  const need=['sfCase','model','issueSummary','solution'].filter(k=>!String(data[k]||'').trim());
-  if(need.length){ toast('Please fill required: '+need.join(', '),'err'); return; }
+
+  const errors=[];
+  if(!req(data.sfCase))errors.push('sfCase');
+  if(!req(data.model))errors.push('model');
+  if(!req(data.system))errors.push('system');
+  if(!req(data.subSystem))errors.push('subSystem');
+  if(!req(data.category))errors.push('category');
+  if(!req(data.item))errors.push('item');
+  if(!req(data.issueSummary))errors.push('issueSummary');
+  if(!req(data.solution))errors.push('solution');
+
+  if(errors.length){ toast('Please fill required: '+errors.join(', '),'err'); return; }
+
+  // files
+  const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
+  const files=inputs.map(i=>i.files&&i.files[0]).filter(Boolean);
+  if(files.length){ for(const f of files){
+      const ok=/\.(pdf|docx?|xlsx?|png|jpg|jpeg|zip)$/i.test(f.name);
+      if(!ok){ toast('Unsupported file: '+f.name,'err'); continue }
+      const base64=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f) });
+      data.attachments.push({name:f.name,type:f.type,data:base64});
+    } }
+
   const arr=getCases(); arr.push(data); setCases(arr);
-  document.getElementById('caseForm').reset(); fillModels('Simplex'); tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
+
+  // reset
+  document.getElementById('caseForm').reset();
+  hiddenType.value='Simplex';
+  machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
+  fillModels('Simplex');
+
+  ddSystem.setValue(''); ddSub.setOptions([]); ddSub.setValue('');
+  ddCat.setOptions([]); ddCat.setValue(''); ddItem.setOptions([]); ddItem.setValue('');
+  wrapSub.classList.add('hidden'); wrapCat.classList.add('hidden'); wrapItem.classList.add('hidden');
+
+  document.getElementById('filesWrap').innerHTML=''; addFileRow();
+  tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
+
   toast('Case saved successfully','ok'); go('cases');
 }
 function collectSteps(){ return [...tsSteps.querySelectorAll('.inline input')].map(i=>i.value).filter(v=>String(v).trim()).join('\n') }
 function val(id){ const el=document.getElementById(id); return el?el.value:'' }
+
+/* ===== Cases render ===== */
 function renderCases(){
   const list=document.getElementById('casesList');
   const q=(document.getElementById('searchBox').value||'').toLowerCase();
-  const arr=getCases().filter(c=> !q || (c.issueSummary||'').toLowerCase().includes(q) || (c.model||'').toLowerCase().includes(q) );
+  const arr=getCases().filter(c=> !q ||
+    (c.issueSummary||'').toLowerCase().includes(q) ||
+    (c.model||'').toLowerCase().includes(q) ||
+    (c.system||'').toLowerCase().includes(q) ||
+    (c.item||'').toLowerCase().includes(q)
+  );
   const badge=document.getElementById('casesCount'); if(badge) badge.textContent=String(arr.length);
   list.innerHTML = arr.length ? arr.map((c,i)=>caseCard(c,i)).join('') : '<div class="panel">No cases yet.</div>';
 }
 function caseCard(c,i){
+  const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)` : 'No attachments';
   return `<div class="case-card">
     <div class="stripe"></div>
     <div>
       <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
-      <div class="meta"><span class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></span></div>
+      <div class="meta">
+        <span class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></span>
+        <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></span>
+        <span class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></span>
+        <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span>
+      </div>
       <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
+      <div class="files" style="margin-top:4px">${files}</div>
     </div>
-    <div class="actions"><button class="btn small" onclick="openCase(${i})">Details</button></div>
+    <div class="actions">
+      <button class="btn small" onclick="openCase(${i})">Details</button>
+      <button class="btn small danger" onclick="deleteCase(${i})">Delete</button>
+    </div>
   </div>`;
 }
 function openCase(i){
   const c=getCases()[i]; if(!c) return; document.getElementById('modalTitle').textContent=`Case #${i+1} — ${c.sfCase||''}`;
+  const files=Array.isArray(c.attachments)&&c.attachments.length?
+    c.attachments.map(a=>`<div class="kv"><span class="k">•</span><a class="btn small" href="${a.data}" target="_blank" rel="noopener">View</a> <a class="btn small" href="${a.data}" download="${a.name}">Download</a> <span class="v">${esc(a.name)}</span></div>`).join('')
+    : '<div class="attach-empty">No attachments</div>';
   document.getElementById('modalBody').innerHTML = `
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></div>
+        <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></div>
+        <div class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></div>
+        <div class="kv"><span class="k">Software:</span><span class="v">${esc(c.softwareVersion||'')}</span></div>
+        <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div>
+      </div>
+      <div class="panel">
+        <div class="kv"><span class="k">Opened:</span><span class="v">${new Date(c.createdAt).toLocaleString()}</span></div>
+        <div class="kv"><span class="k">Author:</span><span class="v">${esc(c.author||'')}</span></div>
+      </div>
+    </div>
     <div class="panel" style="margin-top:12px"><h3>Problem</h3>
       <div class="kv"><span class="k">Summary:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
       <div class="kv"><span class="k">Symptoms:</span><span class="v">${nl(esc(c.symptoms||''))}</span></div>
+    </div>
+    <div class="panel" style="margin-top:12px"><h3>Solution</h3>
       <div class="kv"><span class="k">Troubleshooting:</span><span class="v">${nl(esc(c.troubleshooting||''))}</span></div>
-      <div class="kv"><span class="k">Solution:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
+      <div class="kv"><span class="k">Part (catalog):</span><span class="v">${esc(c.partCatalog||'')}</span></div>
+      <div class="kv"><span class="k">Implemented:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
+      <div class="kv"><span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span></div>
+      <div class="kv"><span class="k">Notes:</span><span class="v">${nl(esc(c.notes||''))}</span></div>
+      <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div>
     </div>`;
   openModal();
 }
-function exportCSV(){
-  const arr=getCases();
-  const cols=['sfCase','machineType','model','softwareVersion','issueSummary','symptoms','troubleshooting','solution','createdAt','author'];
-  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((o[k]||'').toString().replace(/\n/g,' '))).join(','))).join('\n');
-  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
-}
+function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok'); }
+function openModal(){ document.getElementById('modalBack').style.display='flex'; }
+function closeModal(){ document.getElementById('modalBack').style.display='none'; }
 function updateKPIs(){
-  const arr=getCases(); byId('kpiTotal').textContent=arr.length;
-  byId('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
-  byId('kpiUpdated').textContent=arr.length? new Date(arr[arr.length-1].createdAt).toLocaleString() : '—';
+  const arr=getCases(); document.getElementById('kpiTotal').textContent=arr.length;
+  document.getElementById('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
+  const last=arr.length? new Date(arr[arr.length-1].createdAt).toLocaleString() : '—';
+  document.getElementById('kpiUpdated').textContent=last;
   const pageCasesCount=document.getElementById('casesCount'); if(pageCasesCount) pageCasesCount.textContent=String(arr.length);
 }
+function exportCSV(){
+  const arr=getCases();
+  const cols=['sfCase','tfsNumber','machineType','model','system','subSystem','category','item','softwareVersion','issueSummary','symptoms','troubleshooting','partCatalog','solution','verification','notes','attachments','createdAt','author'];
+  const csv=[cols.join(',')].concat(arr.map(o=> cols.map(k=> JSON.stringify((Array.isArray(o[k])? o[k].length+' file(s)' : (o[k]||'')).toString().replace(/\n/g,' '))).join(','))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='landa_cases.csv'; a.click();
+}
+function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-/* ========= Particles & utils ========= */
+/* ===== Particles ===== */
 (function(){
   const c=document.getElementById('particles'); if(!c) return; const ctx=c.getContext('2d'); let w,h;
   function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
@@ -705,7 +906,7 @@ function updateKPIs(){
     ctx.clearRect(0,0,w,h);
     for(const d of dots){
       d.x+=d.vx; d.y+=d.vy;
-      if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d>h) d.vy*=-1;
+      if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
       ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
       ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill();
     }
@@ -714,266 +915,148 @@ function updateKPIs(){
   step();
 })();
 
-function byId(id){ return document.getElementById(id) }
-function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=byId('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
-function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
-function openModal(){ byId('modalBack').style.display='flex' } function closeModal(){ byId('modalBack').style.display='none' }
+/* ===== Root Cause Analyzer logic ===== */
+function selectDiagnosis(type){
+  const step1 = document.getElementById('diagStep1');
+  const step2 = document.getElementById('diagStep2');
+  step2.classList.remove('hidden');
+  step2.innerHTML = renderChecklist(type);
+  step1.scrollIntoView({behavior:'smooth'});
+  localStorage.setItem('landa_diag_state', type);
+}
 
-/* ========= RCA Logic ========= */
-const RCA_LS_PREFIX = 'landa_rca_';
-function startDiagnosis(type){
-  localStorage.setItem('landa_diag_issue', type);
-  byId('diagSelect').classList.add('hidden');
-  byId('diagStep1').classList.remove('hidden');
-
-  const issueMap = { setoff:'SetOff', scratches:'Scratches', uniformity:'Uniformity', jetting:'Jetting', transfer:'Transfer' };
-  byId('issueName').textContent = issueMap[type] || 'General';
-
-  // reset next steps
-  byId('diagStep2').classList.add('hidden');
-  byId('diagSummary').classList.add('hidden');
-  setStepActive(1);
-}
-function backToIssueSelect(){
-  localStorage.removeItem('landa_diag_issue');
-  localStorage.removeItem('landa_diag_branch');
-  byId('diagStep1').classList.add('hidden');
-  byId('diagStep2').classList.add('hidden');
-  byId('diagSummary').classList.add('hidden');
-  byId('diagSelect').classList.remove('hidden');
-  setStepActive(0);
-}
-function setStepActive(n){
-  [1,2,3,4].forEach((i,idx)=>{
-    byId('rcaStep'+i)?.classList.toggle('active', (idx===n));
-  });
-}
-function selectBranch(branch){
-  localStorage.setItem('landa_diag_branch', branch);
-  // build tabs
-  const tabsWrap = byId('rcaTabs');
-  tabsWrap.innerHTML='';
-  const subs = (BRANCH_MAP[branch]||[]);
-  subs.forEach((s,idx)=>{
-    const el=document.createElement('div');
-    el.className='rca-tab'+(idx===0?' active':'');
-    el.textContent=s;
-    el.dataset.sub=s;
-    el.onclick=()=>switchTab(s);
-    tabsWrap.appendChild(el);
-  });
-  byId('rcaList').innerHTML='';
-  if(subs.length){ renderSubSystem(subs[0]); }
-  byId('diagStep2').classList.remove('hidden');
-  byId('diagSummary').classList.add('hidden');
-  setStepActive(2);
-  byId('diagStep1').scrollIntoView({behavior:'smooth', block:'start'});
-}
-function switchTab(sub){
-  document.querySelectorAll('.rca-tab').forEach(t=>t.classList.toggle('active', t.dataset.sub===sub));
-  renderSubSystem(sub);
-}
-function rcaApplySearch(){ renderSubSystem(currentSub()); }
-function rcaClearSearch(){ byId('rcaSearch').value=''; renderSubSystem(currentSub()); }
-function rcaMarkAll(){
-  const wrap=byId('rcaList');
-  wrap.querySelectorAll('input[type="checkbox"]').forEach(cb=>{ cb.checked=true; saveRowState(cb) });
-  toast('All checks marked','ok');
-}
-function currentSub(){ const t=document.querySelector('.rca-tab.active'); return t?t.dataset.sub:''; }
-
-function renderSubSystem(sub){
-  const list=byId('rcaList'); const q=(byId('rcaSearch').value||'').toLowerCase().trim();
-  const arr = (SET_OFF_DATA.subsystems[sub]||[]).map((row,idx)=>({...row,_idx:idx}));
-  const filtered = q? arr.filter(r=> r.check.toLowerCase().includes(q) || (r.spec||[]).join(' ').toLowerCase().includes(q) ) : arr;
-
-  list.innerHTML = filtered.map(row=> rcaRow(sub,row)).join('') || '<div class="panel">No checks found.</div>';
-
-  // re-bind events
-  filtered.forEach(row=>{
-    const cb=byId(rcaId(sub,row._idx,'cb'));
-    const inp=byId(rcaId(sub,row._idx,'actual'));
-    cb.addEventListener('change', ()=>saveRowState(cb));
-    inp.addEventListener('input', ()=>updateDeviation(sub,row._idx));
-    // load saved state
-    const mem = loadRowState(sub,row._idx);
-    if(mem){ cb.checked=!!mem.done; inp.value=mem.actual??''; updateDeviation(sub,row._idx); }
-  });
-}
-function rcaRow(sub,row){
-  const specText = (row.spec||[]).join(' | ');
-  const roles = row.roles||{};
+function renderChecklist(type){
+  let title='', checks=[];
+  if(type==='drying'){
+    title='Drying System Diagnostic';
+    checks=[
+      'Check IR lamp status and operation',
+      'Verify temperature sensor readings',
+      'Inspect airflow and exhaust levels',
+      'Confirm paper transport speed',
+      'Ensure drying rollers are clean and rotating'
+    ];
+  }else if(type==='coating'){
+    title='Coating System Diagnostic';
+    checks=[
+      'Verify coating pump pressure',
+      'Check coating viscosity and level',
+      'Inspect applicator alignment',
+      'Ensure UV lamps are operational',
+      'Confirm correct coating profile is loaded'
+    ];
+  }else if(type==='both'){
+    title='Full Machine Diagnostic';
+    checks=[
+      'Inspect both drying and coating systems',
+      'Run humidity calibration',
+      'Verify general temperature sensors',
+      'Check overall machine ventilation',
+      'Review latest software parameters for SetOff issue'
+    ];
+  }
   return `
-  <div class="rca-row">
-    <div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:center">
-      <label style="display:flex;align-items:center;gap:10px;flex:1;min-width:260px">
-        <input id="${rcaId(sub,row._idx,'cb')}" type="checkbox">
-        <div>
-          <div style="font-weight:600;opacity:.95">${esc(row.check)}</div>
-          ${specText?`<div class="spec-pill" title="Spec target">${esc(specText)}</div>`:`<div class="spec-pill dim">No explicit spec</div>`}
-          <div class="role-badges" style="margin-top:6px">
-            ${roles.operator?`<span class="role op">Operator</span>`:''}
-            ${roles.advanced_operator?`<span class="role adv">Adv. Operator</span>`:''}
-            ${roles.fse_expert?`<span class="role fse">FSE / Expert</span>`:''}
-          </div>
-        </div>
-      </label>
-      <div class="rca-spec" style="flex:1">
-        <div><small class="k">Target</small><div class="spec-pill">${specText||'—'}</div></div>
-        <div>
-          <label class="k" for="${rcaId(sub,row._idx,'actual')}">Actual</label>
-          <input id="${rcaId(sub,row._idx,'actual')}" class="input" placeholder="${specInputPlaceholder(row.spec)}">
-        </div>
-        <div>
-          <div class="k">Deviation</div>
-          <div id="${rcaId(sub,row._idx,'dev')}" class="dev-pill dev-na">—</div>
-        </div>
-      </div>
+  <div class="panel">
+    <h3>${title}</h3>
+    <p>Mark each step as completed:</p>
+    <div id="checklist" class="grid cols-1" style="gap:6px;margin-top:6px">
+      ${checks.map((c,i)=>`
+        <label style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="chk${i}" onchange="saveChecklist()">
+          <span>${c}</span>
+        </label>`).join('')}
     </div>
+    <button class="btn small" style="margin-top:12px" onclick="restartDiagnosis()">Restart Diagnosis</button>
   </div>`;
 }
-function rcaId(sub,idx,suffix){ return `rca_${sub}_${idx}_${suffix}`; }
 
-/* SPEC Parsing & Deviation */
-function specInputPlaceholder(specArr){
-  const s=(specArr||[]).join(' ');
-  if(/~\s*\d+(\.\d+)?/.test(s)) return '≈ value';
-  if(/\d+(\.\d+)?\s*-\s*\d+(\.\d+)?/.test(s)) return 'number in range';
-  if(/\d+%/.test(s)) return '% value';
-  return 'value';
-}
-function parseSpec(specArr){
-  const s=(specArr||[]).join(' ');
-  // Range: 7.2-8.2
-  const mRange = s.match(/(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)/);
-  if(mRange){
-    return {type:'range', min:parseFloat(mRange[1]), max:parseFloat(mRange[3])};
-  }
-  // Approx: ~25  (use ±10% tolerance)
-  const mApprox = s.match(/~\s*(\d+(\.\d+)?)/);
-  if(mApprox){
-    const val = parseFloat(mApprox[1]); const tol = val*0.10;
-    return {type:'approx', target:val, min:val-tol, max:val+tol};
-  }
-  // Percentage range like 60-100%
-  const mPerc = s.match(/(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)\s*%/);
-  if(mPerc){
-    return {type:'range', min:parseFloat(mPerc[1]), max:parseFloat(mPerc[3])};
-  }
-  return {type:'text'}; // free text / not numeric
-}
-function updateDeviation(sub,idx){
-  const row = (SET_OFF_DATA.subsystems[sub]||[])[idx]; if(!row) return;
-  const spec = parseSpec(row.spec||[]);
-  const actualStr = byId(rcaId(sub,idx,'actual')).value.trim();
-  const devEl = byId(rcaId(sub,idx,'dev'));
-  if(!actualStr){ devEl.className='dev-pill dev-na'; devEl.textContent='—'; return; }
-
-  let num = parseFloat(actualStr.replace('%',''));
-  if(isNaN(num)){ devEl.className='dev-pill dev-na'; devEl.textContent='N/A'; return; }
-
-  if(spec.type==='range' || spec.type==='approx'){
-    if(num>=spec.min && num<=spec.max){
-      devEl.className='dev-pill dev-ok';
-      devEl.textContent='Within spec';
-    }else{
-      const d = (num < spec.min) ? (num - spec.min) : (num - spec.max);
-      devEl.className='dev-pill dev-err';
-      devEl.textContent = `Out of spec (${d.toFixed(2)})`;
-    }
-  }else{
-    devEl.className='dev-pill dev-na';
-    devEl.textContent='—';
-  }
-  saveRowState(byId(rcaId(sub,idx,'cb'))); // persist actual too
-}
-function saveRowState(cb){
-  const [_,sub,idx] = cb.id.split('_'); // rca_SUB_IDX_cb
-  const actual = byId(rcaId(sub,idx,'actual')).value;
-  const key = RCA_LS_PREFIX+sub+'_'+idx;
-  localStorage.setItem(key, JSON.stringify({done: cb.checked, actual}));
-}
-function loadRowState(sub,idx){
-  const key = RCA_LS_PREFIX+sub+'_'+idx;
-  try{ return JSON.parse(localStorage.getItem(key)||''); }catch(e){ return null }
+function saveChecklist(){
+  const boxes=[...document.querySelectorAll('#checklist input[type="checkbox"]')];
+  const done=boxes.map(b=>b.checked);
+  localStorage.setItem('landa_diag_checklist', JSON.stringify(done));
 }
 
-/* Summary */
-function rcaGoSummary(){
-  const branch = localStorage.getItem('landa_diag_branch')||'both';
-  const subs = BRANCH_MAP[branch]||[];
-  const out = [];
-  subs.forEach(sub=>{
-    const rows = SET_OFF_DATA.subsystems[sub]||[];
-    const issues=[];
-    rows.forEach((row,idx)=>{
-      const mem = loadRowState(sub,idx)||{};
-      let status='pending';
-      // compute deviation
-      let dev='—', bad=false;
-      const spec = parseSpec(row.spec||[]);
-      if(mem.actual && (spec.type==='range' || spec.type==='approx')){
-        const num=parseFloat(String(mem.actual).replace('%',''));
-        if(!isNaN(num)){
-          if(num>=spec.min && num<=spec.max){ dev='OK'; }
-          else { dev='Out of spec'; bad=true; }
-        }
-      }
-      if(mem.done && !bad){ status='ok'; }
-      else if(bad){ status='deviation'; }
-      else { status='pending'; }
-      if(status!=='ok'){
-        issues.push({idx, check:row.check, spec:(row.spec||[]).join(' | '), actual:mem.actual||'', status, sub});
-      }
-    });
-    if(issues.length) out.push({sub, issues});
-  });
-
-  const wrap=byId('diagSummary');
-  if(!out.length){
-    wrap.innerHTML = `<div class="badge ok">All checks confirmed within spec ✅</div>`;
-  }else{
-    wrap.innerHTML = `
-      <h3 style="margin:0 0 8px">Summary & Recommendations</h3>
-      ${out.map(block=>`
-        <div class="panel" style="margin-top:10px">
-          <div class="title" style="font-weight:700">${block.sub}</div>
-          ${block.issues.map(it=>`
-            <div class="kv" style="margin-top:6px">
-              <span class="k">• ${esc(it.check)}</span>
-              <span class="v">[${it.status==='deviation'?'Deviation ❗':'Pending'}] ${it.spec?`Target: ${esc(it.spec)}; `:''}Actual: ${esc(it.actual||'—')}</span>
-            </div>`).join('')}
-        </div>
-      `).join('')}
-      <div class="panel" style="margin-top:12px">
-        <div class="title">Auto-suggestions</div>
-        <ul style="margin:8px 0 0 18px; line-height:1.6">
-          <li>If IRD values are out-of-spec → increase lamp power/fan as per job spec and recheck IPU.</li>
-          <li>If coating path selected → verify UV lamp status and applicator alignment; re-run coating profile.</li>
-          <li>High setoff despite drying OK → check ink viscosity and ink type (V2/V3) and expiry in IPS.</li>
-          <li>Persistent issues → escalate to FSE (see rows with FSE badge).</li>
-        </ul>
-      </div>
-    `;
-  }
-  wrap.classList.remove('hidden');
-  setStepActive(3);
-  wrap.scrollIntoView({behavior:'smooth', block:'start'});
+function restartDiagnosis(){
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
+  const step2=document.getElementById('diagStep2');
+  step2.innerHTML=''; step2.classList.add('hidden');
+  toast('Diagnosis restarted','ok');
 }
 
-/* Helpers to restore state if coming back */
+function startDiagnosis(type){
+  localStorage.setItem('landa_diag_issue', type);
+  document.getElementById('diagSelect').classList.add('hidden');
+  document.getElementById('diagStep1').classList.remove('hidden');
+
+ const issueMap = {
+  setoff:'SetOff',
+  scratches:'Scratches',
+  uniformity:'Uniformity',
+  jetting:'Jetting',
+  transfer:'Transfer'
+};
+  const issueName = issueMap[type] || 'General';
+  document.querySelector('#diagStep1 h3 span').textContent = issueName;
+
+  // reset step2
+  const step2 = document.getElementById('diagStep2');
+  step2.innerHTML = '';
+  step2.classList.add('hidden');
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
+}
+
+function backToIssueSelect(){
+  localStorage.removeItem('landa_diag_issue');
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
+
+  document.getElementById('diagStep1').classList.add('hidden');
+  const step2 = document.getElementById('diagStep2');
+  step2.innerHTML = '';
+  step2.classList.add('hidden');
+
+  document.getElementById('diagSelect').classList.remove('hidden');
+  document.getElementById('diagSelect').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 function loadDiagnosis(){
   const issue = localStorage.getItem('landa_diag_issue');
-  if(!issue){ return; }
-  byId('diagSelect').classList.add('hidden');
-  byId('diagStep1').classList.remove('hidden');
-  byId('issueName').textContent = (issue==='setoff'?'SetOff':'General');
+  const state = localStorage.getItem('landa_diag_state');
 
-  const branch = localStorage.getItem('landa_diag_branch');
-  if(branch){
-    selectBranch(branch);
+  const sel   = document.getElementById('diagSelect');
+  const step1 = document.getElementById('diagStep1');
+  const step2 = document.getElementById('diagStep2');
+
+  const issueMap = {
+    scratches:'Scratches', uniformity:'Uniformity',
+    jetting:'Jetting',     transfer:'Transfer'
+  };
+
+  if (issue) {
+    sel.classList.add('hidden');
+    step1.classList.remove('hidden');
+    const name = issueMap[issue] || 'General';
+    document.querySelector('#diagStep1 h3 span').textContent = name;
+
+    if (state) {
+      step2.innerHTML = renderChecklist(state);
+      step2.classList.remove('hidden');
+      const saved = JSON.parse(localStorage.getItem('landa_diag_checklist') || '[]');
+      saved.forEach((v,i)=>{ const el=document.getElementById('chk'+i); if(el) el.checked=v; });
+    } else {
+      step2.innerHTML = '';
+      step2.classList.add('hidden');
+    }
+  } else {
+    sel.classList.remove('hidden');
+    step1.classList.add('hidden');
+    step2.innerHTML = '';
+    step2.classList.add('hidden');
   }
 }
+
 loadDiagnosis();
 go('dashboard');
 </script>
