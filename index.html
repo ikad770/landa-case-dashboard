@@ -194,6 +194,19 @@ textarea{ min-height:84px; resize:vertical }
 .dd-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08); border:3px solid transparent; border-radius:10px; background-clip:padding-box }
 .dd-list::-webkit-scrollbar-thumb:hover{ background:rgba(59,208,255,.4); border-color:transparent }
 
+  /* Issue selection cards */
+.issue-grid{display:flex;flex-wrap:wrap;gap:12px}
+.issue-card{
+  flex:1 1 180px; min-width:180px; max-width:260px;
+  padding:14px; border:1px solid var(--border); border-radius:14px; cursor:pointer;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  box-shadow:0 10px 26px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.03);
+  transition:.2s;
+}
+.issue-card:hover{ transform:translateY(-2px); border-color:rgba(59,208,255,.45); box-shadow:0 18px 40px rgba(0,174,239,.28) }
+.issue-card .title{font-weight:600;margin-bottom:6px}
+.issue-card .sub{color:var(--muted);font-size:12.5px}
+
 /* Cards/Modal/FAB */
 .fab{ position:fixed; left:14px; bottom:18px; z-index:60 }
 .fab .btn{ padding:14px 16px; border-radius:20px; font-weight:600; box-shadow:0 18px 40px rgba(0,174,239,.35)}
@@ -440,28 +453,40 @@ textarea{ min-height:84px; resize:vertical }
     <p class="help">Follow the guided diagnostic to identify the source of a problem step-by-step.</p>
 
     <div id="diagContainer">
-      <!-- Step 0 – Problem selection -->
+<!-- Step 0 – Problem selection -->
 <div id="diagSelect" class="panel" style="margin-top:10px">
   <h3 style="margin:0 0 10px">Select Issue to Diagnose</h3>
   <p class="help">Choose the problem type to start the guided analysis:</p>
-
-  <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px">
-    <button class="btn" onclick="startDiagnosis('scratches')">Scratches</button>
-    <button class="btn" onclick="startDiagnosis('uniformity')">Uniformity</button>
-    <button class="btn" onclick="startDiagnosis('jetting')">Jetting</button>
-    <button class="btn" onclick="startDiagnosis('transfer')">Transfer</button>
+  <div class="issue-grid">
+    <div class="issue-card" onclick="startDiagnosis('scratches')">
+      <div class="title">Scratches</div><div class="sub">Print / Blanket</div>
+    </div>
+    <div class="issue-card" onclick="startDiagnosis('uniformity')">
+      <div class="title">Uniformity</div><div class="sub">Density / Bands</div>
+    </div>
+    <div class="issue-card" onclick="startDiagnosis('jetting')">
+      <div class="title">Jetting</div><div class="sub">Nozzles / Missing</div>
+    </div>
+    <div class="issue-card" onclick="startDiagnosis('transfer')">
+      <div class="title">Transfer</div><div class="sub">Media / Adhesion</div>
+    </div>
   </div>
 </div>
       <!-- Step 1 -->
-      <div id="diagStep1" class="panel" style="margin-top:10px">
-        <h3>Problem: <span style="color:var(--accent)">SetOff</span></h3>
-        <p>Perform a print of the same job <b>with</b> and <b>without coating</b>, then examine the drying of both samples.</p>
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
-          <button class="btn" onclick="selectDiagnosis('drying')">Job without coating is NOT properly dried</button>
-          <button class="btn" onclick="selectDiagnosis('coating')">Job with coating is NOT properly dried</button>
-          <button class="btn" onclick="selectDiagnosis('both')">Both samples are NOT properly dried</button>
-        </div>
-      </div>
+      <div id="diagStep1" class="panel hidden" style="margin-top:10px">
+         <h3>Problem: <span id="issueName" style="color:var(--accent)">—</span></h3>
+         <p>Perform a print of the same job <b>with</b> and <b>without coating</b>, then examine the drying of both samples.</p>
+        <!-- back button -->
+  <div class="inline" style="justify-content:flex-end;margin:6px 0 10px">
+    <button class="btn small" type="button" onclick="backToIssueSelect()">← Change issue</button>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
+    <button class="btn" onclick="selectDiagnosis('drying')">Job without coating is NOT properly dried</button>
+    <button class="btn" onclick="selectDiagnosis('coating')">Job with coating is NOT properly dried</button>
+    <button class="btn" onclick="selectDiagnosis('both')">Both samples are NOT properly dried</button>
+  </div>
+</div>
 
       <!-- Step 2 – dynamic -->
       <div id="diagStep2" class="hidden" style="margin-top:14px"></div>
