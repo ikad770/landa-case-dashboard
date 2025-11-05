@@ -458,18 +458,20 @@ textarea{ min-height:84px; resize:vertical }
   <h3 style="margin:0 0 10px">Select Issue to Diagnose</h3>
   <p class="help">Choose the problem type to start the guided analysis:</p>
   <div class="issue-grid">
-    <div class="issue-card" onclick="startDiagnosis('scratches')">
-      <div class="title">Scratches</div><div class="sub">Print / Blanket</div>
-    </div>
-    <div class="issue-card" onclick="startDiagnosis('uniformity')">
-      <div class="title">Uniformity</div><div class="sub">Density / Bands</div>
-    </div>
-    <div class="issue-card" onclick="startDiagnosis('jetting')">
-      <div class="title">Jetting</div><div class="sub">Nozzles / Missing</div>
-    </div>
-    <div class="issue-card" onclick="startDiagnosis('transfer')">
-      <div class="title">Transfer</div><div class="sub">Media / Adhesion</div>
-    </div>
+  <div class="issue-card" onclick="startDiagnosis('setoff')">
+    <div class="title">SetOff</div><div class="sub">Drying / Coating</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('scratches')">
+    <div class="title">Scratches</div><div class="sub">Print / Blanket</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('uniformity')">
+    <div class="title">Uniformity</div><div class="sub">Density / Bands</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('jetting')">
+    <div class="title">Jetting</div><div class="sub">Nozzles / Missing</div>
+  </div>
+  <div class="issue-card" onclick="startDiagnosis('transfer')">
+    <div class="title">Transfer</div><div class="sub">Media / Adhesion</div>
   </div>
 </div>
       <!-- Step 1 -->
@@ -987,10 +989,13 @@ function startDiagnosis(type){
   document.getElementById('diagSelect').classList.add('hidden');
   document.getElementById('diagStep1').classList.remove('hidden');
 
-  const issueMap = {
-    scratches:'Scratches', uniformity:'Uniformity',
-    jetting:'Jetting',     transfer:'Transfer'
-  };
+ const issueMap = {
+  setoff:'SetOff',
+  scratches:'Scratches',
+  uniformity:'Uniformity',
+  jetting:'Jetting',
+  transfer:'Transfer'
+};
   const issueName = issueMap[type] || 'General';
   document.querySelector('#diagStep1 h3 span').textContent = issueName;
 
