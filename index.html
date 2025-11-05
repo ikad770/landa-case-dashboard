@@ -913,7 +913,7 @@ function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','
   step();
 })();
 
-  /* ===== Root Cause Analyzer logic ===== */
+/* ===== Root Cause Analyzer logic ===== */
 function selectDiagnosis(type){
   const step1 = document.getElementById('diagStep1');
   const step2 = document.getElementById('diagStep2');
@@ -922,6 +922,7 @@ function selectDiagnosis(type){
   step1.scrollIntoView({behavior:'smooth'});
   localStorage.setItem('landa_diag_state', type);
 }
+
 function renderChecklist(type){
   let title='', checks=[];
   if(type==='drying'){
@@ -966,11 +967,13 @@ function renderChecklist(type){
     <button class="btn small" style="margin-top:12px" onclick="restartDiagnosis()">Restart Diagnosis</button>
   </div>`;
 }
+
 function saveChecklist(){
   const boxes=[...document.querySelectorAll('#checklist input[type="checkbox"]')];
   const done=boxes.map(b=>b.checked);
   localStorage.setItem('landa_diag_checklist', JSON.stringify(done));
 }
+
 function restartDiagnosis(){
   localStorage.removeItem('landa_diag_state');
   localStorage.removeItem('landa_diag_checklist');
@@ -978,32 +981,78 @@ function restartDiagnosis(){
   step2.innerHTML=''; step2.classList.add('hidden');
   toast('Diagnosis restarted','ok');
 }
-function loadDiagnosis(){
-  const type=localStorage.getItem('landa_diag_state');
-  if(type){ document.getElementById('diagStep2').innerHTML=renderChecklist(type);
-    document.getElementById('diagStep2').classList.remove('hidden');
-    const saved=JSON.parse(localStorage.getItem('landa_diag_checklist')||'[]');
-    saved.forEach((v,i)=>{ const el=document.getElementById('chk'+i); if(el) el.checked=v; });
-  }
-}
-loadDiagnosis();
-  function startDiagnosis(type){
+
+function startDiagnosis(type){
   localStorage.setItem('landa_diag_issue', type);
   document.getElementById('diagSelect').classList.add('hidden');
   document.getElementById('diagStep1').classList.remove('hidden');
 
-  // התאמה לטקסט הכותרת
   const issueMap = {
-    scratches: 'Scratches',
-    uniformity: 'Uniformity',
-    jetting: 'Jetting',
-    transfer: 'Transfer'
+    scratches:'Scratches', uniformity:'Uniformity',
+    jetting:'Jetting',     transfer:'Transfer'
   };
   const issueName = issueMap[type] || 'General';
   document.querySelector('#diagStep1 h3 span').textContent = issueName;
+
+  // reset step2
+  const step2 = document.getElementById('diagStep2');
+  step2.innerHTML = '';
+  step2.classList.add('hidden');
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
 }
 
-  
+function backToIssueSelect(){
+  localStorage.removeItem('landa_diag_issue');
+  localStorage.removeItem('landa_diag_state');
+  localStorage.removeItem('landa_diag_checklist');
+
+  document.getElementById('diagStep1').classList.add('hidden');
+  const step2 = document.getElementById('diagStep2');
+  step2.innerHTML = '';
+  step2.classList.add('hidden');
+
+  document.getElementById('diagSelect').classList.remove('hidden');
+  document.getElementById('diagSelect').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function loadDiagnosis(){
+  const issue = localStorage.getItem('landa_diag_issue');
+  const state = localStorage.getItem('landa_diag_state');
+
+  const sel   = document.getElementById('diagSelect');
+  const step1 = document.getElementById('diagStep1');
+  const step2 = document.getElementById('diagStep2');
+
+  const issueMap = {
+    scratches:'Scratches', uniformity:'Uniformity',
+    jetting:'Jetting',     transfer:'Transfer'
+  };
+
+  if (issue) {
+    sel.classList.add('hidden');
+    step1.classList.remove('hidden');
+    const name = issueMap[issue] || 'General';
+    document.querySelector('#diagStep1 h3 span').textContent = name;
+
+    if (state) {
+      step2.innerHTML = renderChecklist(state);
+      step2.classList.remove('hidden');
+      const saved = JSON.parse(localStorage.getItem('landa_diag_checklist') || '[]');
+      saved.forEach((v,i)=>{ const el=document.getElementById('chk'+i); if(el) el.checked=v; });
+    } else {
+      step2.innerHTML = '';
+      step2.classList.add('hidden');
+    }
+  } else {
+    sel.classList.remove('hidden');
+    step1.classList.add('hidden');
+    step2.innerHTML = '';
+    step2.classList.add('hidden');
+  }
+}
+
+loadDiagnosis();
 go('dashboard');
 </script>
 </body>
