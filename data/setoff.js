@@ -82,4 +82,4 @@ const SET_OFF_DATA = {
     ]
   }
 };
-const BRANCH_MAP = { drying: ['IRD','STS','Powder','IRD X'], coating: ['ICS','BCS'], both: Object.keys(SET_OFF_DATA.subsystems) };
+const BRANCH_MAP = { drying: ['IRD','STS','Powder','IRD X'], coating: ['ICS','BCS'], both: Object.keys(SET_OFF_DATA.Subsystems) };
