@@ -323,7 +323,7 @@
       line.appendChild(cb);
       line.appendChild(h('span',{text:label}));
 
-      const input = h('input',{class:'input v13', placeholder: unit or 'Value', style:'max-width:140px', disabled:true});
+      const input = h('input',{class:'input v13', placeholder: unit || 'Value', style:'max-width:140px', disabled:true});
       let bar = miniBar(spec, null);
       let pill = specPill(null);
 
