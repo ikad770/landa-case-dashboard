@@ -351,3 +351,23 @@
   }
 
 })();
+})();
+ 
+// ---- Backward-compat for legacy HTML onclick="startDiagnosis('...')"
+window.startDiagnosis = function (issue) {
+  // ודא שה-wizard נבנה
+ if (typeof window.initRootCause === 'function' && !document.getElementById('rcaWizard')) {
+    window.initRootCause();
+  }
+  // סימולציה של בחירת SetOff ב-wizard
+  const cards = document.querySelectorAll('#rcaWizard .issue-card');
+  const setoffCard = Array.from(cards).find(c =>
+    c.querySelector('.title')?.textContent.trim().toLowerCase() === 'setoff'
+  ) || cards[0];
+  setoffCard?.click();
+
+  // ברירת מחדל: פתח מיד את ה-branch הראשון (למשל Drying)
+  setTimeout(() => {
+    document.querySelector('#rcaBranch .chip')?.click();
+  }, 0);
+};
