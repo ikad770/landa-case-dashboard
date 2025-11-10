@@ -349,8 +349,6 @@
 
     return box;
   }
-
-})();
 })();
  
 // ---- Backward-compat for legacy HTML onclick="startDiagnosis('...')"
