@@ -55,33 +55,77 @@ window.RCA_DATA = {
 
     subsystems: {
       // Drying branch
-      IRD: {
-        mechanism: 'heat',
-        checks: [
-          { id:'ipu1', label:'IPU 1 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu2', label:'IPU 2 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu3', label:'IPU 3 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu4', label:'IPU 4 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu5', label:'IPU 5 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu6', label:'IPU 6 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'ipu7', label:'IPU 7 Temperature',    unit:'°C', spec:[7.0, 9.0] },
-          { id:'x1',   label:'IRD X Extrusion 1',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x2',   label:'IRD X Extrusion 2',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x3',   label:'IRD X Extrusion 3',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x4',   label:'IRD X Extrusion 4',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x5',   label:'IRD X Extrusion 5',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x6',   label:'IRD X Extrusion 6',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x7',   label:'IRD X Extrusion 7',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x8',   label:'IRD X Extrusion 8',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x9',   label:'IRD X Extrusion 9',    unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x10',  label:'IRD X Extrusion 10',   unit:'m³/h', spec:[7.0, 9.0] },
-          { id:'x11',  label:'IRD X Extrusion 11',   unit:'m³/h', spec:[7.0, 9.0] }
-        ],
-        tips: [
-          'Verify IR lamps status and thermal sensors.',
-          'Balance extrusions; avoid >10% delta between adjacent extrusions.'
-        ]
-      },
+   IRD: {
+  id: "IRD",
+  title: "IRD – Infrared Dryer",
+  checks: [
+    {
+      id: "ird_pressure",
+      order: 1,
+      label: "IRD Pressure",
+      type: "range",
+      unit: "mbar",
+      spec: { min: 2000, max: 2400 }
+    },
+    {
+      id: "ird_vacuum",
+      order: 2,
+      label: "IRD Vacuum",
+      type: "range",
+      unit: "mbar",
+      spec: { min: 60, max: 80 }
+    },
+    {
+      id: "ipu_pressure",
+      order: 3,
+      label: "IPU Pressure (Per Unit)",
+      type: "range",
+      unit: "bar",
+      spec: { min: 280, max: 320 }
+    },
+    {
+      id: "ipu_vacuum",
+      order: 4,
+      label: "IPU Vacuum",
+      type: "range",
+      unit: "mbar",
+      spec: { min: 80, max: 120 }
+    },
+    {
+      id: "blanket_temp",
+      order: 5,
+      label: "Blanket Temperature",
+      type: "multiRange",
+      points: [
+        { point: "ADY1 11200", target: 135, unit: "°C" },
+        { point: "AFIPU1", target: 72, unit: "°C" },
+        { point: "AFIPU7", target: 74, unit: "°C" },
+        { point: "ADY1 6505", target: 130, unit: "°C" }
+      ]
+    },
+    {
+      id: "slits_calib",
+      order: 6,
+      label: "IR Slits Calibration Verification",
+      type: "boolean",
+      prompt: "Ensure IRD Slits are calibrated; refer to IRD Slits procedure."
+    },
+    {
+      id: "mass_balance",
+      order: 7,
+      label: "Mass Balance Validation",
+      type: "boolean",
+      prompt: "Verify mass balance kit is installed; refer to Mass Balance UG procedure."
+    },
+    {
+      id: "pipes_condition",
+      order: 8,
+      label: "IRD System Pipes Condition Validation",
+      type: "boolean",
+      prompt: "Verify all IRD pipes are installed properly and in good condition."
+    }
+  ]
+},
       STS: {
         mechanism: 'flow',
         checks: [
