@@ -163,10 +163,26 @@ const PRESS_NAMES = {
 };
 
 function fillModels(kind){
-  const prefix=(kind==='Duplex')?'D':'S';
-  const max=(prefix==='D')?19:9;
-  const opts=Array.from({length:max},(_,i)=>({value:`${prefix}${i+1}`,label:`${prefix}${i+1}`}));
-  ddModel.setOptions(opts); ddModel.setValue('');
+   const prefix = (kind === 'Duplex') ? 'D' : 'S';
+   const max = (kind === 'Duplex') ? 33 : 35;
+   const map = PRESS_NAMES[kind] || {};
+
+   const opts = [];
+   for (let i = 1; i <= max; i++) {
+     const code = `${prefix}${i}`;
+     const name = map[code];
+     const label = name ? `${code} – ${name}` : code;
+     opts.push({ value: code, label });
+   }
+
+   if (kind === 'Duplex' && PRESS_NAMES.Other) {
+     Object.entries(PRESS_NAMES.Other).forEach(([code, name])=>{
+       opts.push({ value: code, label: `${code} – ${name}` });
+     });
+   }
+
+   ddModel.setOptions(opts);
+   ddModel.setValue('');
 }
 fillModels(hiddenType.value||'Simplex');
 machineTypeChips.addEventListener('click', (e)=>{
