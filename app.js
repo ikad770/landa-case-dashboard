@@ -109,6 +109,59 @@ const machineTypeChips=document.getElementById('machineTypeChips');
 const hiddenType=document.getElementById('machineType');
 const ddModel = makeDropdown(document.getElementById('dd-model'), { placeholder:'Choose…', options:[] });
 
+// Mapping of press code -> customer name
+const PRESS_NAMES = {
+  Simplex: {
+    S08: "ZRP",
+    S10: "Virtual",
+    S11: "Marketing",
+    S12: "SWR MX",
+    S14: "McGowans",
+    S15: "BPI",
+    S16: "K-1",
+    S18: "Dugal",
+    S19: "Neff",
+    S20: "MM",
+    S21: "SCT",          // (SetOff sheet – yellow)
+    S22: "Primary",
+    S23: "FP Mercure",
+    S24: "PGI TEA",
+    S25: "Model",
+    S26: "ZRP",
+    S28: "SWR PL",
+    S29: "Marketing",
+    S30: "Neff",
+    S32: "SWR IE",
+    S35: "Wynalda"
+  },
+  Duplex: {
+    D04: "Bluetree",
+    D06: "GP",
+    D07: "BluePrint",
+    D09: "BJU",
+    D11: "De Jong",
+    D13: "Quad",
+    D14: "Advantage",
+    D16: "Superior",
+    D18: "De Jong",
+    D19: "Abeka",
+    D21: "M13",
+    D22: "Mapprint",
+    D23: "Bluetree",
+    D24: "Shenando",      // לפי מה שנראה בתמונה – תבדוק
+    D25: "Wirtz",
+    D26: "Advantage",
+    D27: "Menasha",
+    D28: "Publication",
+    D29: "Marketing",     // אם יש בשורה – תוודא מול האקסל
+    D30: "Neff",          // אם מופיע – תוודא גם כן
+    D33: "Geiger"
+  },
+  Other: {
+    "NS 40-105": "Komori"
+  }
+};
+
 function fillModels(kind){
   const prefix=(kind==='Duplex')?'D':'S';
   const max=(prefix==='D')?19:9;
