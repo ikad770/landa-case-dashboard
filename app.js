@@ -270,7 +270,7 @@ function fillPresses(kind){
   ddPress.setValue('');
 }
 fillPresses(hiddenPressType.value || 'Simplex');
-
+ddPress.setValue('');
 pressTypeChips.addEventListener('click', e=>{
   const chip = e.target.closest('.chip');
   if(!chip) return;
@@ -468,7 +468,10 @@ async function saveCase(e){
   const errors = [];
   if(!req(data.sfCase))       errors.push('SF Case');
   if(!req(data.pressType))    errors.push('Press Type');
-  if(!req(data.pressName))    errors.push('Press Name');
+  if(!req(data.pressName)){
+    toast('Please select a Press Name', 'err');
+    return;
+}
   if(!req(data.system))       errors.push('System');
   if(!req(data.subSystem))    errors.push('Sub-System');
   if(!req(data.category))     errors.push('Category');
