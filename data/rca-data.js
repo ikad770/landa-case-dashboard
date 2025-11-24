@@ -1,274 +1,163 @@
-// data/rca-data.js
-// Root Cause Analyzer – data model (SetOff + placeholders for other issues)
-
+// Minimal RCA data – IRD path for SetOff (example structure)
 window.RCA_DATA = {
-  /* ========= SETOFF ========= */
-  setoff: {
-    code: "setoff",
-    title: "SetOff",
-    description:
-      "Guided root-cause analysis for SetOff issues, based on machine subsystems and spec checks.",
-
-    // High-level triage questions (VISIO: With / Without / Both)
-    triage: [
-      {
-        id: "coating_mode",
-        label: "When does the SetOff appear?",
-        type: "choice",
-        help: "Choose the closest scenario according to the customer complaint / test print.",
-        options: [
-          { value: "with", label: "Only with coating" },
-          { value: "without", label: "Only without coating" },
-          { value: "both", label: "With & without coating" }
-        ]
-      }
-    ],
-
-    // Which subsystems are relevant per triage result
-    triageBranch: {
-      with: ["ICS", "Powder", "STS"],
-      without: ["IPS", "BCU", "IRD", "BCS", "STS", "DFE"],
-      both: ["IPS", "BCU", "IRD", "BCS", "STS", "DFE", "ICS", "Powder"]
+  issues: {
+    setoff: {
+      id: 'setoff',
+      label: 'SetOff',
+      description: 'Drying / Coating related set-off issue',
+      entryNode: 'setoff_ird_or_coating'
     },
-
-    /* ===== Subsystems (per VISIO) ===== */
-    subsystems: {
-      /* --- IRD: מתוך ה-Visio שעשית --- */
-      IRD: {
-        id: "IRD",
-        title: "IRD – Infrared Dryer",
-        mechanism: "drying",
-        description:
-          "Infrared dryer pressure, vacuum, blanket temperature and calibration checks.",
-        checks: [
-          {
-            id: "ird_pressure",
-            order: 1,
-            label: "IRD Pressure",
-            type: "range",
-            unit: "mbar",
-            spec: { min: 2000, max: 2400 },
-            prompt: "Check IRD pressure sensor and regulator configuration."
-          },
-          {
-            id: "ird_vacuum",
-            order: 2,
-            label: "IRD Vacuum",
-            type: "range",
-            unit: "mbar",
-            spec: { min: 60, max: 80 },
-            prompt: "Verify IRD vacuum level and leakage in the circuit."
-          },
-          {
-            id: "ipu_pressure",
-            order: 3,
-            label: "IPU Pressure (Per Unit)",
-            type: "range",
-            unit: "bar",
-            spec: { min: 280, max: 320 },
-            prompt: "Check IPU pressure per unit according to service procedure."
-          },
-          {
-            id: "ipu_vacuum",
-            order: 4,
-            label: "IPU Vacuum",
-            type: "range",
-            unit: "mbar",
-            spec: { min: 80, max: 120 },
-            prompt: "Verify IPU vacuum lines and valves are operating correctly."
-          },
-          {
-            id: "blanket_temp",
-            order: 5,
-            label: "Blanket Temperature",
-            type: "multiRange",
-            unit: "°C",
-            points: [
-              { id: "ady1_11200", label: "ADY1 11200", target: 135 },
-              { id: "afipu1", label: "AFIPU1", target: 72 },
-              { id: "afipu7", label: "AFIPU7", target: 74 },
-              { id: "ady1_6505", label: "ADY1 6505", target: 130 }
-            ],
-            prompt:
-              "Measure temperatures for all blanket reference points and compare to targets."
-          },
-          {
-            id: "slits_calib",
-            order: 6,
-            label: "IR Slits Calibration Verification",
-            type: "boolean",
-            prompt:
-              "Ensure IRD slits are calibrated and aligned according to IRD Slits procedure."
-          },
-          {
-            id: "mass_balance",
-            order: 7,
-            label: "Mass Balance Validation",
-            type: "boolean",
-            prompt:
-              "Verify mass balance kit is installed and validated (refer to Mass Balance UG)."
-          },
-          {
-            id: "pipes_condition",
-            order: 8,
-            label: "IRD System Pipes Condition Validation",
-            type: "boolean",
-            prompt:
-              "Check all IRD pipes for leaks, damage, or incorrect installation."
-          }
-        ]
-      },
-
-      /* --- דוגמאות / placeholders – עד שתוסיף ב-Visio גם להם Data --- */
-      STS: {
-        id: "STS",
-        title: "STS – Sheet Transport System",
-        mechanism: "transport",
-        description: "Transport related checks that may impact SetOff behaviour.",
-        checks: [
-          {
-            id: "sts_speed",
-            order: 1,
-            label: "Transport speed vs. job profile",
-            type: "boolean",
-            prompt: "Verify transport speed matches job profile and media type."
-          },
-          {
-            id: "sts_alignment",
-            order: 2,
-            label: "Sheet alignment & skew",
-            type: "boolean",
-            prompt:
-              "Check skew sensors and mechanical alignment along the transport path."
-          }
-        ]
-      },
-
-      Powder: {
-        id: "Powder",
-        title: "Powder / Over-coating",
-        mechanism: "surface",
-        description: "Powder / over-coating application checks.",
-        checks: [
-          {
-            id: "powder_amount",
-            order: 1,
-            label: "Powder amount",
-            type: "range",
-            unit: "%",
-            spec: { min: 30, max: 70 },
-            prompt:
-              "Compare powder application to recommended range for the specific media."
-          },
-          {
-            id: "powder_coverage",
-            order: 2,
-            label: "Powder coverage uniformity",
-            type: "boolean",
-            prompt:
-              "Visually verify uniform powder coverage across the sheet surface."
-          }
-        ]
-      },
-
-      Transport: {
-        id: "Transport",
-        title: "General Transport",
-        mechanism: "transport",
-        description: "High-level media transport checks.",
-        checks: [
-          {
-            id: "media_contact",
-            order: 1,
-            label: "Media contact points",
-            type: "boolean",
-            prompt:
-              "Review all media contact points and verify no unexpected contact after printing."
-          }
-        ]
-      },
-
-      // Placeholders – ימולאו בהמשך על בסיס Visio:
-      IPS: {
-        id: "IPS",
-        title: "IPS",
-        mechanism: "upstream",
-        description: "Upstream IPS checks (placeholder).",
-        checks: []
-      },
-      BCU: {
-        id: "BCU",
-        title: "BCU",
-        mechanism: "control",
-        description: "BCU related checks (placeholder).",
-        checks: []
-      },
-      BCS: {
-        id: "BCS",
-        title: "BCS",
-        mechanism: "control",
-        description: "BCS related checks (placeholder).",
-        checks: []
-      },
-      DFE: {
-        id: "DFE",
-        title: "DFE",
-        mechanism: "rip",
-        description: "DFE / RIP related checks (placeholder).",
-        checks: []
-      },
-      ICS: {
-        id: "ICS",
-        title: "ICS – Coating System",
-        mechanism: "coating",
-        description: "ICS coating related checks (placeholder).",
-        checks: []
-      }
+    scratches: {
+      id: 'scratches',
+      label: 'Scratches',
+      description: 'Scratches on print / blanket – flow TBD',
+      entryNode: null
+    },
+    uniformity: {
+      id: 'uniformity',
+      label: 'Uniformity',
+      description: 'Bands / density – flow TBD',
+      entryNode: null
+    },
+    pq: {
+      id: 'pq',
+      label: 'PQ',
+      description: 'Overall print quality – flow TBD',
+      entryNode: null
     }
   },
 
-  /* ========= SCRATCHES (Placeholder) ========= */
-  scratches: {
-    code: "scratches",
-    title: "Scratches",
-    description: "Basic wizard for print scratches investigation (placeholder).",
-    triage: [
-      {
-        id: "side",
-        label: "Where do you see scratches?",
-        type: "choice",
-        options: [
-          { value: "front", label: "Front side" },
-          { value: "back", label: "Back side" },
-          { value: "both", label: "Both sides" }
-        ]
-      }
-    ],
-    triageBranch: {
-      front: [],
-      back: [],
-      both: []
+  // Simple decision tree for IRD only (from Visio logic – conceptually)
+  nodes: {
+    setoff_ird_or_coating: {
+      id: 'setoff_ird_or_coating',
+      type: 'question',
+      text: 'Where does the set-off appear to originate?',
+      options: [
+        {id:'opt_ird_only',label:'IRD only',next:'setoff_ird_entry'},
+        {id:'opt_coating_only',label:'Coating only',next:'setoff_coating_placeholder'},
+        {id:'opt_both',label:'Both IRD and coating',next:'setoff_ird_entry'}
+      ]
     },
-    subsystems: {}
-  },
 
-  /* ========= UNIFORMITY (Placeholder) ========= */
-  uniformity: {
-    code: "uniformity",
-    title: "Uniformity",
-    description: "Placeholder for uniformity based RCA.",
-    triage: [],
-    triageBranch: {},
-    subsystems: {}
-  },
+    setoff_ird_entry: {
+      id: 'setoff_ird_entry',
+      type: 'question',
+      text: 'IRD – which side / zone is affected?',
+      options: [
+        {id:'opt_ird_all',label:'All IPUs / all sides',next:'setoff_ird_all_ipu'},
+        {id:'opt_ird_single',label:'Single IPU / local area',next:'setoff_ird_single_ipu'}
+      ]
+    },
 
-  /* ========= PQ (Placeholder) ========= */
-  pq: {
-    code: "pq",
-    title: "PQ – Print Quality",
-    description: "General print quality wizard (placeholder).",
-    triage: [],
-    triageBranch: {},
-    subsystems: {}
+    setoff_ird_all_ipu: {
+      id: 'setoff_ird_all_ipu',
+      type: 'question',
+      text: 'Check IRD main parameters',
+      options: [
+        {id:'opt_ird_temp_low',label:'Temperature below spec',next:'diag_ird_increase_temp'},
+        {id:'opt_ird_power_low',label:'Power / % below spec',next:'diag_ird_increase_power'},
+        {id:'opt_ird_ok',label:'All parameters already in spec',next:'diag_ird_call_support'}
+      ]
+    },
+
+    setoff_ird_single_ipu: {
+      id: 'setoff_ird_single_ipu',
+      type: 'question',
+      text: 'Single IPU – suspect local issue',
+      options: [
+        {id:'opt_ird_lamp',label:'Lamp suspected / aged',next:'diag_ird_check_lamp'},
+        {id:'opt_ird_sensor',label:'Sensor reading abnormal',next:'diag_ird_check_sensor'},
+        {id:'opt_ird_mechanical',label:'Mechanical / airflow issue',next:'diag_ird_check_airflow'}
+      ]
+    },
+
+    // Placeholder nodes
+    setoff_coating_placeholder: {
+      id: 'setoff_coating_placeholder',
+      type: 'diagnosis',
+      title: 'Coating system suspected',
+      summary: 'Follow coating checklist: pump pressure, viscosity, applicator alignment, UV lamps, profile.',
+      actions: [
+        'Verify coating pump pressure is within spec',
+        'Check coating viscosity and level in tank',
+        'Inspect applicator alignment across web',
+        'Ensure all UV lamps are on and at correct power',
+        'Confirm correct coating profile is selected for this media'
+      ]
+    },
+
+    diag_ird_increase_temp: {
+      id: 'diag_ird_increase_temp',
+      type: 'diagnosis',
+      title: 'IRD temperature below spec',
+      summary: 'Increase IRD temperature gradually within spec and reprint test sheet.',
+      actions: [
+        'Compare current IRD temperature setpoint vs spec for this media and speed',
+        'Increase temperature in small steps (e.g. +5°C) and re-run test',
+        'Verify no media damage or over-drying',
+        'Document final temperature used and store as reference'
+      ]
+    },
+    diag_ird_increase_power: {
+      id: 'diag_ird_increase_power',
+      type: 'diagnosis',
+      title: 'IRD power below spec',
+      summary: 'Increase IRD power (%) for relevant IPUs within allowed spec, then test again.',
+      actions: [
+        'Check IPU power % vs spec table for this media',
+        'Increase power gradually while monitoring set-off',
+        'Ensure IRD cooling / ventilation is working properly',
+        'Update job preset if new settings are stable'
+      ]
+    },
+    diag_ird_call_support: {
+      id: 'diag_ird_call_support',
+      type: 'diagnosis',
+      title: 'IRD parameters are in spec',
+      summary: 'Parameters look correct – escalate to advanced support / service.',
+      actions: [
+        'Capture logs and screenshots of IRD parameters',
+        'Save test sheets (before / after)',
+        'Open SF case and attach print samples + parameter dump',
+        'Contact Landa service for deeper root cause analysis'
+      ]
+    },
+    diag_ird_check_lamp: {
+      id: 'diag_ird_check_lamp',
+      type: 'diagnosis',
+      title: 'Single IPU – lamp suspected',
+      summary: 'Lamp aging or failure may cause local set-off.',
+      actions: [
+        'Check lamp usage hours vs replacement spec',
+        'Measure lamp output if tools exist',
+        'Swap lamps between IPUs (if allowed) to see if defect moves',
+        'Replace lamp if output is low or unstable'
+      ]
+    },
+    diag_ird_check_sensor: {
+      id: 'diag_ird_check_sensor',
+      type: 'diagnosis',
+      title: 'Single IPU – sensor suspected',
+      summary: 'Temperature / feedback sensor may be misreading.',
+      actions: [
+        'Verify sensor wiring and connectors',
+        'Compare sensor reading vs external reference (if possible)',
+        'Check for loose mounting or contamination',
+        'Replace sensor if readings are not reliable'
+      ]
+    },
+    diag_ird_check_airflow: {
+      id: 'diag_ird_check_airflow',
+      type: 'diagnosis',
+      title: 'Single IPU – airflow / mechanical issue',
+      summary: 'Local airflow reduction can cause set-off.',
+      actions: [
+        'Inspect ducts / filters for blockages',
+        'Verify fans are running and spinning freely',
+        'Check mechanical alignment of IRD module',
+        'Clean components and retest with same job'
+      ]
+    }
   }
 };
