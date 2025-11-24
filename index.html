@@ -78,128 +78,62 @@
 
     <main class="main">
       <!-- Dashboard -->
-      <section id="page-dashboard" class="page">
-        <div class="grid cols-3">
-          <div class="panel"><div class="title">Total Cases</div><div id="kpiTotal" class="big">0</div></div>
-          <div class="panel"><div class="title">With Attachments</div><div id="kpiFiles" class="big">0</div></div>
-          <div class="panel"><div class="title">Last Updated</div><div id="kpiUpdated" class="big">—</div></div>
-        </div>
-      </section>
+    <section id="page-dashboard" class="page">
+  <!-- KPI row -->
+  <div class="grid cols-3">
+    <div class="panel">
+      <div class="title">Total Cases</div>
+      <div style="font-size:28px;margin-top:6px" id="kpiTotal">0</div>
+      <div class="help">All cases saved locally</div>
+    </div>
+    <div class="panel">
+      <div class="title">With Attachments</div>
+      <div style="font-size:28px;margin-top:6px" id="kpiFiles">0</div>
+      <div class="help">Cases containing files</div>
+    </div>
+    <div class="panel">
+      <div class="title">Last Updated</div>
+      <div style="font-size:28px;margin-top:6px" id="kpiUpdated">—</div>
+      <div class="help">Most recent save</div>
+    </div>
+  </div>
 
-      <!-- Create Case -->
-      <section id="page-create" class="page hidden">
-        <div class="panel">
-          <h2>Create New Case</h2>
-          <form id="caseForm" onsubmit="saveCase(event)">
-            <div class="grid cols-2">
-              
-              <!-- NEW FIELD ORDER -->
-              <div>
-                <label class="label v13">SF Case *</label>
-                <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
-              </div>
+  <!-- Quick actions -->
+  <div class="panel" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div class="title">Quick Actions</div>
+      <div>
+        <button class="btn" onclick="go('create')">+ New Case</button>
+        <button class="btn" onclick="go('cases')">View All</button>
+        <button class="btn" onclick="exportCSV()">Export CSV</button>
+      </div>
+    </div>
+  </div>
 
-              <div>
-                <label class="label v13">Press Type *</label>
-                <div class="chips" id="machineTypeChips">
-                  <div class="chip active" data-type="Simplex">Simplex</div>
-                  <div class="chip" data-type="Duplex">Duplex</div>
-                </div>
-                <input type="hidden" id="machineType" value="Simplex">
-              </div>
+  <!-- Analytics row -->
+  <div class="grid cols-3" style="margin-top:14px">
+    <!-- By Customer / Press -->
+    <div class="panel">
+      <div class="title">Top Customers / Presses</div>
+      <div class="help">Based on case count</div>
+      <ul class="stat-list" id="statByPress"></ul>
+    </div>
 
-              <div>
-                <label class="label v13">Press Name *</label>
-                <div id="dd-model" class="dd field-pressname"></div>
-              </div>
+    <!-- By System / Sub-System -->
+    <div class="panel">
+      <div class="title">By System & Sub-System</div>
+      <div class="help">Most active areas</div>
+      <ul class="stat-list" id="statBySystem"></ul>
+    </div>
 
-              <div>
-                <label class="label v13">Software Version</label>
-                <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
-              </div>
-
-              <div>
-                <label class="label v13">System *</label>
-                <div id="dd-system" class="dd field-system"></div>
-              </div>
-
-              <div id="wrap-sub" class="hidden">
-                <label class="label v13">Sub-System *</label>
-                <div id="dd-sub" class="dd field-subsystem"></div>
-              </div>
-
-              <div id="wrap-cat" class="hidden">
-                <label class="label v13">Category *</label>
-                <div id="dd-cat" class="dd field-category"></div>
-              </div>
-
-              <div id="wrap-item" class="hidden">
-                <label class="label v13">Item *</label>
-                <div id="dd-item" class="dd field-item"></div>
-              </div>
-
-              <div class="fit-inline full">
-                <div>
-                  <label class="label v13">TFS</label>
-                  <div class="fit-inline">
-                    <input type="checkbox" id="tfsToggle" title="Enable TFS">
-                    <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
-                  </div>
-                </div>
-              </div>
-
-              <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
-
-              <div class="full">
-                <label class="label v13">Issue Summary *</label>
-                <input class="input v13" id="issueSummary" placeholder="Clear 1-line summary (e.g., SetOff on S3 / IRD X)">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Symptoms / Error Messages</label>
-                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Troubleshooting (steps)</label>
-                <div id="tsSteps" class="field-troubles"></div>
-                <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Part (Catalog)</label>
-                <input class="input v13 field-troubles" id="partInput" placeholder="Type part number (e.g., 12-34567)…">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Solution Implemented *</label>
-                <textarea id="solution" class="input v13 field-troubles" placeholder="What fixed the issue"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Verification Method</label>
-                <input id="verification" class="input v13 field-troubles" placeholder="How did we verify the fix?">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Notes</label>
-                <textarea id="notes" class="input v13 field-troubles" placeholder="Anything noteworthy for future cases"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Attachments</label>
-                <div id="filesWrap"></div>
-                <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
-              </div>
-
-              <div class="inline full" style="margin-top:6px">
-                <button class="btn primary" type="submit">Save Case</button>
-                <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
+    <!-- By Software Version -->
+    <div class="panel">
+      <div class="title">By Software Version</div>
+      <div class="help">Cases per SW release</div>
+      <ul class="stat-list" id="statBySw"></ul>
+    </div>
+  </div>
+</section>
 
       <!-- Other Pages -->
       <section id="page-cases" class="page hidden"></section>
