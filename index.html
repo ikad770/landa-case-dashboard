@@ -3,379 +3,438 @@
 <head>
   <meta charset="utf-8">
   <title>Landa Quantum – Troubleshoot Suite (V18.9)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<canvas id="particles"></canvas>
-<div class="toast-wrap" id="toasts"></div>
+  <canvas id="particles"></canvas>
+  <div class="toast-wrap" id="toasts"></div>
 
-<!-- LOGIN -->
-<section id="loginPage">
-  <div class="auth panel center">
-    <div class="logo">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" aria-label="Landa Digital Printing">
-        <defs>
-          <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#00aeef"/>
-            <stop offset="100%" stop-color="#3bd0ff"/>
-          </linearGradient>
-          <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="b"/>
-            <feMerge>
-              <feMergeNode in="b"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-        <text x="50%" y="50%" text-anchor="middle" fill="url(#lg)" filter="url(#g)"
-              font-family="Segoe UI, Inter, system-ui, sans-serif" font-weight="700"
-              font-size="56" letter-spacing="1">Landa
-        </text>
-        <text x="50%" y="82%" text-anchor="middle" fill="#9bb0d0"
-              font-family="Segoe UI, Inter, system-ui, sans-serif"
-              font-size="18" letter-spacing="2">Digital Printing
-        </text>
-      </svg>
-      <div class="subtitle">Quantum Troubleshoot Suite</div>
-    </div>
-    <h2>Sign in to continue</h2>
-    <label class="label" for="authUser">Username</label>
-    <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
-    <label class="label" for="authPass">Password</label>
-    <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-    <button class="btn primary full" id="btnLogin">Login</button>
-  </div>
-</section>
-
-<!-- APP -->
-<div class="app hidden" id="appRoot">
-  <header class="header">
-    <div class="header-left">
-      <button class="menu-btn btn small" id="btnMenu" aria-label="Toggle menu" title="Menu">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </button>
-      <div class="header-title" id="logoHome" title="Go to Dashboard" style="cursor:pointer">
-        <div class="logo-mini" aria-hidden="true">
-          <svg viewBox="0 0 40 40" xmlns="http://.w3.org/2000/svg">
-            <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(0,0,0,0.78)"
-                  stroke="rgba(255,255,255,0.08)"/>
-            <circle cx="20" cy="20" r="8" fill="#00aeef">
-              <animate attributeName="r" values="8;9;8" dur="2.6s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-        </div>
-        <h1>Landa Quantum – Troubleshoot Suite</h1>
+  <!-- LOGIN -->
+  <section id="loginPage">
+    <div class="auth panel center">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" aria-label="Landa Digital Printing">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00aeef"/>
+              <stop offset="100%" stop-color="#3bd0ff"/>
+            </linearGradient>
+            <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2" result="b"/>
+              <feMerge>
+                <feMergeNode in="b"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <text x="50%" y="50%" text-anchor="middle" fill="url(#lg)" filter="url(#g)"
+                font-family="Segoe UI, Inter, system-ui, sans-serif" font-weight="700" font-size="56" letter-spacing="1">
+            Landa
+          </text>
+          <text x="50%" y="82%" text-anchor="middle" fill="#9bb0d0"
+                font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">
+            Digital Printing
+          </text>
+        </svg>
+        <div class="subtitle">Quantum Troubleshoot Suite</div>
       </div>
+      <h2>Sign in to continue</h2>
+      <label class="label" for="authUser">Username</label>
+      <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
+      <label class="label" for="authPass">Password</label>
+      <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+      <button class="btn primary full" id="btnLogin">Login</button>
     </div>
-    <span class="badge-env">V18.9 – RCA + Cases</span>
-  </header>
+  </section>
 
-  <div class="wrap">
-    <aside class="aside" id="aside">
-      <nav class="nav">
-        <a class="item active" href="#" data-route="dashboard"><span>Dashboard</span></a>
-        <a class="item" href="#" data-route="create"><span>Create Case</span></a>
-        <a class="item" href="#" data-route="cases"><span>All Cases</span><span class="badge" id="casesCount">0</span></a>
-        <a class="item" href="#" data-route="diagnosis"><span>Root Cause Analyzer</span></a>
-        <a class="item" href="#" data-route="settings"><span>Settings</span></a>
-        <a class="item" href="#" id="btnLogout"><span>Logout</span></a>
-      </nav>
-    </aside>
-
-    <main class="main">
-      <!-- DASHBOARD -->
-      <section id="page-dashboard" class="page">
-        <!-- KPI row -->
-        <div class="grid cols-3">
-          <div class="panel">
-            <div class="title">Total Cases</div>
-            <div style="font-size:28px;margin-top:6px" id="kpiTotal">0</div>
-            <div class="help">All cases saved locally</div>
+  <!-- APP -->
+  <div class="app hidden" id="appRoot">
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-btn btn small" id="btnMenu" aria-label="Toggle menu" title="Menu">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+        <div class="header-title" id="logoHome" title="Go to Dashboard" style="cursor:pointer">
+          <div class="logo-mini" aria-hidden="true">
+            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(0,0,0,0.78)" stroke="rgba(255,255,255,0.08)"/>
+              <circle cx="20" cy="20" r="8" fill="#00aeef">
+                <animate attributeName="r" values="8;9;8" dur="2.6s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
           </div>
-          <div class="panel">
-            <div class="title">With Attachments</div>
-            <div style="font-size:28px;margin-top:6px" id="kpiFiles">0</div>
-            <div class="help">Cases containing files</div>
-          </div>
-          <div class="panel">
-            <div class="title">Last Updated</div>
-            <div style="font-size:28px;margin-top:6px" id="kpiUpdated">—</div>
-            <div class="help">Most recent save</div>
-          </div>
+          <h1>Landa Quantum – Troubleshoot Suite</h1>
         </div>
+      </div>
+      <span class="badge-env">V18.9-Fishbone</span>
+    </header>
 
-        <!-- Quick Actions -->
-        <div class="panel" style="margin-top:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-            <div class="title">Quick Actions</div>
-            <div>
-              <button class="btn" onclick="go('create')">+ New Case</button>
-              <button class="btn" onclick="go('cases')">View All</button>
-              <button class="btn" onclick="exportCSV()">Export CSV</button>
+    <div class="wrap">
+      <aside class="aside" id="aside">
+        <nav class="nav">
+          <a class="item active" href="#" data-route="dashboard"><span>Dashboard</span></a>
+          <a class="item" href="#" data-route="create"><span>Create Case</span></a>
+          <a class="item" href="#" data-route="cases"><span>All Cases</span><span class="badge" id="casesCount">0</span></a>
+          <a class="item" href="#" data-route="diagnosis"><span>Root Cause Analyzer</span></a>
+          <a class="item" href="#" data-route="settings"><span>Settings</span></a>
+          <a class="item" href="#" id="btnLogout"><span>Logout</span></a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page">
+          <!-- Quick Actions FIRST (as requested) -->
+          <div class="panel dashboard-qa">
+            <div class="panel-head">
+              <div class="title">Quick Actions</div>
+            </div>
+            <div class="qa-grid">
+              <button class="btn primary" onclick="go('create')">+ New Case</button>
+              <button class="btn" onclick="go('cases')">View All Cases</button>
+              <button class="btn" onclick="exportCSV()">Export Cases CSV</button>
+              <button class="btn ghost" onclick="go('diagnosis')">Open RCA Wizard</button>
             </div>
           </div>
-        </div>
 
-        <!-- Analytics row -->
-        <div class="grid cols-3" style="margin-top:14px">
-          <div class="panel">
-            <div class="title">Top Customers / Presses</div>
-            <div class="help">Based on case count</div>
-            <ul class="stat-list" id="statByPress"></ul>
+          <!-- KPIs BELOW -->
+          <div class="grid cols-3" style="margin-top:14px">
+            <div class="panel kpi">
+              <div class="title">Total Cases</div>
+              <div class="kpi-main" id="kpiTotal">0</div>
+              <div class="help">All cases saved locally</div>
+            </div>
+            <div class="panel kpi">
+              <div class="title">Last Updated</div>
+              <div class="kpi-main" id="kpiUpdated">—</div>
+              <div class="help">Most recent save</div>
+            </div>
+            <div class="panel kpi">
+              <div class="title">By Press / SW</div>
+              <div class="kpi-subgrid">
+                <div><span class="kpi-label">Unique Presses</span><span id="kpiPresses">0</span></div>
+                <div><span class="kpi-label">Unique SW Versions</span><span id="kpiSW">0</span></div>
+              </div>
+              <div class="help">Overview by press / software</div>
+            </div>
           </div>
-          <div class="panel">
-            <div class="title">By System &amp; Sub-System</div>
-            <div class="help">Most active areas</div>
-            <ul class="stat-list" id="statBySystem"></ul>
+
+          <!-- Distribution cards -->
+          <div class="grid cols-3" style="margin-top:14px">
+            <div class="panel">
+              <div class="title">Cases by Customer</div>
+              <div id="dashByCustomer" class="mini-list"></div>
+            </div>
+            <div class="panel">
+              <div class="title">Cases by System</div>
+              <div id="dashBySystem" class="mini-list"></div>
+            </div>
+            <div class="panel">
+              <div class="title">Cases by Software</div>
+              <div id="dashBySW" class="mini-list"></div>
+            </div>
           </div>
+        </section>
+
+        <!-- CREATE CASE -->
+        <section id="page-create" class="page hidden">
           <div class="panel">
-            <div class="title">By Software Version</div>
-            <div class="help">Cases per SW release</div>
-            <ul class="stat-list" id="statBySw"></ul>
-          </div>
-        </div>
-      </section>
+            <h2 style="margin:0 0 10px">Create New Case</h2>
+            <form id="caseForm" onsubmit="saveCase(event)">
+              <div class="grid cols-2 create-grid">
 
-      <!-- CREATE CASE -->
-      <section id="page-create" class="page hidden">
-        <div class="panel">
-          <h2 style="margin:0 0 10px">Create New Case</h2>
-          <form id="caseForm" onsubmit="saveCase(event)">
-            <div class="grid cols-2">
-
-              <!-- 1. SF Case -->
-              <div>
-                <label class="label v13">SF Case *</label>
-                <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
-              </div>
-
-              <!-- 2. Press Type -->
-              <div>
-                <label class="label v13">Press Type *</label>
-                <div class="chips" id="machineTypeChips">
-                  <div class="chip active" data-type="Simplex">Simplex</div>
-                  <div class="chip" data-type="Duplex">Duplex</div>
-                </div>
-                <input type="hidden" id="machineType" value="Simplex">
-              </div>
-
-              <!-- 3. Press Name / Press # -->
-              <div>
-                <label class="label v13">Press Name / Press # *</label>
-                <div id="dd-model" class="dd field-model"></div>
-                <div class="help">Press code mapped to customer name</div>
-              </div>
-
-              <!-- 4. Software Version -->
-              <div>
-                <label class="label v13">Software Version</label>
-                <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
-              </div>
-
-              <!-- 5. TFS (optional) -->
-              <div class="fit-inline full">
+                <!-- LEFT COLUMN (meta) -->
                 <div>
-                  <label class="label v13">TFS (optional)</label>
-                  <div class="fit-inline">
-                    <input type="checkbox" id="tfsToggle" title="Enable TFS">
-                    <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
+                  <!-- SF Case -->
+                  <label class="label v13">SF Case *</label>
+                  <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
+
+                  <!-- Press Type -->
+                  <label class="label v13" style="margin-top:10px">Press Type *</label>
+                  <div class="chips" id="pressTypeChips">
+                    <div class="chip active" data-type="Simplex">Simplex</div>
+                    <div class="chip" data-type="Duplex">Duplex</div>
+                  </div>
+                  <input type="hidden" id="pressType" value="Simplex">
+
+                  <!-- Press Name -->
+                  <label class="label v13" style="margin-top:10px">Press Name *</label>
+                  <div id="dd-press" class="dd field-press"></div>
+
+                  <!-- Software Version -->
+                  <label class="label v13" style="margin-top:10px">Software Version</label>
+                  <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
+
+                  <!-- Optional TFS -->
+                  <div style="margin-top:12px">
+                    <label class="label v13">TFS (optional)</label>
+                    <div class="fit-inline">
+                      <input type="checkbox" id="tfsToggle" title="Enable TFS">
+                      <input class="input v13 hidden field-tfs" id="tfsNumber"
+                             inputmode="numeric" placeholder="TFS-12345">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT COLUMN (system hierarchy) -->
+                <div>
+                  <label class="label v13">System *</label>
+                  <div id="dd-system" class="dd field-system"></div>
+
+                  <div id="wrap-sub" class="hidden" style="margin-top:10px">
+                    <label class="label v13">Sub-System *</label>
+                    <div id="dd-sub" class="dd field-subsystem"></div>
+                  </div>
+
+                  <div id="wrap-cat" class="hidden" style="margin-top:10px">
+                    <label class="label v13">Category *</label>
+                    <div id="dd-cat" class="dd field-category"></div>
+                  </div>
+
+                  <div id="wrap-item" class="hidden" style="margin-top:10px">
+                    <label class="label v13">Item *</label>
+                    <div id="dd-item" class="dd field-item"></div>
+                  </div>
+                </div>
+
+                <div class="full">
+                  <hr class="sep">
+                </div>
+
+                <!-- Issue Summary -->
+                <div class="full">
+                  <label class="label v13">Issue Summary *</label>
+                  <input class="input v13 field-wide" id="issueSummary" placeholder="One line summary">
+                </div>
+
+                <!-- Symptoms -->
+                <div class="full">
+                  <label class="label v13">Symptoms / Error Messages</label>
+                  <textarea id="symptoms" class="input v13 field-wide"
+                            placeholder="Short bullets or error codes"></textarea>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="full">
+                  <label class="label v13">Troubleshooting (steps)</label>
+                  <div id="tsSteps" class="field-troubles"></div>
+                  <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
+                </div>
+
+                <!-- Part Issue (only if HW-related) -->
+                <div class="full">
+                  <label class="label v13">Part Issue (if HW related)</label>
+                  <div class="partwrap field-troubles">
+                    <input class="input v13" id="partInput"
+                           placeholder="Type part number or description">
+                    <div class="part-suggest" id="partSuggest"></div>
+                  </div>
+                </div>
+
+                <!-- Final Solution -->
+                <div class="full">
+                  <label class="label v13">Final Solution *</label>
+                  <textarea id="solution" class="input v13 field-wide"
+                            placeholder="What fixed the issue"></textarea>
+
+                  <div class="solution-meta">
+                    <div class="fit-inline">
+                      <input type="checkbox" id="solVersionDependent">
+                      <label for="solVersionDependent" class="label-inline">
+                        Solution is software-version dependent
+                      </label>
+                    </div>
+                    <div id="solVersionWrap" class="hidden sol-version-wrap">
+                      <label class="label v13" style="margin-top:6px">Affected Versions</label>
+                      <input id="solVersionText" class="input v13 field-wide"
+                             placeholder="Example: 4.2.11, 4.2.12…">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Verification / Notes -->
+                <div class="full">
+                  <label class="label v13">Verification Method</label>
+                  <input id="verification" class="input v13 field-wide"
+                         placeholder="How did we verify the fix?">
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Notes</label>
+                  <textarea id="notes" class="input v13 field-wide"
+                            placeholder="Anything noteworthy for future cases"></textarea>
+                </div>
+
+                <!-- Attachments -->
+                <div class="full">
+                  <label class="label v13">Attachments (multiple)</label>
+                  <div id="filesWrap"></div>
+                  <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
+                  <div class="help">Accepted: pdf, doc, xls, png, jpg, jpeg, zip</div>
+                </div>
+
+                <!-- Actions -->
+                <div class="inline full" style="margin-top:6px">
+                  <button class="btn primary" type="submit">Save Case</button>
+                  <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ALL CASES -->
+        <section id="page-cases" class="page hidden">
+          <div class="panel">
+            <div class="panel-head">
+              <h2 style="margin:0">All Cases</h2>
+              <div class="inline" style="flex-wrap:wrap; gap:8px">
+                <input id="searchBox" class="input v13"
+                       placeholder="Search (Issue / Press / System)" style="min-width:220px">
+                <button class="btn" onclick="renderCases()">Apply</button>
+                <button class="btn" onclick="exportCSV()">Export CSV</button>
+              </div>
+            </div>
+          </div>
+          <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
+        </section>
+
+        <!-- ROOT CAUSE ANALYZER -->
+        <section id="page-diagnosis" class="page hidden">
+          <div class="panel">
+            <h2 style="margin:0 0 6px">Root Cause Analyzer – Guided Fishbone</h2>
+            <p class="help">
+              Start from the symptom, answer a few focused questions, and get a suggested root-cause direction.
+            </p>
+
+            <!-- Stepper -->
+            <div class="wizard-stepper">
+              <div class="wizard-step" data-step="1">
+                <div class="bubble">1</div>
+                <div class="label">Select Issue</div>
+              </div>
+              <div class="wizard-step" data-step="2">
+                <div class="bubble">2</div>
+                <div class="label">Check IRD Parameters</div>
+              </div>
+              <div class="wizard-step" data-step="3">
+                <div class="bubble">3</div>
+                <div class="label">Diagnosis</div>
+              </div>
+              <div class="wizard-track"><div class="wizard-track-fill" id="wizardTrack"></div></div>
+            </div>
+
+            <!-- Wizard Body -->
+            <div id="rcaWizard" class="wizard-layout">
+              <!-- LEFT: content / questions -->
+              <div class="wizard-main">
+                <!-- Step 1 -->
+                <div class="wizard-card" id="wizStep1">
+                  <h3>Select main issue</h3>
+                  <p class="help">Choose the closest description to what the customer is reporting.</p>
+                  <div class="issue-grid">
+                    <button class="issue-pill" data-issue="setoff">
+                      <div class="pill-title">SetOff</div>
+                      <div class="pill-sub">Ink / coating offset / smearing</div>
+                    </button>
+                    <button class="issue-pill" data-issue="scratches">
+                      <div class="pill-title">Scratches</div>
+                      <div class="pill-sub">Surface damage / mechanical marks</div>
+                    </button>
+                    <button class="issue-pill" data-issue="uniformity">
+                      <div class="pill-title">Uniformity</div>
+                      <div class="pill-sub">Density / bands / non-uniform image</div>
+                    </button>
+                    <button class="issue-pill" data-issue="pq">
+                      <div class="pill-title">PQ</div>
+                      <div class="pill-sub">General print-quality concerns</div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Step 2 – IRD checks (from RCA_DATA) -->
+                <div class="wizard-card hidden" id="wizStep2">
+                  <h3>IRD – Guided checks</h3>
+                  <p class="help">
+                    Fill only what you can measure right now. Each line compares your reading to the recommended spec.
+                  </p>
+                  <div id="irdQuestions" class="ird-grid"><!-- filled by rca.js --></div>
+                </div>
+
+                <!-- Step 3 – Diagnosis -->
+                <div class="wizard-card hidden" id="wizStep3">
+                  <h3>Suggested diagnosis</h3>
+                  <div id="diagSummary" class="diag-summary">
+                    <!-- filled by rca.js -->
                   </div>
                 </div>
               </div>
 
-              <div class="full">
-                <hr style="border:0;border-top:1px solid var(--border)">
-              </div>
-
-              <!-- 6. System hierarchy -->
-              <div>
-                <label class="label v13">System *</label>
-                <div id="dd-system" class="dd field-system"></div>
-              </div>
-
-              <div id="wrap-sub" class="hidden">
-                <label class="label v13">Sub-System *</label>
-                <div id="dd-sub" class="dd field-subsystem"></div>
-              </div>
-
-              <div id="wrap-cat" class="hidden">
-                <label class="label v13">Category *</label>
-                <div id="dd-cat" class="dd field-category"></div>
-              </div>
-
-              <div id="wrap-item" class="hidden">
-                <label class="label v13">Item *</label>
-                <div id="dd-item" class="dd field-item"></div>
-              </div>
-
-              <div class="full">
-                <hr style="border:0;border-top:1px solid var(--border)">
-              </div>
-
-              <!-- 7. Issue Summary -->
-              <div class="full">
-                <label class="label v13">Issue Summary *</label>
-                <input class="input v13" id="issueSummary" placeholder="One line summary">
-              </div>
-
-              <!-- 8. Symptoms / Error Messages -->
-              <div class="full">
-                <label class="label v13">Symptoms / Error Messages</label>
-                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
-              </div>
-
-              <!-- 9. Troubleshooting (steps) -->
-              <div class="full">
-                <label class="label v13">Troubleshooting (steps)</label>
-                <div id="tsSteps" class="field-troubles"></div>
-                <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
-              </div>
-
-              <!-- 10. Part Issue (only for HW) -->
-              <div class="full hidden" id="partIssueSection">
-                <label class="label v13">Part Issue (HW only)</label>
-                <div class="help">Shown only when Category = HW</div>
-                <textarea id="partIssue" class="input v13 field-troubles"
-                          placeholder="Describe the hardware part issue (catalog, location, failure mode)…"></textarea>
-              </div>
-
-              <!-- 11. Final Solution + SW dependency -->
-              <div class="full">
-                <label class="label v13">Final Solution *</label>
-                <textarea id="finalSolution" class="input v13 field-troubles"
-                          placeholder="What fixed the issue"></textarea>
-                <div class="fit-inline" style="margin-top:6px;align-items:center;gap:12px">
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)">
-                    <input type="checkbox" id="solutionVersionDependent">
-                    <span>Solution is software-version dependent</span>
-                  </label>
-                  <input class="input v13" id="solutionFixVersions"
-                         placeholder="Fixed in versions (e.g. 4.2.11, 4.2.12)"
-                         style="max-width:260px;display:none">
+              <!-- RIGHT: context panel -->
+              <aside class="wizard-side">
+                <div class="panel slim">
+                  <div class="title">Session snapshot</div>
+                  <div class="mini-list" id="wizSnapshot"></div>
                 </div>
-              </div>
-
-              <!-- 12. Verification Method -->
-              <div class="full">
-                <label class="label v13">Verification Method</label>
-                <input id="verification" class="input v13 field-troubles"
-                       placeholder="How did we verify the fix?">
-              </div>
-
-              <!-- 13. Notes -->
-              <div class="full">
-                <label class="label v13">Notes</label>
-                <textarea id="notes" class="input v13 field-troubles"
-                          placeholder="Anything noteworthy for future cases"></textarea>
-              </div>
-
-              <!-- 14. Attachments -->
-              <div class="full">
-                <label class="label v13">Attachments (multiple)</label>
-                <div id="filesWrap"></div>
-                <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
-                <div class="help">Accepted: pdf, doc, xls, png, jpg, jpeg, zip</div>
-              </div>
-
-              <div class="inline full" style="margin-top:6px">
-                <button class="btn primary" type="submit">Save Case</button>
-                <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
-              </div>
-
+                <div class="panel slim">
+                  <div class="title">Tips</div>
+                  <ul class="tips">
+                    <li>Keep answers factual – avoid “maybe / feels like”.</li>
+                    <li>Skip parameters you can’t measure now – the engine will still help.</li>
+                    <li>Use the result as a direction, not as a final decision.</li>
+                  </ul>
+                </div>
+              </aside>
             </div>
-          </form>
-        </div>
-      </section>
 
-      <!-- CASES -->
-      <section id="page-cases" class="page hidden">
-        <div class="panel">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-            <h2 style="margin:0">All Cases</h2>
-            <div class="inline" style="flex-wrap:wrap;gap:8px">
-              <input id="searchBox" class="input v13"
-                     placeholder="Search (Issue / Press / System / SW)"
-                     style="min-width:220px">
-              <button class="btn" onclick="renderCases()">Apply</button>
-              <button class="btn" onclick="exportCSV()">Export CSV</button>
+            <!-- Wizard Footer -->
+            <div class="wizard-footer">
+              <button class="btn small ghost" id="btnRestartRCA">Start over</button>
+              <div class="spacer"></div>
+              <button class="btn small" id="btnPrevRCA">Back</button>
+              <button class="btn small primary" id="btnNextRCA">Next</button>
             </div>
           </div>
-        </div>
-        <div id="casesList" class="grid cols-1" style="margin-top:14px"></div>
-      </section>
+        </section>
 
-      <!-- ROOT CAUSE ANALYZER -->
-      <section id="page-diagnosis" class="page hidden">
-        <div class="panel">
-          <h2 style="margin:0 0 10px">Root Cause Analyzer – Fishbone Wizard</h2>
-          <p class="help">
-            Guided troubleshooting based on issue type, press configuration and IRD / coating / PQ flow.
-          </p>
-
-          <div id="rcaRoot">
-            <!-- Issue selection -->
-            <div class="panel" style="margin-top:6px">
-              <h3 style="margin:0 0 8px">Select main issue</h3>
-              <div class="issue-grid">
-                <button class="issue-card" type="button" onclick="RCA.start('setoff')">
-                  <div class="title">SetOff</div>
-                  <div class="sub">Drying / Coating</div>
-                </button>
-                <button class="issue-card" type="button" onclick="RCA.start('scratches')">
-                  <div class="title">Scratches</div>
-                  <div class="sub">Print / Blanket</div>
-                </button>
-                <button class="issue-card" type="button" onclick="RCA.start('uniformity')">
-                  <div class="title">Uniformity</div>
-                  <div class="sub">Density / Bands</div>
-                </button>
-                <button class="issue-card" type="button" onclick="RCA.start('pq')">
-                  <div class="title">PQ</div>
-                  <div class="sub">Overall print quality</div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Wizard container -->
-            <div id="rcaWizardHost" style="margin-top:12px"></div>
+        <!-- SETTINGS -->
+        <section id="page-settings" class="page hidden">
+          <div class="panel">
+            <h2 style="margin:0 0 10px">Settings</h2>
+            <div class="help">Coming soon…</div>
           </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Floating New Case FAB -->
+    <div class="fab" id="fabNew">
+      <button class="btn primary" onclick="go('create')">+ New Case</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-back" id="modalBack">
+      <div class="modal" id="modal">
+        <div class="modal-head">
+          <div class="title" id="modalTitle">Case</div>
+          <button class="btn small danger" onclick="closeModal()">Close</button>
         </div>
-      </section>
-
-      <!-- SETTINGS -->
-      <section id="page-settings" class="page hidden">
-        <div class="panel">
-          <h2 style="margin:0 0 10px">Settings</h2>
-          <div class="help">Coming soon…</div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div class="fab" id="fabNew">
-    <button class="btn primary" onclick="go('create')">+ New Case</button>
-  </div>
-
-  <!-- CASE MODAL -->
-  <div class="modal-back" id="modalBack">
-    <div class="modal" id="modal">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div class="title" id="modalTitle">Case</div>
-        <button class="btn small danger" onclick="closeModal()">Close</button>
+        <div id="modalBody" style="margin-top:12px"></div>
       </div>
-      <div id="modalBody" style="margin-top:12px"></div>
     </div>
   </div>
-</div>
 
-<!-- SCRIPTS -->
-<script src="fishbone.js"></script>
-<script src="rca-data.js"></script>
-<script src="app.js"></script>
-<script src="cases.js"></script>
-<script src="rca.js"></script>
+  <!-- SCRIPTS -->
+  <script src="app.js"></script>
+  <script src="cases.js"></script>
+  <script src="rca-data.js"></script>
+  <script src="rca.js"></script>
+  <script src="fishbone.js"></script>
 </body>
 </html>
