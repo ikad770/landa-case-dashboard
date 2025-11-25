@@ -1,7 +1,9 @@
-// fishbone.js – placeholder for future deep fishbone visualizations.
-// Currently the RCA logic is handled in rca.js with data from rca-data.js.
+// fishbone.js – placeholder for future advanced fishbone visual.
+// Currently not doing heavy UI – logic sits in rca.js
 
-(function(){
-  // In the future this can render an actual fishbone diagram view
-  // based on the RCA_DATA structure and user selections.
-})();
+window.FISHBONE = {
+  setoff: {
+    name: 'SetOff',
+    branches: ['Thermal', 'Airflow', 'Substrate', 'Coating', 'Mechanics']
+  }
+};
