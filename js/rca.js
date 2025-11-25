@@ -1,318 +1,275 @@
-// Root Cause Analyzer wizard logic
+// rca.js – Wizard logic (SetOff → IRD → diagnosis)
 
-let wizState = {
-  step: 1,
-  issue: null,
-  answers: {} // { questionId: { value, status } }
-};
+(function(){
+  let currentStep = 1;
+  let currentIssue = null;
+  let answers = {}; // { id: {value, inSpec, info} }
 
-function initRCA(){
-  // Avoid double-binding
-  if(initRCA._initialized) return;
-  initRCA._initialized = true;
+  function $(id){ return document.getElementById(id); }
 
-  const issueButtons = document.querySelectorAll('.issue-pill');
-  issueButtons.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      issueButtons.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      wizState.issue = btn.dataset.issue;
-      updateSnapshot();
+  function setStep(step){
+    currentStep = step;
+    const cards = [
+      {step:1, el:$('wizStep1')},
+      {step:2, el:$('wizStep2')},
+      {step:3, el:$('wizStep3')}
+    ];
+    cards.forEach(c=>{
+      if(!c.el) return;
+      c.el.classList.toggle('hidden', c.step !== step);
     });
-  });
 
-  document.getElementById('btnNextRCA').addEventListener('click', nextStep);
-  document.getElementById('btnPrevRCA').addEventListener('click', prevStep);
-  document.getElementById('btnRestartRCA').addEventListener('click', restartRCA);
+    const steps = document.querySelectorAll('.wizard-step');
+    steps.forEach(s=>{
+      const n = Number(s.getAttribute('data-step'));
+      s.classList.remove('active','completed');
+      if(n < step) s.classList.add('completed');
+      if(n === step) s.classList.add('active');
+    });
 
-  renderStep();
-  rebuildIRDQuestions();
-}
+    const track = $('wizardTrack');
+    if(track){
+      const pct = step === 1 ? 0 : step === 2 ? 50 : 100;
+      track.style.width = pct + '%';
+    }
 
-function renderStep(){
-  const step = wizState.step;
-  const s1 = document.getElementById('wizStep1');
-  const s2 = document.getElementById('wizStep2');
-  const s3 = document.getElementById('wizStep3');
-
-  s1.classList.toggle('hidden', step !== 1);
-  s2.classList.toggle('hidden', step !== 2);
-  s3.classList.toggle('hidden', step !== 3);
-
-  // Stepper UI
-  const steps = document.querySelectorAll('.wizard-step');
-  steps.forEach(st=>{
-    const n = Number(st.dataset.step);
-    st.classList.toggle('active', n === step);
-    st.classList.toggle('done',   n < step);
-  });
-
-  const track = document.getElementById('wizardTrack');
-  if(track){
-    const pct = (step-1) / 2 * 100;
-    track.style.width = pct + '%';
+    updateSnapshot();
+    if (step === 3) buildDiagnosis();
   }
 
-  // Buttons
-  const btnPrev = document.getElementById('btnPrevRCA');
-  const btnNext = document.getElementById('btnNextRCA');
-
-  if(step === 1){
-    btnPrev.disabled = true;
-    btnNext.textContent = 'Next';
-  } else if(step === 2){
-    btnPrev.disabled = false;
-    btnNext.textContent = 'Next';
-  } else {
-    btnPrev.disabled = false;
-    btnNext.textContent = 'Finish';
+  function selectIssue(issueKey){
+    currentIssue = issueKey;
+    document.querySelectorAll('.issue-pill').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.issue === issueKey);
+    });
+    updateSnapshot();
   }
 
-  updateSnapshot();
-  if(step === 3) buildDiagnosis();
-}
+  function buildIRDUI(){
+    const container = $('irdQuestions');
+    if (!container || !window.RCA_DATA || !RCA_DATA.IRD) return;
+    container.innerHTML = '';
 
-function nextStep(){
-  if(wizState.step === 1){
-    if(!wizState.issue){
-      toast('Select an issue to continue','err');
+    RCA_DATA.IRD.forEach(q=>{
+      const row = document.createElement('div');
+      row.className = 'ird-row';
+      row.dataset.id = q.id;
+
+      const label = document.createElement('div');
+      label.className = 'ird-label';
+      label.textContent = q.label;
+
+      const spec = document.createElement('div');
+      spec.className = 'ird-spec';
+      if (q.type === 'boolean') {
+        spec.textContent = 'Expected: OK';
+      } else if (q.min != null && q.max != null) {
+        spec.textContent = `Spec: ${q.min}–${q.max} ${q.unit || ''}`;
+      } else {
+        spec.textContent = q.unit || '';
+      }
+
+      const inputWrap = document.createElement('div');
+      if (q.type === 'boolean') {
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.addEventListener('change', ()=> onAnswerChange(q, cb.checked ? 'OK' : 'NOK'));
+        inputWrap.appendChild(cb);
+      } else {
+        const inp = document.createElement('input');
+        inp.type = 'number';
+        inp.className = 'input';
+        inp.placeholder = q.unit || '';
+        inp.addEventListener('input', ()=> onAnswerChange(q, inp.value));
+        inputWrap.appendChild(inp);
+      }
+
+      const status = document.createElement('div');
+      status.className = 'ird-status';
+      status.textContent = '—';
+
+      row.appendChild(label);
+      row.appendChild(spec);
+      row.appendChild(inputWrap);
+      row.appendChild(status);
+
+      container.appendChild(row);
+    });
+  }
+
+  function onAnswerChange(q, raw){
+    let inSpec = null;
+    let value = raw;
+
+    if (q.type === 'boolean') {
+      inSpec = (raw === 'OK');
+    } else {
+      const num = Number(raw);
+      if (!raw || isNaN(num)) {
+        inSpec = null;
+      } else if (q.min != null && q.max != null) {
+        inSpec = (num >= q.min && num <= q.max);
+      } else if (q.min != null) {
+        inSpec = (num >= q.min);
+      } else if (q.max != null) {
+        inSpec = (num <= q.max);
+      }
+      value = num;
+    }
+
+    answers[q.id] = {
+      value,
+      inSpec,
+      factor: q.factor,
+      label: q.label
+    };
+
+    const row = document.querySelector(`.ird-row[data-id="${q.id}"]`);
+    if (!row) return;
+    const status = row.querySelector('.ird-status');
+    if (!status) return;
+
+    if (inSpec === null) {
+      status.textContent = 'Not evaluated';
+      status.className = 'ird-status';
+    } else if (inSpec) {
+      status.textContent = 'Within spec';
+      status.className = 'ird-status ok';
+    } else {
+      status.textContent = 'Out of spec';
+      status.className = 'ird-status out';
+    }
+
+    updateSnapshot();
+  }
+
+  function updateSnapshot(){
+    const snap = $('wizSnapshot');
+    if (!snap) return;
+    const lines = [];
+
+    if (currentIssue) {
+      lines.push(`<div class="mini-row">
+        <span class="mini-label">Issue</span>
+        <span class="mini-value">${currentIssue.toUpperCase()}</span>
+      </div>`);
+    }
+
+    const outOfSpec = Object.values(answers).filter(a=>a.inSpec === false);
+    if (outOfSpec.length) {
+      lines.push(`<div class="mini-label" style="margin-top:4px">Out-of-spec signals:</div>`);
+      outOfSpec.slice(0,4).forEach(a=>{
+        lines.push(`<div class="mini-row">
+          <span class="mini-label">${a.label}</span>
+          <span class="mini-value">Out</span>
+        </div>`);
+      });
+    }
+
+    snap.innerHTML = lines.join('') || '<div class="mini-label">No data yet.</div>';
+  }
+
+  function buildDiagnosis(){
+    const diag = $('diagSummary');
+    if (!diag) return;
+
+    const out = Object.values(answers).filter(a=>a.inSpec === false);
+    if (!currentIssue) {
+      diag.innerHTML = '<div class="diag-card">Please select an issue first.</div>';
       return;
     }
-    // Only SetOff currently mapped to IRD
-    if(wizState.issue !== 'setoff'){
-      toast('Currently only SetOff is mapped to IRD wizard (others coming soon)','ok');
-    }
-  }
-  if(wizState.step === 2){
-    // validate minimal input? optional – we allow skipping
-  }
-  wizState.step = Math.min(3, wizState.step+1);
-  renderStep();
-}
-
-function prevStep(){
-  wizState.step = Math.max(1, wizState.step-1);
-  renderStep();
-}
-
-function restartRCA(){
-  wizState = { step:1, issue:null, answers:{} };
-  document.querySelectorAll('.issue-pill').forEach(b=>b.classList.remove('active'));
-  rebuildIRDQuestions();
-  renderStep();
-}
-
-// Build IRD questions UI from RCA_DATA
-function rebuildIRDQuestions(){
-  const cont = document.getElementById('irdQuestions');
-  if(!cont) return;
-  cont.innerHTML='';
-
-  const d = (window.RCA_DATA && window.RCA_DATA.setoff && window.RCA_DATA.setoff.irs)
-    ? window.RCA_DATA.setoff.irs
-    : null;
-  if(!d){
-    cont.innerHTML = '<div class="help">IRD data not configured.</div>';
-    return;
-  }
-
-  d.questions.forEach(q=>{
-    const row = document.createElement('div');
-    row.className = 'ird-row';
-    row.dataset.qid = q.id;
-
-    const cellLabel = document.createElement('div');
-    const l1 = document.createElement('div');
-    l1.className = 'label';
-    l1.textContent = q.label;
-    cellLabel.appendChild(l1);
-    if(q.tip){
-      const l2 = document.createElement('div');
-      l2.className = 'spec';
-      l2.textContent = q.tip;
-      cellLabel.appendChild(l2);
-    } else if(q.prompt){
-      const l2 = document.createElement('div');
-      l2.className = 'spec';
-      l2.textContent = q.prompt;
-      cellLabel.appendChild(l2);
+    if (!out.length) {
+      diag.innerHTML = `
+        <div class="diag-card">
+          <strong>No clear out-of-spec signals detected.</strong>
+          <div>From the IRD parameters you entered, everything looks within spec.<br>
+          Focus next on coating formulation, substrate, and mechanical setup.</div>
+        </div>`;
+      return;
     }
 
-    const cellInput = document.createElement('div');
-    let input;
-    if(q.type === 'range'){
-      input = document.createElement('input');
-      input.type = 'number';
-      input.className = 'input v13';
-      input.placeholder = 'Value';
-      input.style.maxWidth='100%';
-      input.addEventListener('input', ()=> onAnswerChange(q, input));
-    } else {
-      input = document.createElement('select');
-      input.className='input v13';
-      ['','OK','Not OK','N/A'].forEach(v=>{
-        const o=document.createElement('option');
-        o.value=v;
-        o.textContent=v || 'Select…';
-        input.appendChild(o);
+    const byFactor = new Map();
+    for (const a of out) {
+      const key = a.factor || 'General';
+      if (!byFactor.has(key)) byFactor.set(key, []);
+      byFactor.get(key).push(a);
+    }
+
+    const cards = [];
+    byFactor.forEach((arr, factor)=>{
+      const items = arr.map(a=>`• ${a.label}`).join('<br>');
+      cards.push(`
+        <div class="diag-card">
+          <strong>${factor}</strong>
+          <div>${items}</div>
+        </div>
+      `);
+    });
+
+    cards.push(`
+      <div class="diag-card">
+        <strong>Next actions</strong>
+        <div>
+          Use this as a direction: address the highest-impact factors first (thermal / airflow),
+          then run a short confirmation print. If symptoms persist, extend the analysis to coating,
+          substrate and mechanical sections in the case form.
+        </div>
+      </div>
+    `);
+
+    diag.innerHTML = cards.join('');
+  }
+
+  function resetWizard() {
+    currentStep = 1;
+    currentIssue = null;
+    answers = {};
+    document.querySelectorAll('.issue-pill').forEach(btn=>btn.classList.remove('active'));
+    buildIRDUI();
+    setStep(1);
+  }
+
+  function attachEvents(){
+    // issue pills
+    document.querySelectorAll('.issue-pill').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        selectIssue(btn.dataset.issue);
+        setStep(2);
       });
-      input.addEventListener('change', ()=> onAnswerChange(q, input));
-    }
-    cellInput.appendChild(input);
+    });
 
-    const cellSpec = document.createElement('div');
-    cellSpec.className = 'spec';
-    if(q.type === 'range' && typeof q.min === 'number' && typeof q.max === 'number'){
-      cellSpec.textContent = `Spec: ${q.min}–${q.max} ${q.unit||''}`;
-    } else {
-      cellSpec.textContent = '';
-    }
+    const btnNext = $('btnNextRCA');
+    const btnPrev = $('btnPrevRCA');
+    const btnRestart = $('btnRestartRCA');
 
-    const cellStatus = document.createElement('div');
-    const badge = document.createElement('div');
-    badge.className = 'badge-status warn';
-    badge.textContent = '—';
-    cellStatus.appendChild(badge);
-
-    row.appendChild(cellLabel);
-    row.appendChild(cellInput);
-    row.appendChild(cellSpec);
-    row.appendChild(cellStatus);
-    cont.appendChild(row);
-  });
-}
-
-function onAnswerChange(q, input){
-  const id = q.id;
-  let value = input.value;
-  let status = 'unknown';
-
-  if(q.type === 'range'){
-    if(value === '' || isNaN(Number(value))){
-      status = 'unknown';
-    } else {
-      const num = Number(value);
-      if(typeof q.min === 'number' && typeof q.max === 'number'){
-        if(num < q.min - 0.001) status = 'low';
-        else if(num > q.max + 0.001) status = 'high';
-        else status = 'ok';
+    if (btnNext) btnNext.addEventListener('click', ()=>{
+      if (currentStep === 1) {
+        if (!currentIssue) {
+          if (typeof toast === 'function') toast('Please select an issue first','err');
+          return;
+        }
+        setStep(2);
+      } else if (currentStep === 2) {
+        setStep(3);
       } else {
-        status = 'ok';
+        setStep(3);
       }
-    }
-  } else {
-    if(!value) status = 'unknown';
-    else if(value === 'OK') status='ok';
-    else if(value === 'N/A') status='na';
-    else status='bad';
+    });
+
+    if (btnPrev) btnPrev.addEventListener('click', ()=>{
+      if (currentStep === 3) setStep(2);
+      else if (currentStep === 2) setStep(1);
+    });
+
+    if (btnRestart) btnRestart.addEventListener('click', resetWizard);
   }
 
-  wizState.answers[id] = { value, status };
-  updateIRDRowStatus(id, status);
-  updateSnapshot();
-}
-
-function updateIRDRowStatus(id, status){
-  const row = document.querySelector(`.ird-row[data-qid="${id}"]`);
-  if(!row) return;
-  const badge = row.querySelector('.badge-status');
-  if(!badge) return;
-
-  badge.className = 'badge-status';
-  if(status === 'ok'){
-    badge.classList.add('ok');
-    badge.textContent='Within spec';
-  } else if(status === 'low'){
-    badge.classList.add('bad');
-    badge.textContent='Below spec';
-  } else if(status === 'high'){
-    badge.classList.add('bad');
-    badge.textContent='Above spec';
-  } else if(status === 'bad'){
-    badge.classList.add('bad');
-    badge.textContent='Problem';
-  } else if(status === 'na'){
-    badge.classList.add('warn');
-    badge.textContent='N/A';
-  } else {
-    badge.classList.add('warn');
-    badge.textContent='—';
-  }
-}
-
-// Snapshot side panel
-function updateSnapshot(){
-  const box = document.getElementById('wizSnapshot');
-  if(!box) return;
-  const issue = wizState.issue;
-  const step  = wizState.step;
-
-  let issueLabel = 'Not selected';
-  if(issue === 'setoff') issueLabel='SetOff';
-  else if(issue === 'scratches') issueLabel='Scratches';
-  else if(issue === 'uniformity') issueLabel='Uniformity';
-  else if(issue === 'pq') issueLabel='PQ';
-
-  const answered = Object.values(wizState.answers).filter(a=>a && a.value);
-  box.innerHTML = `
-    <div class="row"><span>Issue</span><span>${issueLabel}</span></div>
-    <div class="row"><span>Step</span><span>${step} / 3</span></div>
-    <div class="row"><span>Answered checks</span><span>${answered.length}</span></div>
-  `;
-}
-
-// Diagnosis summary
-function buildDiagnosis(){
-  const cont = document.getElementById('diagSummary');
-  if(!cont) return;
-  const answers = wizState.answers;
-  const bad = Object.entries(answers).filter(([_,a])=> a.status === 'bad' || a.status === 'low' || a.status === 'high');
-  const ok  = Object.entries(answers).filter(([_,a])=> a.status === 'ok');
-
-  let mainText;
-  if(!Object.keys(answers).length){
-    mainText = 'No parameters were filled. Please go back and provide at least a few key readings.';
-  } else if(!bad.length){
-    mainText = 'All provided parameters are within spec. Focus on non-IRD causes (coating, media, handling).';
-  } else {
-    mainText = 'Some IRD parameters are out of spec. Use the hints below as a starting point for your troubleshooting.';
+  function initRCA(){
+    if (!document.getElementById('rcaWizard')) return;
+    buildIRDUI();
+    attachEvents();
+    setStep(1);
   }
 
-  cont.innerHTML = `
-    <div class="diag-main">
-      ${mainText}
-    </div>
-    <div>
-      ${bad.map(([id,a])=> diagTag(id,a,'bad')).join('')}
-      ${ok.slice(0,3).map(([id,a])=> diagTag(id,a,'ok')).join('')}
-    </div>
-    <div class="spec" style="margin-top:8px">
-      This is a guidance tool only. Always validate the result with your own engineering judgment
-      and Landa procedures.
-    </div>
-  `;
-}
-
-function diagTag(id, a, kind){
-  const q = findQuestionById(id);
-  if(!q) return '';
-  const label = q.label || id;
-  const statusText = (()=>{
-    if(kind==='ok') return 'OK';
-    if(a.status === 'low')  return 'Below spec';
-    if(a.status === 'high') return 'Above spec';
-    return 'Out of spec';
-  })();
-  return `
-    <span class="diag-tag">
-      <strong>${statusText}</strong> – ${esc(label)}
-    </span>`;
-}
-function findQuestionById(id){
-  const d = window.RCA_DATA && window.RCA_DATA.setoff && window.RCA_DATA.setoff.irs;
-  if(!d) return null;
-  return d.questions.find(q=>q.id === id) || null;
-}
-
-// expose
-window.initRCA = initRCA;
+  window.initRCA = initRCA;
+})();
