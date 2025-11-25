@@ -1,55 +1,52 @@
-// RCA data model – currently focused on SetOff / IRD
-// Each question can be:
-//  type: "range"  -> numeric with min/max spec
-//  type: "check"  -> checkbox (OK / Not OK / N.A.)
+// rca-data.js – IRD spec & questions for SetOff (from your Visio idea, simplified)
 
 window.RCA_DATA = {
-  setoff: {
-    label: 'SetOff',
-    irs: {
-      label: 'IRD',
-      questions: [
-        {
-          id: 'ird_temp_exit',
-          label: 'Sheet temperature at IRD exit',
-          type: 'range',
-          unit: '°C',
-          min: 45,
-          max: 60,
-          tip: 'Measure with IR thermometer at IRD exit on the printed sheet.'
-        },
-        {
-          id: 'ird_power_level',
-          label: 'IRD power level (job setting)',
-          type: 'range',
-          unit: '%',
-          min: 70,
-          max: 100,
-          tip: 'Check the job parameters for IRD power configuration.'
-        },
-        {
-          id: 'ird_airflow',
-          label: 'Air flow / extraction around IRD',
-          type: 'check',
-          prompt: 'Proper airflow, no blocked ducts, no visible smoke accumulation.'
-        },
-        {
-          id: 'ird_contamination',
-          label: 'IRD contamination',
-          type: 'check',
-          prompt: 'No heavy contamination on IR lamps or glasses.'
-        },
-        {
-          id: 'ird_web_speed',
-          label: 'Web / transport speed vs reference',
-          type: 'range',
-          unit: 'm/min',
-          min: 0,
-          max: 120,
-          tip: 'Compare to default process speed for this media / application.'
-        }
-      ]
+  IRD: [
+    {
+      id: 'ird_temp',
+      label: 'IRD temperature (average °C)',
+      unit: '°C',
+      min: 70,
+      max: 90,
+      weight: 3,
+      factor: 'Thermal energy'
+    },
+    {
+      id: 'ird_power',
+      label: 'IRD power level',
+      unit: '%',
+      min: 70,
+      max: 100,
+      weight: 2,
+      factor: 'Thermal energy'
+    },
+    {
+      id: 'ird_speed',
+      label: 'Web speed',
+      unit: 'm/min',
+      min: 60,
+      max: 200,
+      weight: 2,
+      factor: 'Process balance'
+    },
+    {
+      id: 'ird_airflow',
+      label: 'Airflow / exhaust OK?',
+      unit: 'OK?',
+      min: null,
+      max: null,
+      type: 'boolean',
+      weight: 2,
+      factor: 'Airflow'
+    },
+    {
+      id: 'ird_humidity',
+      label: 'Ambient RH',
+      unit: '%',
+      min: 35,
+      max: 60,
+      weight: 1,
+      factor: 'Environment'
     }
-  }
-  // TODO: add Scratches / Uniformity / PQ fishbone branches once data is ready
+  ]
 };
