@@ -90,7 +90,7 @@
       <main class="main">
         <!-- DASHBOARD -->
         <section id="page-dashboard" class="page">
-          <!-- Quick Actions FIRST (as requested) -->
+          <!-- Quick Actions FIRST -->
           <div class="panel dashboard-qa">
             <div class="panel-head">
               <div class="title">Quick Actions</div>
@@ -430,15 +430,16 @@
     </div>
   </div>
 
-<!-- Data first -->
-<script src="data/rca-data.js"></script>
+  <!-- SCRIPTS: order is IMPORTANT -->
+  <!-- Data first -->
+  <script src="data/rca-data.js"></script>
 
-<!-- Logic for subsystems -->
-<script src="js/cases.js"></script>
-<script src="js/rca.js"></script>
-<script src="fishbone.js"></script>
+  <!-- Logic for subsystems / cases / RCA -->
+  <script src="js/cases.js"></script>
+  <script src="js/rca.js"></script>
+  <script src="fishbone.js"></script>
 
-<!-- App LAST (router, navigation, init) -->
-<script src="app.js"></script>
+  <!-- App LAST (router + init) -->
+  <script src="app.js"></script>
 </body>
 </html>
