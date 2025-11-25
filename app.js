@@ -1,458 +1,687 @@
-
-/* ===== Helpers ===== */
-function toast(msg,type='ok'){ const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; const w=document.getElementById('toasts'); w.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),250)},1600); }
-function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) } function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
-const LS_KEY='landa_cases_v13';
-
-/* ===== Storage ===== */
-function getCases(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return [] } }
-function setCases(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); updateKPIs(); }
-
-/* ===== Routing ===== */
-const pages=['dashboard','create','cases','diagnosis','settings'];
-const fabNew=document.getElementById('fabNew');
-function go(route){
-  pages.forEach(p=>document.getElementById('page-'+p).classList.add('hidden'));
-  const tgt=document.getElementById('page-'+route); if(tgt) tgt.classList.remove('hidden');
-  document.querySelectorAll('.nav .item').forEach(a=>a.classList.toggle('active', a.dataset.route===route));
-  if(route==='dashboard') updateKPIs();
-  if(route==='cases') renderCases();
-  if(fabNew) fabNew.style.display = (route==='create') ? 'none' : 'block';
-  window.scrollTo({top:0, behavior:'smooth'});
+/* ========= Helpers ========= */
+function toast(msg, type = "ok") {
+  const wrap = document.getElementById("toasts");
+  if (!wrap) return;
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    setTimeout(() => t.remove(), 260);
+  }, 1600);
 }
-document.getElementById('logoHome').addEventListener('click', ()=> go('dashboard'));
-document.querySelectorAll('.nav .item').forEach(a=>{
-  const r=a.getAttribute('data-route');
-  if(r){ a.addEventListener('click', (e)=>{ e.preventDefault(); go(r); if (document.body.classList.contains('aside-open')) document.body.classList.remove('aside-open'); }); }
-});
-const btnMenu=document.getElementById('btnMenu');
-if(btnMenu) btnMenu.addEventListener('click', ()=> document.body.classList.toggle('aside-open'));
+function esc(s) {
+  return (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
+}
+const LS_KEY_CASES = "landa_cases_v19";
+const LS_KEY_AUTH  = "landaAuth_v19";
+const LS_KEY_THEME = "landaTheme_v19";
+const LS_KEY_DENS  = "landaDensity_v19";
 
-/* ===== Auth ===== */
-const AUTH_KEY='landaAuth';
-const loginPage=document.getElementById('loginPage');
-const appRoot=document.getElementById('appRoot');
-function showApp(){ loginPage.classList.add('hidden'); appRoot.classList.remove('hidden'); go('dashboard'); updateKPIs(); }
-function showLogin(){ appRoot.classList.add('hidden'); loginPage.classList.remove('hidden'); }
-document.getElementById('btnLogin').addEventListener('click', ()=>{
-  const u=document.getElementById('authUser').value.trim();
-  const p=document.getElementById('authPass').value.trim();
-  if(u==='Expert' && p==='Landa123456'){
-    toast('Welcome, Expert','ok'); localStorage.setItem(AUTH_KEY,'true'); setTimeout(showApp, 650);
-  }else{ toast('Invalid credentials','err'); }
+/* ========= Storage ========= */
+function getCases() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_CASES) || "[]"); }
+  catch (e) { return []; }
+}
+function setCases(arr) {
+  localStorage.setItem(LS_KEY_CASES, JSON.stringify(arr));
+  updateKPIs();
+  const countEl = document.getElementById("casesCount");
+  if (countEl) countEl.textContent = arr.length;
+}
+function upsertCase(caseObj) {
+  const cases = getCases();
+  const idx = cases.findIndex(c => c.id === caseObj.id);
+  if (idx >= 0) cases[idx] = caseObj; else cases.push(caseObj);
+  setCases(cases);
+}
+function getCaseById(id) {
+  return getCases().find(c => c.id === id);
+}
+
+/* ========= Routing ========= */
+const pages = ["dashboard", "create", "cases", "diagnosis", "settings"];
+
+function go(route) {
+  pages.forEach(p => {
+    const el = document.getElementById("page-" + p);
+    if (el) el.classList.add("hidden");
+  });
+  const tgt = document.getElementById("page-" + route);
+  if (tgt) tgt.classList.remove("hidden");
+  document.querySelectorAll(".nav .item").forEach(a => {
+    const r = a.getAttribute("data-route");
+    a.classList.toggle("active", r === route);
+  });
+
+  if (route === "dashboard") updateKPIs();
+  if (route === "cases" && typeof window.renderAllCases === "function") {
+    window.renderAllCases();
+  }
+  if (route === "diagnosis" && typeof window.renderRCA === "function") {
+    window.renderRCA();
+  }
+
+  if (document.body.classList.contains("aside-open"))
+    document.body.classList.remove("aside-open");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("logoHome")?.addEventListener("click", () => go("dashboard"));
+document.querySelectorAll(".nav .item").forEach(a => {
+  const r = a.getAttribute("data-route");
+  if (r) {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      go(r);
+    });
+  }
 });
-if(localStorage.getItem(AUTH_KEY)==='true'){ showApp(); }
-document.getElementById('btnLogout').addEventListener('click', e=>{
-  e.preventDefault(); toast('Logged out successfully','ok'); localStorage.removeItem(AUTH_KEY);
-  document.body.classList.remove('aside-open'); setTimeout(showLogin, 650);
+document.getElementById("btnMenu")?.addEventListener("click", () => {
+  document.body.classList.toggle("aside-open");
 });
 
-/* ===== Custom Dropdown Engine ===== */
-function makeDropdown(container, { placeholder='Choose…', options=[], onChange=()=>{}, maxHeight=260 }){
-  container.classList.add('dd');
+/* ========= Auth ========= */
+const loginPage = document.getElementById("loginPage");
+const appRoot   = document.getElementById("appRoot");
+const authUser  = document.getElementById("authUser");
+const authPass  = document.getElementById("authPass");
+
+function showApp() {
+  loginPage.classList.add("hidden");
+  appRoot.classList.remove("hidden");
+  go("dashboard");
+  updateKPIs();
+}
+function showLogin() {
+  appRoot.classList.add("hidden");
+  loginPage.classList.remove("hidden");
+}
+
+function attemptLogin() {
+  const u = (authUser?.value || "").trim();
+  const p = (authPass?.value || "").trim();
+  if (u === "Expert" && p === "Landa123456") {
+    toast("Welcome, Expert", "ok");
+    localStorage.setItem(LS_KEY_AUTH, "true");
+    setTimeout(showApp, 550);
+  } else {
+    toast("Invalid credentials", "err");
+  }
+}
+document.getElementById("btnLogin")?.addEventListener("click", attemptLogin);
+[authUser, authPass].forEach(el => {
+  el?.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      attemptLogin();
+    }
+  });
+});
+document.getElementById("btnLogout")?.addEventListener("click", e => {
+  e.preventDefault();
+  toast("Logged out", "ok");
+  localStorage.removeItem(LS_KEY_AUTH);
+  setTimeout(showLogin, 400);
+});
+
+if (localStorage.getItem(LS_KEY_AUTH) === "true") {
+  showApp();
+}
+
+/* ========= Theme & Density ========= */
+function applyThemeFromStorage() {
+  const t = localStorage.getItem(LS_KEY_THEME) || "dark";
+  if (t === "light") document.body.classList.add("light");
+  else document.body.classList.remove("light");
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem(LS_KEY_THEME, isLight ? "light" : "dark");
+}
+document.getElementById("btnToggleTheme")?.addEventListener("click", toggleTheme);
+
+function applyDensityFromStorage() {
+  const d = localStorage.getItem(LS_KEY_DENS) || "normal";
+  if (d === "compact") document.body.classList.add("compact");
+  else document.body.classList.remove("compact");
+}
+function toggleDensity() {
+  const isCompact = document.body.classList.toggle("compact");
+  localStorage.setItem(LS_KEY_DENS, isCompact ? "compact" : "normal");
+}
+document.getElementById("btnToggleDensity")?.addEventListener("click", toggleDensity);
+
+applyThemeFromStorage();
+applyDensityFromStorage();
+
+/* ========= Particles Background ========= */
+(function () {
+  const c = document.getElementById("particles");
+  if (!c) return;
+  const ctx = c.getContext("2d");
+  let w = window.innerWidth, h = window.innerHeight;
+  c.width = w; c.height = h;
+  const ps = [];
+  for (let i = 0; i < 60; i++) {
+    ps.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 2 + 0.6,
+      dx: (Math.random() - 0.5) * 0.25,
+      dy: (Math.random() - 0.5) * 0.25,
+      o: 0.15 + Math.random() * 0.25
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    ps.forEach(p => {
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,174,239,${p.o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener("resize", () => {
+    w = window.innerWidth; h = window.innerHeight; c.width = w; c.height = h;
+  });
+})();
+
+/* ========= Dropdown Engine ========= */
+function makeDropdown(container, { placeholder = "Choose…", options = [], onChange = () => { }, maxHeight = 260 }) {
+  container.classList.add("dd");
   container.innerHTML = `
     <button type="button" class="dd-btn"><span class="dd-label">${placeholder}</span></button>
     <span class="dd-arrow" aria-hidden="true"></span>
     <div class="dd-list" style="max-height:${maxHeight}px"></div>
     <input type="hidden" class="dd-value" value="">
   `;
-  const btn = container.querySelector('.dd-btn');
-  const list = container.querySelector('.dd-list');
-  const label = container.querySelector('.dd-label');
-  const input = container.querySelector('.dd-value');
-  let state = { open:false, opts:options, index:-1 };
+  const btn = container.querySelector(".dd-btn");
+  const list = container.querySelector(".dd-list");
+  const label = container.querySelector(".dd-label");
+  const input = container.querySelector(".dd-value");
+  let state = { open: false, opts: options };
 
-  function render(){
-    list.innerHTML = '';
-    if(!state.opts || !state.opts.length){ list.innerHTML = `<div class="dd-empty">No options</div>`; return; }
-    state.opts.forEach((o,i)=>{
-      const it=document.createElement('div'); it.className='dd-item';
-      it.setAttribute('data-value',o.value); it.setAttribute('data-index',i);
-      if(String(input.value)===String(o.value)) it.setAttribute('aria-selected','true');
-      it.textContent=o.label ?? o.value;
-      it.addEventListener('click', ()=> selectIndex(i));
+  function render() {
+    list.innerHTML = "";
+    if (!state.opts || !state.opts.length) {
+      list.innerHTML = `<div class="dd-empty">No options</div>`;
+      return;
+    }
+    state.opts.forEach((o, i) => {
+      const it = document.createElement("div");
+      it.className = "dd-item";
+      it.setAttribute("data-value", o.value);
+      it.setAttribute("data-index", String(i));
+      if (String(input.value) === String(o.value)) it.setAttribute("aria-selected", "true");
+      it.textContent = o.label ?? o.value;
+      it.addEventListener("click", () => selectIndex(i));
       list.appendChild(it);
     });
   }
-  function open(){ if(container.classList.contains('disabled')) return;
-    container.classList.add('open'); state.open=true;
-    const idx=Math.max(0, state.opts.findIndex(o=> String(o.value)===String(input.value)));
-    highlight(idx); adjustInView();
-    window.addEventListener('click', outside); window.addEventListener('keydown', keys);
+  function selectIndex(i) {
+    const o = state.opts[i]; if (!o) return;
+    input.value = o.value;
+    label.textContent = o.label ?? o.value;
+    onChange(o.value, o);
+    container.classList.remove("open");
+    state.open = false;
   }
-  function close(){ container.classList.remove('open'); state.open=false;
-    window.removeEventListener('click', outside); window.removeEventListener('keydown', keys); }
-  function outside(e){ if(!container.contains(e.target)) close(); }
-  function keys(e){
-    if(!state.open) return;
-    if(e.key==='Escape'){ close(); btn.focus(); }
-    else if(e.key==='ArrowDown'){ e.preventDefault(); highlight(Math.min(state.index+1, state.opts.length-1)); adjustInView(); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); highlight(Math.max(state.index-1,0)); adjustInView(); }
-    else if(e.key==='Enter'){ e.preventDefault(); if(state.index>=0) selectIndex(state.index); }
-  }
-  function highlight(i){ state.index=i; [...list.children].forEach(c=>c.classList.remove('hover')); if(list.children[i]) list.children[i].classList.add('hover'); }
-  function adjustInView(){ const el=list.children[state.index]; if(!el) return; const r=el.getBoundingClientRect(); const L=list.getBoundingClientRect();
-    if(r.top<L.top) list.scrollTop -= (L.top-r.top)+6; if(r.bottom>L.bottom) list.scrollTop += (r.bottom-L.bottom)+6; }
-  function selectIndex(i){ const o=state.opts[i]; if(!o) return;
-    input.value=o.value; label.textContent=o.label ?? o.value;
-    [...list.children].forEach(x=>x.removeAttribute('aria-selected')); if(list.children[i]) list.children[i].setAttribute('aria-selected','true');
-    onChange(o.value, o.label ?? o.value); close(); }
-  btn.addEventListener('click', ()=> state.open?close():open());
-  const api={ setOptions(newOpts){ state.opts=newOpts||[]; render(); if(!state.opts.some(o=> String(o.value)===String(input.value))){ input.value=''; label.textContent=placeholder; } },
-              setValue(v){ const i=state.opts.findIndex(o=> String(o.value)===String(v)); if(i>=0){ selectIndex(i); } else { input.value=''; label.textContent=placeholder; } },
-              value(){ return input.value }, disable(flag){ container.classList.toggle('disabled', !!flag); } };
-  render(); return api;
-}
-
-/* ===== Machine Type / Model ===== */
-const machineTypeChips=document.getElementById('machineTypeChips');
-const hiddenType=document.getElementById('machineType');
-const ddModel = makeDropdown(document.getElementById('dd-model'), { placeholder:'Choose…', options:[] });
-
-// Mapping of press code -> customer name
-const PRESS_NAMES = {
-  Simplex: {
-    S08: "ZRP",
-    S10: "Virtual",
-    S11: "Marketing",
-    S12: "SWR MX",
-    S14: "McGowans",
-    S15: "BPI",
-    S16: "K-1",
-    S18: "Dugal",
-    S19: "Neff",
-    S20: "MM",
-    S21: "SCT",          // (SetOff sheet – yellow)
-    S22: "Primary",
-    S23: "FP Mercure",
-    S24: "PGI TEA",
-    S25: "Model",
-    S26: "ZRP",
-    S28: "SWR PL",
-    S29: "Marketing",
-    S30: "Neff",
-    S32: "SWR IE",
-    S35: "Wynalda"
-  },
-  Duplex: {
-    D04: "Bluetree",
-    D06: "GP",
-    D07: "BluePrint",
-    D09: "BJU",
-    D11: "De Jong",
-    D13: "Quad",
-    D14: "Advantage",
-    D16: "Superior",
-    D18: "De Jong",
-    D19: "Abeka",
-    D21: "M13",
-    D22: "Mapprint",
-    D23: "Bluetree",
-    D24: "Shenando",      // לפי מה שנראה בתמונה – תבדוק
-    D25: "Wirtz",
-    D26: "Advantage",
-    D27: "Menasha",
-    D28: "Publication",
-    D29: "Marketing",     // אם יש בשורה – תוודא מול האקסל
-    D30: "Neff",          // אם מופיע – תוודא גם כן
-    D33: "Geiger"
-  },
-  Other: {
-    "NS 40-105": "Komori"
-  }
-};
-
-function fillModels(kind){
-   const prefix = (kind === 'Duplex') ? 'D' : 'S';
-   const max = (kind === 'Duplex') ? 33 : 35;
-   const map = PRESS_NAMES[kind] || {};
-
-   const opts = [];
-   for (let i = 1; i <= max; i++) {
-     const code = `${prefix}${i}`;
-     const name = map[code];
-     const label = name ? `${code} – ${name}` : code;
-     opts.push({ value: code, label });
-   }
-
-   if (kind === 'Duplex' && PRESS_NAMES.Other) {
-     Object.entries(PRESS_NAMES.Other).forEach(([code, name])=>{
-       opts.push({ value: code, label: `${code} – ${name}` });
-     });
-   }
-
-   ddModel.setOptions(opts);
-   ddModel.setValue('');
-}
-fillModels(hiddenType.value||'Simplex');
-machineTypeChips.addEventListener('click', (e)=>{
-  const chip=e.target.closest('.chip'); if(!chip) return;
-  machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  chip.classList.add('active'); hiddenType.value=chip.dataset.type; fillModels(hiddenType.value);
-});
-
-/* ===== Hierarchical data (from your image – BSS) ===== */
-const HIER = {
-  "BSS": {
-    subSystems: [
-      "LIB","BCU","BCD&BTD Motors","BACS","Fly-Off","Air Knife","Hot Plate","Dancer","BCLS","Vacuum Box"
-    ],
-    categories: {
-      "HW": ["Rollers","Sensors","Motors","Brackets","Gaskets","Spare Parts","Pipes","Encoders","Valves"],
-      "SW": ["LIA","RTC","OPC","Parameters","Inverters Version"],
-      "EC": ["Inverters","Cables","SSR","CB's","FEC's"]
-    }
-  }
-};
-const SYSTEMS = Object.keys(HIER).map(x=>({value:x,label:x}));
-
-/* ===== Build dynamic dropdowns: System → Sub → Category → Item ===== */
-const ddSystem = makeDropdown(document.getElementById('dd-system'), { placeholder:'Choose…', options:SYSTEMS, onChange:onSystem });
-const wrapSub = document.getElementById('wrap-sub');
-const wrapCat = document.getElementById('wrap-cat');
-const wrapItem= document.getElementById('wrap-item');
-
-const ddSub = makeDropdown(document.getElementById('dd-sub'), { placeholder:'Select sub-system…', options:[], onChange:onSub });
-const ddCat = makeDropdown(document.getElementById('dd-cat'), { placeholder:'HW / SW / EC', options:[], onChange:onCat });
-const ddItem= makeDropdown(document.getElementById('dd-item'), { placeholder:'Select item…', options:[] });
-
-function onSystem(val){
-  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
-  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
-  wrapSub.classList.add('hidden'); ddSub.setOptions([]); ddSub.setValue('');
-
-  const node = HIER[val];
-  if(!node){ return; }
-  ddSub.setOptions(node.subSystems.map(s=>({value:s,label:s})));
-  wrapSub.classList.remove('hidden');
-}
-function onSub(){
-  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
-  wrapCat.classList.add('hidden'); ddCat.setOptions([]); ddCat.setValue('');
-
-  const sys = ddSystem.value();
-  if(!sys || !HIER[sys]) return;
-  const cats = Object.keys(HIER[sys].categories);
-  ddCat.setOptions(cats.map(c=>({value:c,label:c})));
-  wrapCat.classList.remove('hidden');
-}
-function onCat(catVal){
-  wrapItem.classList.add('hidden'); ddItem.setOptions([]); ddItem.setValue('');
-  const sys = ddSystem.value();
-  if(!sys || !catVal) return;
-  const items = (HIER[sys].categories[catVal] || []).map(x=>({value:x,label:x}));
-  ddItem.setOptions(items);
-  wrapItem.classList.remove('hidden');
-}
-
-/* ===== TFS toggle ===== */
-const tfsToggle=document.getElementById('tfsToggle');
-const tfsNumber=document.getElementById('tfsNumber');
-tfsToggle.addEventListener('change', ()=>{
-  if(tfsToggle.checked){ tfsNumber.classList.remove('hidden'); tfsNumber.focus(); }
-  else { tfsNumber.classList.add('hidden'); tfsNumber.value=''; }
-});
-
-/* ===== Troubleshooting steps ===== */
-const tsSteps=document.getElementById('tsSteps');
-function addStep(val=''){
-  const row=document.createElement('div'); row.className='inline'; row.style.margin='6px 0';
-  const inp=document.createElement('input'); inp.className='input v13'; inp.placeholder='Describe a step…'; inp.value=val; inp.style.flex='1';
-  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
-  row.appendChild(inp); row.appendChild(rm); tsSteps.appendChild(row);
-}
-addStep('Check connections and sensors');
-addStep('Verify model-specific settings');
-
-/* ===== Part smart suggest (demo) ===== */
-const partInput=document.getElementById('partInput');
-const partSuggest=document.getElementById('partSuggest');
-if(partInput){
-  const parts=Array.from({length:160},(_,i)=> ((i%2===0)?'12':'34') + '-' + String(10000+i).slice(-5));
-  const filterParts=q=>{const v=String(q||'').trim().toLowerCase(); if(!v) return []; return parts.filter(p=>p.toLowerCase().includes(v)).slice(0,30)};
-  partInput.addEventListener('input', ()=>{
-    const list=filterParts(partInput.value); partSuggest.innerHTML='';
-    if(!list.length){ partSuggest.style.display='none'; return }
-    list.forEach(p=>{ const row=document.createElement('div'); row.textContent=p; row.addEventListener('click',()=>{partInput.value=p; partSuggest.style.display='none'}); partSuggest.appendChild(row) });
-    partSuggest.style.display='block';
+  btn.addEventListener("click", () => {
+    state.open = !state.open;
+    container.classList.toggle("open", state.open);
+    if (state.open) render();
   });
-  document.addEventListener('click',(e)=>{ if(!partSuggest.contains(e.target) && e.target!==partInput){ partSuggest.style.display='none' }});
-}
-
-/* ===== Files ===== */
-function addFileRow(){
-  const w=document.getElementById('filesWrap');
-  const row=document.createElement('div'); row.className='inline';
-  const inp=document.createElement('input'); inp.type='file'; inp.className='file'; inp.accept='.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip';
-  const rm=document.createElement('button'); rm.className='btn small danger'; rm.type='button'; rm.textContent='Remove'; rm.onclick=()=>row.remove();
-  row.appendChild(inp); row.appendChild(rm); w.appendChild(row);
-}
-addFileRow();
-
-/* ===== Save Case ===== */
-async function saveCase(e){
-  e.preventDefault();
-  const req=v=>v&&String(v).trim().length>0;
-
-  const data={
-    sfCase:val('sfCase'),
-    tfsNumber: tfsToggle.checked ? val('tfsNumber') : '',
-    machineType: val('machineType'),
-    model: ddModel.value(),
-    system: ddSystem.value(),
-    subSystem: ddSub.value(),
-    category: ddCat.value(),
-    item: ddItem.value(),
-    softwareVersion: val('softwareVersion'),
-    issueSummary: val('issueSummary'),
-    symptoms: val('symptoms'),
-    troubleshooting: collectSteps(),
-    partCatalog: val('partInput'),
-    solution: val('solution'),
-    verification: val('verification'),
-    notes: val('notes'),
-    attachments: [],
-    createdAt: new Date().toISOString(),
-    author:'Expert'
-  };
-
-  const errors=[];
-  if(!req(data.sfCase))errors.push('sfCase');
-  if(!req(data.model))errors.push('model');
-  if(!req(data.system))errors.push('system');
-  if(!req(data.subSystem))errors.push('subSystem');
-  if(!req(data.category))errors.push('category');
-  if(!req(data.item))errors.push('item');
-  if(!req(data.issueSummary))errors.push('issueSummary');
-  if(!req(data.solution))errors.push('solution');
-
-  if(errors.length){ toast('Please fill required: '+errors.join(', '),'err'); return; }
-
-  const inputs=[...document.querySelectorAll('#filesWrap input[type="file"]')];
-  const files=inputs.map(i=>i.files&&i.files[0]).filter(Boolean);
-  if(files.length){ for(const f of files){
-      const ok=/\.(pdf|docx?|xlsx?|png|jpg|jpeg|zip)$/i.test(f.name);
-      if(!ok){ toast('Unsupported file: '+f.name,'err'); continue }
-      const base64=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f) });
-      data.attachments.push({name:f.name,type:f.type,data:base64});
-    } }
-
-  const arr=getCases(); arr.push(data); setCases(arr);
-
-  document.getElementById('caseForm').reset();
-  hiddenType.value='Simplex';
-  machineTypeChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  machineTypeChips.querySelector('[data-type="Simplex"]').classList.add('active');
-  fillModels('Simplex');
-
-  ddSystem.setValue(''); ddSub.setOptions([]); ddSub.setValue('');
-  ddCat.setOptions([]); ddCat.setValue(''); ddItem.setOptions([]); ddItem.setValue('');
-  wrapSub.classList.add('hidden'); wrapCat.classList.add('hidden'); wrapItem.classList.add('hidden');
-
-  document.getElementById('filesWrap').innerHTML=''; addFileRow();
-  tsSteps.innerHTML=''; addStep('Check connections and sensors'); addStep('Verify model-specific settings');
-
-  toast('Case saved successfully','ok'); go('cases');
-}
-function collectSteps(){ return [...tsSteps.querySelectorAll('.inline input')].map(i=>i.value).filter(v=>String(v).trim()).join('\n') }
-function val(id){ const el=document.getElementById(id); return el?el.value:'' }
-
-/* ===== Cases render ===== */
-function renderCases(){
-  const list=document.getElementById('casesList');
-  const q=(document.getElementById('searchBox').value||'').toLowerCase();
-  const arr=getCases().filter(c=> !q ||
-    (c.issueSummary||'').toLowerCase().includes(q) ||
-    (c.model||'').toLowerCase().includes(q) ||
-    (c.system||'').toLowerCase().includes(q) ||
-    (c.item||'').toLowerCase().includes(q)
-  );
-  const badge=document.getElementById('casesCount'); if(badge) badge.textContent=String(arr.length);
-  list.innerHTML = arr.length ? arr.map((c,i)=>caseCard(c,i)).join('') : '<div class="panel">No cases yet.</div>';
-}
-function caseCard(c,i){
-  const files=Array.isArray(c.attachments)&&c.attachments.length? `${c.attachments.length} file(s)` : 'No attachments';
-  return `<div class="case-card">
-    <div class="stripe"></div>
-    <div>
-      <div class="title">#${i+1} — ${esc(c.sfCase||'')}</div>
-      <div class="meta">
-        <span class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></span>
-        <span class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></span>
-        <span class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></span>
-        <span class="kv"><span class="k">SW:</span><span class="v">${esc(c.softwareVersion||'')}</span></span>
-      </div>
-      <div class="kv" style="margin-top:8px"><span class="k">Issue:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
-      <div class="files" style="margin-top:4px">${files}</div>
-    </div>
-    <div class="actions">
-      <button class="btn small" onclick="openCase(${i})">Details</button>
-      <button class="btn small danger" onclick="deleteCase(${i})">Delete</button>
-    </div>
-  </div>`;
-}
-function openCase(i){
-  const c=getCases()[i]; if(!c) return; document.getElementById('modalTitle').textContent=`Case #${i+1} — ${c.sfCase||''}`;
-  const files=Array.isArray(c.attachments)&&c.attachments.length?
-    c.attachments.map(a=>`<div class="kv"><span class="k">•</span><a class="btn small" href="${a.data}" target="_blank" rel="noopener">View</a> <a class="btn small" href="${a.data}" download="${a.name}">Download</a> <span class="v">${esc(a.name)}</span></div>`).join('')
-    : '<div class="attach-empty">No attachments</div>';
-  document.getElementById('modalBody').innerHTML = `
-    <div class="grid cols-2">
-      <div class="panel">
-        <div class="kv"><span class="k">Model:</span><span class="v">${esc(c.model||'')} (${esc(c.machineType||'')})</span></div>
-        <div class="kv"><span class="k">System:</span><span class="v">${esc(c.system||'')} / ${esc(c.subSystem||'')}</span></div>
-        <div class="kv"><span class="k">Category:</span><span class="v">${esc(c.category||'')} → ${esc(c.item||'')}</span></div>
-        <div class="kv"><span class="k">Software:</span><span class="v">${esc(c.softwareVersion||'')}</span></div>
-        <div class="kv"><span class="k">TFS:</span><span class="v">${esc(c.tfsNumber||'')}</span></div>
-      </div>
-      <div class="panel">
-        <div class="kv"><span class="k">Opened:</span><span class="v">${new Date(c.createdAt).toLocaleString()}</span></div>
-        <div class="kv"><span class="k">Author:</span><span class="v">${esc(c.author||'')}</span></div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:12px"><h3>Problem</h3>
-      <div class="kv"><span class="k">Summary:</span><span class="v">${esc(c.issueSummary||'')}</span></div>
-      <div class="kv"><span class="k">Symptoms:</span><span class="v">${nl(esc(c.symptoms||''))}</span></div>
-    </div>
-    <div class="panel" style="margin-top:12px"><h3>Solution</h3>
-      <div class="kv"><span class="k">Troubleshooting:</span><span class="v">${nl(esc(c.troubleshooting||''))}</span></div>
-      <div class="kv"><span class="k">Part (catalog):</span><span class="v">${esc(c.partCatalog||'')}</span></div>
-      <div class="kv"><span class="k">Implemented:</span><span class="v">${nl(esc(c.solution||''))}</span></div>
-      <div class="kv"><span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span></div>
-      <div class="kv"><span class="k">Notes:</span><span class="v">${nl(esc(c.notes||''))}</span></div>
-      <div class="kv" style="margin-top:12px"><span class="k">Files:</span><span class="v">${files}</span></div>
-    </div>`;
-  openModal();
-}
-function deleteCase(i){ const arr=getCases(); if(!arr[i]) return; if(!confirm('Delete this case?')) return; arr.splice(i,1); setCases(arr); renderCases(); toast('Case deleted','ok'); }
-function openModal(){ document.getElementById('modalBack').style.display='flex'; }
-function closeModal(){ document.getElementById('modalBack').style.display='none'; }
-function updateKPIs(){
-  const arr=getCases(); document.getElementById('kpiTotal').textContent=arr.length;
-  document.getElementById('kpiFiles').textContent=arr.filter(c=>Array.isArray(c.attachments)&&c.attachments.length).length;
-  const last=arr.length? new Date(arr[arr.length-1].createdAt).toLocaleString() : '—';
-  document.getElementById('kpiUpdated').textContent=last;
-  const pageCasesCount=document.getElementById('casesCount'); if(pageCasesCount) pageCasesCount.textContent=String(arr.length);
-}
-
-/* ===== Particles ===== */
-(function(){
-  const c=document.getElementById('particles'); if(!c) return; const ctx=c.getContext('2d'); let w,h;
-  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; }
-  addEventListener('resize',resize); resize();
-  const dots=Array.from({length:60},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.6,vx:(Math.random()-.5)*0.28,vy:(Math.random()-.5)*0.28}));
-  function step(){
-    ctx.clearRect(0,0,w,h);
-    for(const d of dots){
-      d.x+=d.vx; d.y+=d.vy;
-      if(d.x<0||d.x>w) d.vx*=-1; if(d.y<0||d.y>h) d.vy*=-1;
-      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(59,208,255,0.25)'; ctx.fill();
+  document.addEventListener("click", e => {
+    if (!container.contains(e.target)) {
+      state.open = false;
+      container.classList.remove("open");
     }
-    requestAnimationFrame(step);
-  }
-  step();
-})();
+  });
+  render();
+  return {
+    setOptions(newOpts) { state.opts = newOpts || []; render(); },
+    setValue(val) {
+      input.value = val;
+      const o = state.opts.find(o => String(o.value) === String(val));
+      label.textContent = o ? (o.label ?? o.value) : placeholder;
+    },
+    get value() { return input.value; }
+  };
+}
 
-/* ===== Expose utilities used by RCA ===== */
+/* ========= Case Form ========= */
+let ddPressType, ddPress, ddRegion, ddSystem, ddSubsystem,
+  ddSeverity, ddCategory, ddOrigin, ddHwSw, ddStatus;
+
+const PRESS_MAP = [
+  // דוגמא – כאן תוכל לעדכן בהתאם לרשימה האמיתית:
+  // { id: "D9", customer: "Customer A" },
+  // { id: "D10", customer: "Customer B" }
+];
+
+function getPressOptions() {
+  if (!PRESS_MAP.length) return [];
+  return PRESS_MAP.map(p => ({ value: p.id, label: `${p.id} · ${p.customer}` }));
+}
+
+function initForm() {
+  const form = document.getElementById("caseForm");
+  if (!form) return;
+
+  ddPressType = makeDropdown(document.getElementById("dd-press-type"), {
+    placeholder: "Press Type",
+    options: [
+      { value: "S10", label: "S10" },
+      { value: "S11", label: "S11" },
+      { value: "W10", label: "W10" },
+      { value: "Other", label: "Other" }
+    ]
+  });
+  ddPress = makeDropdown(document.getElementById("dd-press"), {
+    placeholder: "Press Name",
+    options: getPressOptions(),
+    onChange: (val) => {
+      const pm = PRESS_MAP.find(p => p.id === val);
+      if (pm) {
+        const cust = document.getElementById("customer");
+        if (cust && !cust.value) cust.value = pm.customer;
+      }
+    }
+  });
+  ddRegion = makeDropdown(document.getElementById("dd-region"), {
+    placeholder: "Region",
+    options: [
+      { value: "NA", label: "North America" },
+      { value: "EU", label: "Europe" },
+      { value: "APJ", label: "APJ" },
+      { value: "IL", label: "Israel" },
+      { value: "Other", label: "Other" }
+    ]
+  });
+  ddSystem = makeDropdown(document.getElementById("dd-system"), {
+    placeholder: "System",
+    options: [
+      { value: "Print Engine", label: "Print Engine" },
+      { value: "Feeder", label: "Feeder" },
+      { value: "Coater", label: "Coater" },
+      { value: "Dryer", label: "Dryer" },
+      { value: "ICS", label: "ICS" },
+      { value: "IRD", label: "IRD" },
+      { value: "STS", label: "STS" },
+      { value: "Other", label: "Other" }
+    ],
+    onChange: (v) => {
+      const subs = {
+        "Print Engine": ["Ink Delivery", "Imaging", "Registration"],
+        "Feeder": ["Loader", "Vacuum", "Sensors"],
+        "Coater": ["Varnish", "Anilox", "UV"],
+        "Dryer": ["Hot Air", "IR", "Cooling"],
+        "ICS": ["ICS SW", "ICS HW"],
+        "IRD": ["Mass Balance", "Pipes", "Sensors"],
+        "STS": ["Powder", "Vacuum"],
+        "Other": []
+      }[v] || [];
+      ddSubsystem.setOptions(subs.map(x => ({ value: x, label: x })));
+    }
+  });
+  ddSubsystem = makeDropdown(document.getElementById("dd-subsystem"), {
+    placeholder: "Sub System",
+    options: []
+  });
+  ddSeverity = makeDropdown(document.getElementById("dd-severity"), {
+    placeholder: "Severity",
+    options: [
+      { value: "Critical", label: "Critical" },
+      { value: "High", label: "High" },
+      { value: "Medium", label: "Medium" },
+      { value: "Low", label: "Low" }
+    ]
+  });
+  ddCategory = makeDropdown(document.getElementById("dd-category"), {
+    placeholder: "Category",
+    options: [
+      { value: "Quality", label: "Quality" },
+      { value: "Availability", label: "Availability" },
+      { value: "Usability", label: "Usability" },
+      { value: "Performance", label: "Performance" },
+      { value: "Other", label: "Other" }
+    ]
+  });
+  ddOrigin = makeDropdown(document.getElementById("dd-origin"), {
+    placeholder: "Origin",
+    options: [
+      { value: "Field", label: "Field" },
+      { value: "Lab", label: "Lab" },
+      { value: "Internal", label: "Internal" },
+      { value: "Customer", label: "Customer" }
+    ]
+  });
+  ddHwSw = makeDropdown(document.getElementById("dd-hw-sw"), {
+    placeholder: "Type",
+    options: [
+      { value: "HW", label: "Hardware" },
+      { value: "SW", label: "Software" },
+      { value: "Mixed", label: "HW + SW" }
+    ],
+    onChange: (v) => {
+      const row = document.getElementById("hwPartRow");
+      if (!row) return;
+      if (v === "HW" || v === "Mixed") row.classList.remove("hidden");
+      else row.classList.add("hidden");
+    }
+  });
+  ddStatus = makeDropdown(document.getElementById("dd-status"), {
+    placeholder: "Status",
+    options: [
+      { value: "Open", label: "Open" },
+      { value: "In Progress", label: "In Progress" },
+      { value: "Monitoring", label: "Monitoring" },
+      { value: "Closed", label: "Closed" }
+    ]
+  });
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const sfCase = document.getElementById("sfCase").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const description = document.getElementById("description").value.trim();
+    if (!sfCase || !subject || !description) {
+      toast("Please fill SF Case, Subject & Description", "err");
+      return;
+    }
+
+    const cases = getCases();
+    const now = (new Date()).toISOString().slice(0, 10);
+    const currentEditId = window.currentEditId || null;
+
+    const createdAt = document.getElementById("createdAt").value || now;
+    const updatedAt = document.getElementById("updatedAt").value || now;
+    const hwSw = ddHwSw ? ddHwSw.value : "";
+    const hwPart = document.getElementById("hwPart")?.value.trim() || "";
+
+    const base = currentEditId ? cases.find(c => c.id === currentEditId) || {} : {};
+
+    const c = {
+      id: currentEditId || Date.now(),
+      sfCase,
+      pressType: ddPressType?.value || "",
+      press: ddPress?.value || "",
+      customer: document.getElementById("customer").value.trim(),
+      region: ddRegion?.value || "",
+      system: ddSystem?.value || "",
+      subsystem: ddSubsystem?.value || "",
+      swVersion: document.getElementById("swVersion").value.trim(),
+      severity: ddSeverity?.value || "",
+      category: ddCategory?.value || "",
+      origin: ddOrigin?.value || "",
+      subject,
+      description,
+      attachments: document.getElementById("attachments").value.trim(),
+      notes: document.getElementById("notes").value.trim(),
+      owner: document.getElementById("owner").value.trim(),
+      tags: document.getElementById("tags").value.trim(),
+      hwSw,
+      hwPart,
+      targetDate: document.getElementById("targetDate").value,
+      status: ddStatus?.value || "",
+      createdAt: base.createdAt || createdAt,
+      updatedAt,
+      rcaLink: document.getElementById("rcaLink").value.trim()
+    };
+    upsertCase(c);
+    window.currentEditId = null;
+    toast("Case saved", "ok");
+    form.reset();
+    ddPressType.setValue("");
+    ddPress.setValue("");
+    ddRegion.setValue("");
+    ddSystem.setValue("");
+    ddSubsystem.setValue("");
+    ddSeverity.setValue("");
+    ddCategory.setValue("");
+    ddOrigin.setValue("");
+    ddHwSw.setValue("");
+    ddStatus.setValue("");
+    const row = document.getElementById("hwPartRow");
+    row && row.classList.add("hidden");
+    updateKPIs();
+  });
+
+  document.getElementById("btnResetCaseForm")?.addEventListener("click", () => {
+    window.currentEditId = null;
+    form.reset();
+    ddPressType.setValue("");
+    ddPress.setValue("");
+    ddRegion.setValue("");
+    ddSystem.setValue("");
+    ddSubsystem.setValue("");
+    ddSeverity.setValue("");
+    ddCategory.setValue("");
+    ddOrigin.setValue("");
+    ddHwSw.setValue("");
+    ddStatus.setValue("");
+    document.getElementById("hwPartRow")?.classList.add("hidden");
+  });
+}
+initForm();
+
+/* ========= Edit from All Cases ========= */
+window.editCaseFromList = function (id) {
+  const c = getCaseById(id);
+  if (!c) return;
+  window.currentEditId = id;
+  go("create");
+  // Fill form
+  document.getElementById("sfCase").value = c.sfCase || "";
+  ddPressType.setValue(c.pressType || "");
+  ddPress.setValue(c.press || "");
+  document.getElementById("customer").value = c.customer || "";
+  ddRegion.setValue(c.region || "");
+  ddSystem.setValue(c.system || "");
+  ddSubsystem.setValue(c.subsystem || "");
+  document.getElementById("swVersion").value = c.swVersion || "";
+  ddSeverity.setValue(c.severity || "");
+  ddCategory.setValue(c.category || "");
+  ddOrigin.setValue(c.origin || "");
+  document.getElementById("subject").value = c.subject || "";
+  document.getElementById("description").value = c.description || "";
+  document.getElementById("attachments").value = c.attachments || "";
+  document.getElementById("notes").value = c.notes || "";
+  document.getElementById("owner").value = c.owner || "";
+  document.getElementById("tags").value = c.tags || "";
+  ddHwSw.setValue(c.hwSw || "");
+  const row = document.getElementById("hwPartRow");
+  if (row) {
+    if (c.hwSw === "HW" || c.hwSw === "Mixed") row.classList.remove("hidden");
+    else row.classList.add("hidden");
+  }
+  document.getElementById("hwPart").value = c.hwPart || "";
+  document.getElementById("targetDate").value = c.targetDate || "";
+  ddStatus.setValue(c.status || "");
+  document.getElementById("createdAt").value = c.createdAt || "";
+  document.getElementById("updatedAt").value = c.updatedAt || "";
+  document.getElementById("rcaLink").value = c.rcaLink || "";
+};
+
+/* ========= Dashboard KPIs ========= */
+function updateKPIs() {
+  const cases = getCases();
+  const total = cases.length;
+  const open = cases.filter(c => c.status === "Open" || c.status === "In Progress").length;
+  const critical = cases.filter(c => c.severity === "Critical" || c.severity === "High").length;
+  const hw = cases.filter(c => c.hwSw === "HW" || c.hwSw === "Mixed").length;
+
+  const elTotal = document.getElementById("kpiTotal");
+  const elOpen = document.getElementById("kpiOpen");
+  const elCrit = document.getElementById("kpiCritical");
+  const elHW = document.getElementById("kpiHW");
+  if (elTotal) elTotal.textContent = total;
+  if (elOpen) elOpen.textContent = open;
+  if (elCrit) elCrit.textContent = critical;
+  if (elHW) elHW.textContent = hw;
+
+  const countEl = document.getElementById("casesCount");
+  if (countEl) countEl.textContent = total;
+
+  renderDashboardBreakdowns(cases);
+}
+
+function aggregateBy(cases, field, limit = 6) {
+  const map = new Map();
+  cases.forEach(c => {
+    const key = (c[field] || "Unknown").trim() || "Unknown";
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  const arr = Array.from(map.entries()).map(([label, count]) => ({ label, count }));
+  arr.sort((a, b) => b.count - a.count);
+  if (limit && arr.length > limit) return arr.slice(0, limit);
+  return arr;
+}
+
+function renderBarList(containerId, items, filterField) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = "";
+  if (!items.length) {
+    el.innerHTML = `<div class="bar-row"><span class="bar-label">No data</span></div>`;
+    return;
+  }
+  const max = Math.max(...items.map(i => i.count));
+  items.forEach(it => {
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `
+      <span class="bar-label">${esc(it.label)}</span>
+      <div class="bar-bar-wrap"><div class="bar-bar" style="width:${(it.count / max) * 100}%"></div></div>
+      <span class="bar-count">${it.count}</span>
+    `;
+    row.addEventListener("click", () => {
+      window.pendingCasesFilter = { field: filterField, value: it.label };
+      go("cases");
+    });
+    el.appendChild(row);
+  });
+}
+
+function renderTimeline(cases) {
+  const el = document.getElementById("dashTimeline");
+  if (!el) return;
+  el.innerHTML = "";
+  const map = new Map();
+  cases.forEach(c => {
+    const d = c.createdAt || "";
+    if (!d || d.length < 7) return;
+    const year = d.slice(0, 4);
+    const month = parseInt(d.slice(5, 7), 10);
+    if (!month) return;
+    const q = "Q" + (Math.floor((month - 1) / 3) + 1);
+    const key = `${year}-${q}`;
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  const arr = Array.from(map.entries()).map(([k, count]) => ({ key: k, count }));
+  arr.sort((a, b) => a.key.localeCompare(b.key));
+  if (!arr.length) {
+    el.innerHTML = `<div class="timeline-col"><span>No data</span></div>`;
+    return;
+  }
+  const max = Math.max(...arr.map(a => a.count));
+  arr.forEach(it => {
+    const col = document.createElement("div");
+    col.className = "timeline-col";
+    col.innerHTML = `
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" style="height:${(it.count / max) * 80 + 10}px"></div>
+      </div>
+      <div>${esc(it.key)}</div>
+      <div>${it.count}</div>
+    `;
+    col.addEventListener("click", () => {
+      window.pendingCasesFilter = { field: "quarter", value: it.key };
+      go("cases");
+    });
+    el.appendChild(col);
+  });
+}
+
+function renderDashboardBreakdowns(cases) {
+  renderBarList("dashBySystem", aggregateBy(cases, "system"), "system");
+  renderBarList("dashByCustomer", aggregateBy(cases, "customer"), "customer");
+
+  // HW / SW breakdown
+  const hwMap = new Map();
+  cases.forEach(c => {
+    const k = c.hwSw || "Unknown";
+    hwMap.set(k, (hwMap.get(k) || 0) + 1);
+  });
+  const hwArr = Array.from(hwMap.entries()).map(([label, count]) => ({ label, count }));
+  renderBarList("dashHwSw", hwArr, "hwSw");
+
+  // SW version breakdown
+  renderBarList("dashByVersion", aggregateBy(cases, "swVersion"), "swVersion");
+
+  // timeline
+  renderTimeline(cases);
+}
+
+updateKPIs();
+
+/* ========= Settings: Export / Import / Clear ========= */
+document.getElementById("btnExportCases")?.addEventListener("click", () => {
+  const data = JSON.stringify(getCases(), null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "landa_cases_v19.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("inputImportCases")?.addEventListener("change", e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported)) throw new Error("invalid structure");
+      const current = getCases();
+      const merged = [...current];
+      imported.forEach(ic => {
+        if (!ic || typeof ic !== "object") return;
+        // if same id, replace; else push
+        const idx = merged.findIndex(c => c.id === ic.id);
+        if (idx >= 0) merged[idx] = ic; else merged.push(ic);
+      });
+      setCases(merged);
+      toast("Cases imported", "ok");
+    } catch (err) {
+      toast("Import failed – invalid file", "err");
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("btnClearCases")?.addEventListener("click", () => {
+  if (!confirm("Clear all cases from this browser?")) return;
+  localStorage.removeItem(LS_KEY_CASES);
+  setCases([]);
+  toast("All cases cleared", "ok");
+});
+
+/* ========= Expose helpers to other files ========= */
+window.getCases = getCases;
+window.setCases = setCases;
+window.getCaseById = getCaseById;
+window.go = go;
 window.toast = toast;
