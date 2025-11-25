@@ -1,275 +1,324 @@
-// rca.js – Wizard logic (SetOff → IRD → diagnosis)
+/* Root Cause Analyzer – UI & logic
+ * Uses: RCA_DATA from data/rca-data.js
+ */
 
-(function(){
-  let currentStep = 1;
-  let currentIssue = null;
-  let answers = {}; // { id: {value, inSpec, info} }
+(function () {
+  "use strict";
 
-  function $(id){ return document.getElementById(id); }
+  const state = {
+    currentStep: 1,
+    issueId: null,
+    answers: {},        // paramId -> value
+    specResult: {}      // paramId -> "ok" / "bad"
+  };
 
-  function setStep(step){
-    currentStep = step;
-    const cards = [
-      {step:1, el:$('wizStep1')},
-      {step:2, el:$('wizStep2')},
-      {step:3, el:$('wizStep3')}
-    ];
-    cards.forEach(c=>{
-      if(!c.el) return;
-      c.el.classList.toggle('hidden', c.step !== step);
+  function qs(sel) {
+    return document.querySelector(sel);
+  }
+  function qsa(sel) {
+    return Array.from(document.querySelectorAll(sel));
+  }
+
+  /* ---------- Stepper visuals ---------- */
+
+  function updateStepper() {
+    const total = 3;
+    const track = qs("#wizardTrack");
+    const steps = qsa(".wizard-stepper .wizard-step");
+    const ratio = (state.currentStep - 1) / (total - 1);
+    track.style.width = `${ratio * 100}%`;
+
+    steps.forEach((s) => {
+      const stepNum = Number(s.getAttribute("data-step"));
+      s.classList.toggle("active", stepNum === state.currentStep);
+      s.classList.toggle("done", stepNum < state.currentStep);
     });
+  }
 
-    const steps = document.querySelectorAll('.wizard-step');
-    steps.forEach(s=>{
-      const n = Number(s.getAttribute('data-step'));
-      s.classList.remove('active','completed');
-      if(n < step) s.classList.add('completed');
-      if(n === step) s.classList.add('active');
-    });
-
-    const track = $('wizardTrack');
-    if(track){
-      const pct = step === 1 ? 0 : step === 2 ? 50 : 100;
-      track.style.width = pct + '%';
-    }
-
+  function showStep(step) {
+    state.currentStep = step;
+    qs("#wizStep1").classList.toggle("hidden", step !== 1);
+    qs("#wizStep2").classList.toggle("hidden", step !== 2);
+    qs("#wizStep3").classList.toggle("hidden", step !== 3);
+    updateStepper();
+    updateFooterButtons();
     updateSnapshot();
-    if (step === 3) buildDiagnosis();
   }
 
-  function selectIssue(issueKey){
-    currentIssue = issueKey;
-    document.querySelectorAll('.issue-pill').forEach(btn=>{
-      btn.classList.toggle('active', btn.dataset.issue === issueKey);
-    });
-    updateSnapshot();
-  }
+  function updateFooterButtons() {
+    const prev = qs("#btnPrevRCA");
+    const next = qs("#btnNextRCA");
+    prev.disabled = state.currentStep === 1;
 
-  function buildIRDUI(){
-    const container = $('irdQuestions');
-    if (!container || !window.RCA_DATA || !RCA_DATA.IRD) return;
-    container.innerHTML = '';
-
-    RCA_DATA.IRD.forEach(q=>{
-      const row = document.createElement('div');
-      row.className = 'ird-row';
-      row.dataset.id = q.id;
-
-      const label = document.createElement('div');
-      label.className = 'ird-label';
-      label.textContent = q.label;
-
-      const spec = document.createElement('div');
-      spec.className = 'ird-spec';
-      if (q.type === 'boolean') {
-        spec.textContent = 'Expected: OK';
-      } else if (q.min != null && q.max != null) {
-        spec.textContent = `Spec: ${q.min}–${q.max} ${q.unit || ''}`;
-      } else {
-        spec.textContent = q.unit || '';
-      }
-
-      const inputWrap = document.createElement('div');
-      if (q.type === 'boolean') {
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.addEventListener('change', ()=> onAnswerChange(q, cb.checked ? 'OK' : 'NOK'));
-        inputWrap.appendChild(cb);
-      } else {
-        const inp = document.createElement('input');
-        inp.type = 'number';
-        inp.className = 'input';
-        inp.placeholder = q.unit || '';
-        inp.addEventListener('input', ()=> onAnswerChange(q, inp.value));
-        inputWrap.appendChild(inp);
-      }
-
-      const status = document.createElement('div');
-      status.className = 'ird-status';
-      status.textContent = '—';
-
-      row.appendChild(label);
-      row.appendChild(spec);
-      row.appendChild(inputWrap);
-      row.appendChild(status);
-
-      container.appendChild(row);
-    });
-  }
-
-  function onAnswerChange(q, raw){
-    let inSpec = null;
-    let value = raw;
-
-    if (q.type === 'boolean') {
-      inSpec = (raw === 'OK');
+    if (state.currentStep === 3) {
+      next.textContent = "Finish";
+    } else if (state.currentStep === 1) {
+      next.textContent = "Start checks";
     } else {
-      const num = Number(raw);
-      if (!raw || isNaN(num)) {
-        inSpec = null;
-      } else if (q.min != null && q.max != null) {
-        inSpec = (num >= q.min && num <= q.max);
-      } else if (q.min != null) {
-        inSpec = (num >= q.min);
-      } else if (q.max != null) {
-        inSpec = (num <= q.max);
-      }
-      value = num;
+      next.textContent = "Next";
     }
+  }
 
-    answers[q.id] = {
-      value,
-      inSpec,
-      factor: q.factor,
-      label: q.label
+  /* ---------- Issue selection (step 1) ---------- */
+
+  function initIssues() {
+    const pills = qsa(".issue-pill");
+    pills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        pills.forEach((p) => p.classList.remove("active"));
+        pill.classList.add("active");
+        state.issueId = pill.getAttribute("data-issue");
+        updateSnapshot();
+      });
+    });
+  }
+
+  /* ---------- IRD questions (step 2) ---------- */
+
+  function renderIRD() {
+    const wrap = qs("#irdQuestions");
+    if (!wrap || !window.RCA_DATA || !RCA_DATA.IRD) return;
+
+    wrap.innerHTML = "";
+
+    RCA_DATA.IRD.forEach((row) => {
+      const line = document.createElement("div");
+      line.className = "ird-row";
+      line.dataset.id = row.id;
+
+      const label = document.createElement("div");
+      label.className = "ird-label";
+      label.textContent = row.label;
+      line.appendChild(label);
+
+      const spec = document.createElement("div");
+      spec.className = "ird-spec";
+      if (row.type === "range") {
+        spec.textContent = `${row.min} – ${row.max} ${row.unit || ""}`.trim();
+      } else {
+        spec.textContent = row.tip || "";
+      }
+      line.appendChild(spec);
+
+      const iw = document.createElement("div");
+      iw.className = "ird-input-wrap";
+
+      let input;
+      if (row.type === "boolean") {
+        input = document.createElement("input");
+        input.type = "checkbox";
+      } else {
+        input = document.createElement("input");
+        input.type = "number";
+        input.inputMode = "decimal";
+        input.placeholder = row.unit || "";
+      }
+      input.dataset.id = row.id;
+      iw.appendChild(input);
+
+      const pill = document.createElement("span");
+      pill.className = "ird-pill";
+      pill.textContent = "Not evaluated";
+      iw.appendChild(pill);
+
+      line.appendChild(iw);
+      wrap.appendChild(line);
+
+      // events
+      if (row.type === "boolean") {
+        input.addEventListener("change", () => {
+          const val = !!input.checked;
+          state.answers[row.id] = val;
+          state.specResult[row.id] = val ? "ok" : "bad";
+          pill.textContent = val ? "OK" : "Not OK";
+          pill.classList.toggle("ok", val);
+          pill.classList.toggle("bad", !val);
+          updateSnapshot();
+        });
+      } else {
+        input.addEventListener("input", () => {
+          const v = Number(input.value);
+          if (!input.value) {
+            pill.textContent = "Not evaluated";
+            pill.classList.remove("ok", "bad");
+            delete state.answers[row.id];
+            delete state.specResult[row.id];
+          } else {
+            const ok = v >= row.min && v <= row.max;
+            state.answers[row.id] = v;
+            state.specResult[row.id] = ok ? "ok" : "bad";
+            pill.textContent = ok ? "In spec" : "Out of spec";
+            pill.classList.toggle("ok", ok);
+            pill.classList.toggle("bad", !ok);
+          }
+          updateSnapshot();
+        });
+      }
+    });
+  }
+
+  /* ---------- Snapshot side panel ---------- */
+
+  function updateSnapshot() {
+    const box = qs("#wizSnapshot");
+    if (!box) return;
+    box.innerHTML = "";
+
+    const issue =
+      RCA_DATA.issues && RCA_DATA.issues.find((x) => x.id === state.issueId);
+
+    const addRow = (label, value) => {
+      const row = document.createElement("div");
+      row.className = "mini-row";
+      row.innerHTML = `<span>${label}</span><span>${value}</span>`;
+      box.appendChild(row);
     };
 
-    const row = document.querySelector(`.ird-row[data-id="${q.id}"]`);
-    if (!row) return;
-    const status = row.querySelector('.ird-status');
-    if (!status) return;
-
-    if (inSpec === null) {
-      status.textContent = 'Not evaluated';
-      status.className = 'ird-status';
-    } else if (inSpec) {
-      status.textContent = 'Within spec';
-      status.className = 'ird-status ok';
+    if (issue) {
+      addRow("Issue", issue.label);
     } else {
-      status.textContent = 'Out of spec';
-      status.className = 'ird-status out';
+      addRow("Issue", "Not selected");
     }
 
-    updateSnapshot();
+    const answered = Object.keys(state.answers).length;
+    if (answered > 0) {
+      const bad = Object.values(state.specResult).filter((v) => v === "bad")
+        .length;
+      addRow("IRD answered", String(answered));
+      addRow("Out of spec", String(bad));
+    } else {
+      addRow("IRD checks", "Not started");
+    }
   }
 
-  function updateSnapshot(){
-    const snap = $('wizSnapshot');
-    if (!snap) return;
-    const lines = [];
+  /* ---------- Diagnosis (step 3) ---------- */
 
-    if (currentIssue) {
-      lines.push(`<div class="mini-row">
-        <span class="mini-label">Issue</span>
-        <span class="mini-value">${currentIssue.toUpperCase()}</span>
-      </div>`);
-    }
+  function buildDiagnosis() {
+    const box = qs("#diagSummary");
+    if (!box) return;
+    box.innerHTML = "";
 
-    const outOfSpec = Object.values(answers).filter(a=>a.inSpec === false);
-    if (outOfSpec.length) {
-      lines.push(`<div class="mini-label" style="margin-top:4px">Out-of-spec signals:</div>`);
-      outOfSpec.slice(0,4).forEach(a=>{
-        lines.push(`<div class="mini-row">
-          <span class="mini-label">${a.label}</span>
-          <span class="mini-value">Out</span>
-        </div>`);
-      });
-    }
+    const list = RCA_DATA.IRD || [];
+    const badIds = Object.keys(state.specResult).filter(
+      (id) => state.specResult[id] === "bad"
+    );
 
-    snap.innerHTML = lines.join('') || '<div class="mini-label">No data yet.</div>';
-  }
+    const title = document.createElement("div");
+    title.className = "diag-tagline";
 
-  function buildDiagnosis(){
-    const diag = $('diagSummary');
-    if (!diag) return;
-
-    const out = Object.values(answers).filter(a=>a.inSpec === false);
-    if (!currentIssue) {
-      diag.innerHTML = '<div class="diag-card">Please select an issue first.</div>';
-      return;
-    }
-    if (!out.length) {
-      diag.innerHTML = `
-        <div class="diag-card">
-          <strong>No clear out-of-spec signals detected.</strong>
-          <div>From the IRD parameters you entered, everything looks within spec.<br>
-          Focus next on coating formulation, substrate, and mechanical setup.</div>
-        </div>`;
+    if (!state.issueId) {
+      title.textContent = "Please select an issue in step 1.";
+      box.appendChild(title);
       return;
     }
 
-    const byFactor = new Map();
-    for (const a of out) {
-      const key = a.factor || 'General';
-      if (!byFactor.has(key)) byFactor.set(key, []);
-      byFactor.get(key).push(a);
+    if (!list.length) {
+      title.textContent = "No IRD data defined.";
+      box.appendChild(title);
+      return;
     }
 
-    const cards = [];
-    byFactor.forEach((arr, factor)=>{
-      const items = arr.map(a=>`• ${a.label}`).join('<br>');
-      cards.push(`
-        <div class="diag-card">
-          <strong>${factor}</strong>
-          <div>${items}</div>
-        </div>
-      `);
+    if (badIds.length === 0) {
+      title.textContent = "No clear IRD problem detected.";
+      box.appendChild(title);
+
+      const p = document.createElement("div");
+      p.className = "diag-list";
+      p.innerHTML =
+        "All measured parameters are within spec. Continue with the fishbone path: check IPS → BCU → HA → BCS → STS / DFE as described in the SetOff troubleshooting diagram.";
+      box.appendChild(p);
+      return;
+    }
+
+    title.textContent = "IRD parameters out of spec";
+    box.appendChild(title);
+
+    const ul = document.createElement("ul");
+    ul.className = "diag-list";
+
+    badIds.forEach((id) => {
+      const row = list.find((r) => r.id === id);
+      if (!row) return;
+      const li = document.createElement("li");
+      const specText =
+        row.type === "range"
+          ? `Spec: ${row.min} – ${row.max} ${row.unit || ""}`.trim()
+          : row.tip || "";
+      li.textContent = `${row.label} – out of spec. ${specText}`;
+      ul.appendChild(li);
     });
 
-    cards.push(`
-      <div class="diag-card">
-        <strong>Next actions</strong>
-        <div>
-          Use this as a direction: address the highest-impact factors first (thermal / airflow),
-          then run a short confirmation print. If symptoms persist, extend the analysis to coating,
-          substrate and mechanical sections in the case form.
-        </div>
-      </div>
-    `);
+    box.appendChild(ul);
 
-    diag.innerHTML = cards.join('');
+    const hint = document.createElement("div");
+    hint.className = "diag-list";
+    hint.style.marginTop = "6px";
+    hint.innerHTML =
+      "Focus the next troubleshooting steps on IRD hardware (fans, slits, sensors) and drying capacity. If problems remain after fixing IRD, continue with the downstream subsystems along the fishbone chart.";
+    box.appendChild(hint);
   }
 
-  function resetWizard() {
-    currentStep = 1;
-    currentIssue = null;
-    answers = {};
-    document.querySelectorAll('.issue-pill').forEach(btn=>btn.classList.remove('active'));
-    buildIRDUI();
-    setStep(1);
-  }
+  /* ---------- Navigation buttons ---------- */
 
-  function attachEvents(){
-    // issue pills
-    document.querySelectorAll('.issue-pill').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        selectIssue(btn.dataset.issue);
-        setStep(2);
-      });
-    });
-
-    const btnNext = $('btnNextRCA');
-    const btnPrev = $('btnPrevRCA');
-    const btnRestart = $('btnRestartRCA');
-
-    if (btnNext) btnNext.addEventListener('click', ()=>{
-      if (currentStep === 1) {
-        if (!currentIssue) {
-          if (typeof toast === 'function') toast('Please select an issue first','err');
-          return;
-        }
-        setStep(2);
-      } else if (currentStep === 2) {
-        setStep(3);
-      } else {
-        setStep(3);
+  function handleNext() {
+    if (state.currentStep === 1) {
+      if (!state.issueId) {
+        alert("Please select an issue first.");
+        return;
       }
-    });
-
-    if (btnPrev) btnPrev.addEventListener('click', ()=>{
-      if (currentStep === 3) setStep(2);
-      else if (currentStep === 2) setStep(1);
-    });
-
-    if (btnRestart) btnRestart.addEventListener('click', resetWizard);
+      showStep(2);
+    } else if (state.currentStep === 2) {
+      showStep(3);
+      buildDiagnosis();
+    } else {
+      // step 3 -> finish = restart
+      restart();
+    }
   }
 
-  function initRCA(){
-    if (!document.getElementById('rcaWizard')) return;
-    buildIRDUI();
-    attachEvents();
-    setStep(1);
+  function handlePrev() {
+    if (state.currentStep > 1) {
+      showStep(state.currentStep - 1);
+    }
   }
 
-  window.initRCA = initRCA;
+  function restart() {
+    state.currentStep = 1;
+    state.issueId = null;
+    state.answers = {};
+    state.specResult = {};
+
+    // reset UI
+    qsa(".issue-pill").forEach((p) => p.classList.remove("active"));
+    qsa(".ird-row input").forEach((inp) => {
+      if (inp.type === "checkbox") inp.checked = false;
+      else inp.value = "";
+    });
+    qsa(".ird-pill").forEach((pill) => {
+      pill.textContent = "Not evaluated";
+      pill.classList.remove("ok", "bad");
+    });
+    if (qs("#diagSummary")) qs("#diagSummary").innerHTML = "";
+
+    showStep(1);
+  }
+
+  /* ---------- Init ---------- */
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!qs("#rcaWizard")) return; // page not present
+
+    initIssues();
+    renderIRD();
+    updateSnapshot();
+    showStep(1);
+
+    const btnNext = qs("#btnNextRCA");
+    const btnPrev = qs("#btnPrevRCA");
+    const btnRestart = qs("#btnRestartRCA");
+
+    if (btnNext) btnNext.addEventListener("click", handleNext);
+    if (btnPrev) btnPrev.addEventListener("click", handlePrev);
+    if (btnRestart) btnRestart.addEventListener("click", restart);
+  });
 })();
