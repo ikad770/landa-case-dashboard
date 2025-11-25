@@ -25,10 +25,8 @@ function go(route){
   document.querySelectorAll('.nav .item').forEach(a=>a.classList.toggle('active', a.dataset.route===route));
   
   if(route==='dashboard') updateKPIs();
-  // קורא לפונקציית הרינדור מתוך js/cases.js, מוודא שהיא גלובלית
   if(route==='cases') window.renderCases(); 
   if(route==='create') initCreatePage(); 
-  // קורא ל-Launcher של ה-Wizard מתוך js/rca.js
   if(route==='diagnosis') window.injectRcaLauncher(); 
   
   if(fabNew) fabNew.style.display=route==='dashboard'?'flex':'none';
