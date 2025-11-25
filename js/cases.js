@@ -13,7 +13,7 @@
   function esc(s){ return (s||'').replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c])) }
   function nl(s){ return String(s||'').replace(/\n/g,'<br>') }
 
-  // פונקציית עזר להצגת תג הקושי
+  // פונקציית עזר להצגת תג הקושי (Difficulty Badge)
   function getDifficultyBadge(diffId){
     const diff = ENUMS.DIFFICULTY_LEVELS.find(d => d.id === diffId);
     if (!diff) return `<span class="difficulty-badge">N/A</span>`;
@@ -81,6 +81,11 @@
     // פונקציית פתיחת המודאל (Details)
     window.openCase = function(index){
       const c = getCases()[index]; if(!c) return;
+      
+      // מנקה אם יש מודאל קודם פתוח
+      const existingModal = document.getElementById('modalBack');
+      if (existingModal) existingModal.remove();
+
       const modal = document.createElement('div');
       modal.id = 'modalBack';
       
@@ -121,7 +126,7 @@
               <span class="k">Verification:</span><span class="v">${esc(c.verification||'')}</span>
             </div>
             
-            ${c.attachments.length ? `
+            ${c.attachments && c.attachments.length ? `
               <div class="full" style="margin-top:10px">
                 <span class="label">Attachments:</span>
                 ${c.attachments.map(a => `<a href="${a}" target="_blank" style="display:block;color:var(--accent);font-size:13px">${a}</a>`).join('')}
@@ -140,26 +145,13 @@
       `;
       document.body.appendChild(modal);
       
-      // סטיילינג למודאל
-      modal.style.cssText = `
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.8); z-index: 1000;
-        display: flex; justify-content: center; align-items: center;
-      `;
-      $$('.modal-content', modal).forEach(el => el.style.cssText = `
-        background: var(--bg2); border-radius: var(--radius);
-        max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-      `);
-      $$('.modal-header', modal).forEach(el => el.style.cssText = `
-        padding: 15px 20px; border-bottom: 1px solid var(--border);
-        display: flex; justify-content: space-between; align-items: center;
-        background: var(--bg);
-      `);
-      $$('.modal-footer', modal).forEach(el => el.style.cssText = `
-        padding: 10px 20px; border-top: 1px solid var(--border);
-        text-align: right;
-      `);
+      // אין צורך בסטיילינג inline נוסף, הוא מוגדר ב-style.css
+      // מוסיף סגירה בלחיצה מחוץ למודאל
+      modal.addEventListener('click', (e) => {
+          if (e.target.id === 'modalBack') {
+              e.target.remove();
+          }
+      });
     };
 
     $('#q').oninput = paint; // חיפוש בזמן הקלדה
@@ -170,6 +162,4 @@
 
   // חשיפה גלובלית לפונקציה כדי ש-app.js יוכל לקרוא לה ב-go('cases')
   window.renderCases = render; 
-
-  // Router hook כבר לא נדרש כאן כי app.js מטפל בזה דרך window.renderCases
 })();
