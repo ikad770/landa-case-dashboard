@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V18.8-Dynamic)</title>
+<title>Landa Quantum – Troubleshoot Suite (V19.0 – Next)</title>
 <link rel="icon" type="image/svg+xml"
-  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='8' fill='%23000000' opacity='0.85' stroke='%23ffffff10'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%2300aeef'/%3E%3C/svg%3E">
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='4' y='4' width='32' height='32' rx='9' fill='%2305090b' stroke='%23ffffff15'/%3E%3Ccircle cx='20' cy='20' r='9' fill='%2300aeef'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,18 +13,18 @@
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- LOGIN -->
+<!-- LOGIN – full screen -->
 <section id="loginPage">
   <div class="auth panel center">
     <div class="logo">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110">
         <defs>
-          <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#00aeef"/>
-            <stop offset="100%" stop-color="#3bd0ff"/>
+          <linearGradient id="lg-login" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00aeef" />
+            <stop offset="100%" stop-color="#3bd0ff" />
           </linearGradient>
         </defs>
-        <text x="50%" y="50%" text-anchor="middle" fill="url(#lg)"
+        <text x="50%" y="52%" text-anchor="middle" fill="url(#lg-login)"
               font-family="Segoe UI, Inter, system-ui, sans-serif"
               font-weight="700" font-size="56">Landa</text>
         <text x="50%" y="82%" text-anchor="middle" fill="#9bb0d0"
@@ -34,10 +34,14 @@
       <div class="subtitle">Quantum Troubleshoot Suite</div>
     </div>
     <h2>Sign in to continue</h2>
+    <p class="auth-sub">User: <b>Expert</b> &nbsp;•&nbsp; Password: <b>Landa123456</b></p>
+
     <label class="label" for="authUser">Username</label>
     <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
+
     <label class="label" for="authPass">Password</label>
     <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+
     <button class="btn primary full" id="btnLogin">Login</button>
   </div>
 </section>
@@ -49,162 +53,351 @@
       <button class="menu-btn btn small" id="btnMenu" aria-label="Toggle menu">
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </button>
-      <div class="header-title" id="logoHome" style="cursor:pointer">
-        <div class="logo-mini">
-          <svg viewBox="0 0 40 40">
-            <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(0,0,0,0.78)" stroke="rgba(255,255,255,0.08)"/>
-            <circle cx="20" cy="20" r="8" fill="#00aeef">
-              <animate attributeName="r" values="8;9;8" dur="2.6s" repeatCount="indefinite"/>
-            </circle>
+      <div class="header-title" id="logoHome">
+        <div class="mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+            <defs>
+              <linearGradient id="g2-header" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00aeef"/>
+                <stop offset="100%" stop-color="#3bd0ff"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="32" height="32" rx="9" fill="#050608" stroke="rgba(255,255,255,.08)"/>
+            <circle cx="20" cy="20" r="9" fill="url(#g2-header)"/>
           </svg>
         </div>
-        <h1>Landa Quantum – Troubleshoot Suite</h1>
+        <div class="header-text">
+          <h1>Landa Quantum – Troubleshoot Suite</h1>
+          <span>Case Management & Root Cause Intelligence</span>
+        </div>
       </div>
     </div>
-    <span class="badge-env">V18.8-Dynamic</span>
+    <div class="header-right">
+      <span class="badge-env">V19.0 · Next Level</span>
+      <span class="user-pill">
+        <span class="dot"></span>
+        Expert
+      </span>
+    </div>
   </header>
 
   <div class="wrap">
     <aside class="aside" id="aside">
       <nav class="nav">
-        <a class="item active" data-route="dashboard">Dashboard</a>
-        <a class="item" data-route="create">Create Case</a>
-        <a class="item" data-route="cases">All Cases <span class="badge" id="casesCount">0</span></a>
-        <a class="item" data-route="diagnosis">Root Cause Analyzer</a>
-        <a class="item" data-route="settings">Settings</a>
-        <a class="item" id="btnLogout">Logout</a>
+        <div class="nav-section-label">Navigation</div>
+        <a class="item active" data-route="dashboard">
+          <span>Dashboard</span>
+        </a>
+        <a class="item" data-route="create">
+          <span>Create Case</span>
+        </a>
+        <a class="item" data-route="cases">
+          <span>All Cases</span>
+          <span class="badge" id="casesCount">0</span>
+        </a>
+        <a class="item" data-route="diagnosis">
+          <span>Root Cause Analyzer</span>
+        </a>
+        <a class="item" data-route="settings">
+          <span>Settings</span>
+        </a>
+        <div class="nav-section-label">Session</div>
+        <a class="item" id="btnLogout">
+          <span>Logout</span>
+        </a>
       </nav>
     </aside>
 
     <main class="main">
-      <!-- Dashboard -->
+      <!-- ================= DASHBOARD ================= -->
       <section id="page-dashboard" class="page">
-        <div class="grid cols-3">
-          <div class="panel"><div class="title">Total Cases</div><div id="kpiTotal" class="big">0</div></div>
-          <div class="panel"><div class="title">With Attachments</div><div id="kpiFiles" class="big">0</div></div>
-          <div class="panel"><div class="title">Last Updated</div><div id="kpiUpdated" class="big">—</div></div>
+        <div class="page-header">
+          <div>
+            <h2>Operations Overview</h2>
+            <p>Key health indicators across all troubleshooting cases.</p>
+          </div>
         </div>
-      </section>
 
-      <!-- Create Case -->
-      <section id="page-create" class="page hidden">
-        <div class="panel">
-          <h2>Create New Case</h2>
-          <form id="caseForm" onsubmit="saveCase(event)">
-            <div class="grid cols-2">
-              
-              <!-- NEW FIELD ORDER -->
+        <!-- High level KPIs -->
+        <div class="grid cols-4 kpi-row">
+          <div class="panel kpi-card" data-kpi="total">
+            <div class="kpi-label">Total Cases</div>
+            <div class="kpi-value" id="kpiTotal">0</div>
+            <div class="kpi-foot">All recorded cases in the system.</div>
+          </div>
+
+          <div class="panel kpi-card" data-kpi="open">
+            <div class="kpi-label">Open / In Progress</div>
+            <div class="kpi-value" id="kpiOpen">0</div>
+            <div class="kpi-foot">Active cases not closed yet.</div>
+          </div>
+
+          <div class="panel kpi-card" data-kpi="critical">
+            <div class="kpi-label">Critical & High</div>
+            <div class="kpi-value" id="kpiCritical">0</div>
+            <div class="kpi-foot">High-impact cases requiring focus.</div>
+          </div>
+
+          <div class="panel kpi-card" data-kpi="hw">
+            <div class="kpi-label">HW Related</div>
+            <div class="kpi-value" id="kpiHW">0</div>
+            <div class="kpi-foot">Cases tagged as HW or Mixed.</div>
+          </div>
+        </div>
+
+        <!-- Distributions -->
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="panel-header">
               <div>
-                <label class="label v13">SF Case *</label>
-                <input class="input v13 field-sf" id="sfCase" inputmode="numeric" placeholder="123456">
-              </div>
-
-              <div>
-                <label class="label v13">Press Type *</label>
-                <div class="chips" id="machineTypeChips">
-                  <div class="chip active" data-type="Simplex">Simplex</div>
-                  <div class="chip" data-type="Duplex">Duplex</div>
-                </div>
-                <input type="hidden" id="machineType" value="Simplex">
-              </div>
-
-              <div>
-                <label class="label v13">Press Name *</label>
-                <div id="dd-model" class="dd field-pressname"></div>
-              </div>
-
-              <div>
-                <label class="label v13">Software Version</label>
-                <input class="input v13 field-sw" id="softwareVersion" placeholder="4.2.11">
-              </div>
-
-              <div>
-                <label class="label v13">System *</label>
-                <div id="dd-system" class="dd field-system"></div>
-              </div>
-
-              <div id="wrap-sub" class="hidden">
-                <label class="label v13">Sub-System *</label>
-                <div id="dd-sub" class="dd field-subsystem"></div>
-              </div>
-
-              <div id="wrap-cat" class="hidden">
-                <label class="label v13">Category *</label>
-                <div id="dd-cat" class="dd field-category"></div>
-              </div>
-
-              <div id="wrap-item" class="hidden">
-                <label class="label v13">Item *</label>
-                <div id="dd-item" class="dd field-item"></div>
-              </div>
-
-              <div class="fit-inline full">
-                <div>
-                  <label class="label v13">TFS</label>
-                  <div class="fit-inline">
-                    <input type="checkbox" id="tfsToggle" title="Enable TFS">
-                    <input class="input v13 hidden" id="tfsNumber" inputmode="numeric" placeholder="TFS-12345" style="max-width:220px">
-                  </div>
-                </div>
-              </div>
-
-              <div class="full"><hr style="border:0; border-top:1px solid var(--border)"></div>
-
-              <div class="full">
-                <label class="label v13">Issue Summary *</label>
-                <input class="input v13" id="issueSummary" placeholder="Clear 1-line summary (e.g., SetOff on S3 / IRD X)">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Symptoms / Error Messages</label>
-                <textarea id="symptoms" class="input v13" placeholder="Short bullets or error codes"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Troubleshooting (steps)</label>
-                <div id="tsSteps" class="field-troubles"></div>
-                <button class="btn small" type="button" onclick="addStep()">+ Add step</button>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Part (Catalog)</label>
-                <input class="input v13 field-troubles" id="partInput" placeholder="Type part number (e.g., 12-34567)…">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Solution Implemented *</label>
-                <textarea id="solution" class="input v13 field-troubles" placeholder="What fixed the issue"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Verification Method</label>
-                <input id="verification" class="input v13 field-troubles" placeholder="How did we verify the fix?">
-              </div>
-
-              <div class="full">
-                <label class="label v13">Notes</label>
-                <textarea id="notes" class="input v13 field-troubles" placeholder="Anything noteworthy for future cases"></textarea>
-              </div>
-
-              <div class="full">
-                <label class="label v13">Attachments</label>
-                <div id="filesWrap"></div>
-                <button class="btn small" type="button" onclick="addFileRow()">+ Add another file</button>
-              </div>
-
-              <div class="inline full" style="margin-top:6px">
-                <button class="btn primary" type="submit">Save Case</button>
-                <button class="btn ghost" type="button" onclick="go('cases')">View All</button>
+                <div class="title">By System</div>
+                <div class="subtitle">Top subsystems by number of cases</div>
               </div>
             </div>
-          </form>
+            <div class="bar-list" id="dashBySystem"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="title">By Customer</div>
+                <div class="subtitle">Top customers by active cases</div>
+              </div>
+            </div>
+            <div class="bar-list" id="dashByCustomer"></div>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="title">HW vs SW</div>
+                <div class="subtitle">Classification by case type</div>
+              </div>
+            </div>
+            <div class="bar-list" id="dashHwSw"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="title">By Software Version</div>
+                <div class="subtitle">Top versions with most cases</div>
+              </div>
+            </div>
+            <div class="bar-list" id="dashByVersion"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-wide">
+          <div class="panel-header">
+            <div>
+              <div class="title">Timeline</div>
+              <div class="subtitle">Cases by quarter (based on Created At)</div>
+            </div>
+          </div>
+          <div class="timeline" id="dashTimeline"></div>
         </div>
       </section>
 
-      <!-- Other Pages -->
-      <section id="page-cases" class="page hidden"></section>
-      <section id="page-diagnosis" class="page hidden"></section>
-      <section id="page-settings" class="page hidden"></section>
+      <!-- ================= CREATE CASE ================= -->
+      <section id="page-create" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h2>Create Case</h2>
+            <p>Structured capture of all relevant TS information.</p>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="title">Case Metadata</div>
+            <form id="caseForm" class="case-form">
+              <div class="grid cols-2">
+                <div class="full">
+                  <label class="label v13">SF Case # *</label>
+                  <input class="input v13" id="sfCase" required placeholder="CS-123456">
+                </div>
+
+                <div>
+                  <label class="label v13">Press Type *</label>
+                  <div id="dd-press-type" class="dd field-press-type"></div>
+                </div>
+                <div>
+                  <label class="label v13">Press Name *</label>
+                  <div id="dd-press" class="dd field-press"></div>
+                </div>
+
+                <div>
+                  <label class="label v13">Customer</label>
+                  <input class="input v13" id="customer" placeholder="Customer name">
+                </div>
+                <div>
+                  <label class="label v13">Region</label>
+                  <div id="dd-region" class="dd field-region"></div>
+                </div>
+
+                <div>
+                  <label class="label v13">System *</label>
+                  <div id="dd-system" class="dd field-system"></div>
+                </div>
+                <div>
+                  <label class="label v13">Sub System</label>
+                  <div id="dd-subsystem" class="dd field-subsystem"></div>
+                </div>
+
+                <div>
+                  <label class="label v13">SW Version *</label>
+                  <input class="input v13" id="swVersion" placeholder="Q20.4.1">
+                </div>
+                <div>
+                  <label class="label v13">Severity *</label>
+                  <div id="dd-severity" class="dd field-severity"></div>
+                </div>
+
+                <div>
+                  <label class="label v13">Category</label>
+                  <div id="dd-category" class="dd field-category"></div>
+                </div>
+                <div>
+                  <label class="label v13">Origin</label>
+                  <div id="dd-origin" class="dd field-origin"></div>
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Subject *</label>
+                  <input class="input v13" id="subject" maxlength="140" placeholder="Short summary">
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Description *</label>
+                  <textarea class="input v13" id="description" rows="4" placeholder="Detailed description"></textarea>
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Attachments</label>
+                  <input class="input v13" id="attachments" placeholder="Links / file names">
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Notes</label>
+                  <textarea class="input v13" id="notes" rows="3"></textarea>
+                </div>
+
+                <div>
+                  <label class="label v13">Owner</label>
+                  <input class="input v13" id="owner" placeholder="TS owner">
+                </div>
+                <div>
+                  <label class="label v13">Tags</label>
+                  <input class="input v13" id="tags" placeholder="Comma separated">
+                </div>
+
+                <div>
+                  <label class="label v13">HW / SW</label>
+                  <div id="dd-hw-sw" class="dd field-hwsw"></div>
+                </div>
+                <div id="hwPartRow" class="hw-only hidden">
+                  <label class="label v13">Part (for HW)</label>
+                  <input class="input v13" id="hwPart" placeholder="Part number / description">
+                </div>
+
+                <div>
+                  <label class="label v13">Target Date</label>
+                  <input class="input v13" type="date" id="targetDate">
+                </div>
+                <div>
+                  <label class="label v13">Status</label>
+                  <div id="dd-status" class="dd field-status"></div>
+                </div>
+
+                <div>
+                  <label class="label v13">Created At</label>
+                  <input class="input v13" type="date" id="createdAt">
+                </div>
+                <div>
+                  <label class="label v13">Updated At</label>
+                  <input class="input v13" type="date" id="updatedAt">
+                </div>
+
+                <div class="full">
+                  <label class="label v13">Link to RCA / IRD</label>
+                  <input class="input v13" id="rcaLink" placeholder="Reference to IRD / Root Cause doc">
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" type="submit">Save Case</button>
+                <button class="btn ghost" type="button" id="btnResetCaseForm">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="title">Context & Guidelines</div>
+            <ul class="hint-list">
+              <li>Use <b>consistent wording</b> in Subject and Description – this will feed future analytics.</li>
+              <li>Always set <b>Severity</b>, <b>System</b> and <b>SW Version</b> – they drive dashboards and RCA.</li>
+              <li>For HW issues, select <b>HW/Mixed</b> and specify the <b>Part</b> to enable parts statistics.</li>
+              <li>Created / Updated dates are used for <b>quarterly analysis</b>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ALL CASES ================= -->
+      <section id="page-cases" class="page hidden">
+        <!-- Filled dynamically by js/cases.js -->
+      </section>
+
+      <!-- ================= ROOT CAUSE ANALYZER ================= -->
+      <section id="page-diagnosis" class="page hidden">
+        <!-- Filled dynamically by js/rca.js -->
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section id="page-settings" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h2>Settings</h2>
+            <p>Workspace preferences & data utilities.</p>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="title">Appearance</div>
+            <div class="settings-row">
+              <span>Theme</span>
+              <button class="btn small" id="btnToggleTheme">Toggle Dark / Light</button>
+            </div>
+            <div class="settings-row">
+              <span>Density</span>
+              <button class="btn small" id="btnToggleDensity">Toggle Compact Mode</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="title">Data Management</div>
+            <div class="settings-row">
+              <span>Export Cases</span>
+              <button class="btn small" id="btnExportCases">Download JSON</button>
+            </div>
+            <div class="settings-row">
+              <span>Import Cases</span>
+              <label class="file-input-label">
+                <input type="file" id="inputImportCases" accept="application/json">
+                <span class="btn small">Choose File</span>
+              </label>
+            </div>
+            <div class="settings-row">
+              <span>Clear All Cases</span>
+              <button class="btn small danger" id="btnClearCases">Clear Storage</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -216,7 +409,7 @@
 <!-- Cases (Create / All Cases pages) -->
 <script src="js/cases.js"></script>
 
-<!-- Root Cause Analyzer – new system -->
+<!-- Root Cause Analyzer -->
 <script src="data/rca-data.js"></script>
 <script src="js/rca.js"></script>
 </body>
