@@ -18,7 +18,7 @@
     const diagPage = document.getElementById("page-diagnosis");
     if (!diagPage) return;
 
-    // מנקה תוכן קיים (ממודאל קודם)
+    // מנקה תוכן קיים
     diagPage.innerHTML = '';
     
     // מכין את ה-host של ה-Fishbone
@@ -26,7 +26,7 @@
     fbHost.id = "fbHost";
     diagPage.appendChild(fbHost);
 
-    // בניית האפשרויות לבחירת סוג הבעיה
+    // בניית האפשרויות לבחירת סוג הבעיה מתוך ENUMS
     const optionsHtml = ENUMS.ISSUE_CODES.map(issue => `
       <div class="rca-issue-card" data-issue="${issue.id}">
         <div class="title" style="color:var(--accent)">${issue.name} (${issue.id})</div>
@@ -72,7 +72,20 @@
           qs("#rcaLaunchPanel", diagPage).classList.add('hidden'); 
 
         } else {
-          window.toast(`RCA data for ${issueId.toUpperCase()} not implemented yet.`, 'warn');
+          // עבור קודים שטרם מוטמע להם Fishbone (כמו SCRATCHES, BANDING)
+          window.toast(`RCA data for ${issueId.toUpperCase()} not implemented yet. Showing SetOff default.`, 'warn');
+          
+          ACTIVE.issue = 'setoff'; // נופל לדיפולט
+          ACTIVE.branch = null; 
+          ACTIVE.currentStep = 0;
+          ACTIVE.answers = {};
+          
+          if (typeof window.initFishbone === 'function') {
+             window.initFishbone('setoff'); 
+          } else {
+             return;
+          }
+          qs("#rcaLaunchPanel", diagPage).classList.add('hidden');
         }
       });
     });
