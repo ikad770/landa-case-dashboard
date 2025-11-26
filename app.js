@@ -14,12 +14,13 @@ function toast(msg, type = "ok") {
 function esc(s) {
   return (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
 }
+
 const LS_KEY_CASES = "landa_cases_v19";
 const LS_KEY_AUTH  = "landaAuth_v19";
 const LS_KEY_THEME = "landaTheme_v19";
 const LS_KEY_DENS  = "landaDensity_v19";
 
-/* ========= Storage ========= */
+/* ======== Storage ========= */
 function getCases() {
   try { return JSON.parse(localStorage.getItem(LS_KEY_CASES) || "[]"); }
   catch (e) { return []; }
@@ -30,17 +31,17 @@ function setCases(arr) {
   const countEl = document.getElementById("casesCount");
   if (countEl) countEl.textContent = arr.length;
 }
-function upsertCase(caseObj) {
-  const cases = getCases();
-  const idx = cases.findIndex(c => c.id === caseObj.id);
-  if (idx >= 0) cases[idx] = caseObj; else cases.push(caseObj);
-  setCases(cases);
-}
 function getCaseById(id) {
   return getCases().find(c => c.id === id);
 }
+function upsertCase(c) {
+  const cases = getCases();
+  const idx = cases.findIndex(x => x.id === c.id);
+  if (idx >= 0) cases[idx] = c; else cases.push(c);
+  setCases(cases);
+}
 
-/* ========= Routing ========= */
+/* ======== Routing ========= */
 const pages = ["dashboard", "create", "cases", "diagnosis", "settings"];
 
 function go(route) {
@@ -63,9 +64,6 @@ function go(route) {
     window.renderRCA();
   }
 
-  if (document.body.classList.contains("aside-open"))
-    document.body.classList.remove("aside-open");
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -79,9 +77,7 @@ document.querySelectorAll(".nav .item").forEach(a => {
     });
   }
 });
-document.getElementById("btnMenu")?.addEventListener("click", () => {
-  document.body.classList.toggle("aside-open");
-});
+document.getElementById("btnNavCreateCase")?.addEventListener("click", () => go("create"));
 
 /* ========= Auth ========= */
 const loginPage = document.getElementById("loginPage");
@@ -106,11 +102,12 @@ function attemptLogin() {
   if (u === "Expert" && p === "Landa123456") {
     toast("Welcome, Expert", "ok");
     localStorage.setItem(LS_KEY_AUTH, "true");
-    setTimeout(showApp, 550);
+    setTimeout(showApp, 450);
   } else {
     toast("Invalid credentials", "err");
   }
 }
+
 document.getElementById("btnLogin")?.addEventListener("click", attemptLogin);
 [authUser, authPass].forEach(el => {
   el?.addEventListener("keydown", e => {
@@ -157,7 +154,7 @@ document.getElementById("btnToggleDensity")?.addEventListener("click", toggleDen
 applyThemeFromStorage();
 applyDensityFromStorage();
 
-/* ========= Particles Background ========= */
+/* ========= Particles ========= */
 (function () {
   const c = document.getElementById("particles");
   if (!c) return;
@@ -194,32 +191,32 @@ applyDensityFromStorage();
   });
 })();
 
-/* ========= Dropdown Engine ========= */
-function makeDropdown(container, { placeholder = "Choose…", options = [], onChange = () => { }, maxHeight = 260 }) {
+/* ========= Dropdown engine ========= */
+function makeDropdown(container, { placeholder = "Choose…", options = [], onChange = () => {} }) {
   container.classList.add("dd");
   container.innerHTML = `
     <button type="button" class="dd-btn"><span class="dd-label">${placeholder}</span></button>
     <span class="dd-arrow" aria-hidden="true"></span>
-    <div class="dd-list" style="max-height:${maxHeight}px"></div>
+    <div class="dd-list"></div>
     <input type="hidden" class="dd-value" value="">
   `;
   const btn = container.querySelector(".dd-btn");
   const list = container.querySelector(".dd-list");
   const label = container.querySelector(".dd-label");
   const input = container.querySelector(".dd-value");
-  let state = { open: false, opts: options };
+  let state = { opts: options.slice() };
 
   function render() {
     list.innerHTML = "";
-    if (!state.opts || !state.opts.length) {
+    if (!state.opts.length) {
       list.innerHTML = `<div class="dd-empty">No options</div>`;
       return;
     }
     state.opts.forEach((o, i) => {
       const it = document.createElement("div");
       it.className = "dd-item";
-      it.setAttribute("data-value", o.value);
-      it.setAttribute("data-index", String(i));
+      it.dataset.value = o.value;
+      it.dataset.index = i;
       if (String(input.value) === String(o.value)) it.setAttribute("aria-selected", "true");
       it.textContent = o.label ?? o.value;
       it.addEventListener("click", () => selectIndex(i));
@@ -232,22 +229,18 @@ function makeDropdown(container, { placeholder = "Choose…", options = [], onCh
     label.textContent = o.label ?? o.value;
     onChange(o.value, o);
     container.classList.remove("open");
-    state.open = false;
   }
   btn.addEventListener("click", () => {
-    state.open = !state.open;
-    container.classList.toggle("open", state.open);
-    if (state.open) render();
+    container.classList.toggle("open");
+    if (container.classList.contains("open")) render();
   });
   document.addEventListener("click", e => {
-    if (!container.contains(e.target)) {
-      state.open = false;
-      container.classList.remove("open");
-    }
+    if (!container.contains(e.target)) container.classList.remove("open");
   });
+
   render();
   return {
-    setOptions(newOpts) { state.opts = newOpts || []; render(); },
+    setOptions(newOpts) { state.opts = newOpts.slice(); render(); },
     setValue(val) {
       input.value = val;
       const o = state.opts.find(o => String(o.value) === String(val));
@@ -257,45 +250,69 @@ function makeDropdown(container, { placeholder = "Choose…", options = [], onCh
   };
 }
 
-/* ========= Case Form ========= */
-let ddPressType, ddPress, ddRegion, ddSystem, ddSubsystem,
-  ddSeverity, ddCategory, ddOrigin, ddHwSw, ddStatus;
-
+/* ========= Press & Systems data (אפשר להשלים בהמשך את כל הרשימה) ========= */
 const PRESS_MAP = [
-  // דוגמא – כאן תוכל לעדכן בהתאם לרשימה האמיתית:
-  // { id: "D9", customer: "Customer A" },
-  // { id: "D10", customer: "Customer B" }
+  // דוגמה – כאן אתה תרחיב את כל הרשימה שלך:
+  { id: "S22", name: "S22 Primary", customer: "Primary", type: "S" },
+  { id: "S10", name: "S10 Virtual", customer: "Virtual", type: "S" },
+  { id: "D9",  name: "D9 Example",  customer: "Example Customer", type: "D" }
 ];
 
-function getPressOptions() {
-  if (!PRESS_MAP.length) return [];
-  return PRESS_MAP.map(p => ({ value: p.id, label: `${p.id} · ${p.customer}` }));
+const SYSTEMS = {
+  "Print Engine": ["Ink Delivery", "Imaging", "Registration"],
+  "Feeder": ["Loader", "Vacuum", "Sensors"],
+  "Coater": ["Varnish", "Anilox", "UV"],
+  "Dryer": ["Hot Air", "IR", "Cooling"],
+  "ICS": ["ICS SW", "ICS HW"],
+  "IRD": ["Mass Balance", "Pipes", "Sensors"],
+  "STS": ["Powder", "Vacuum"],
+  "Other": []
+};
+
+/* ========= Case form ========= */
+let ddPress, ddRegion, ddSystem, ddSubsystem, ddHwSw, ddStatus;
+let tsStepsState = [];
+let attachmentsState = [];
+
+function filterPressByType(type) {
+  if (type === "Other") return [];
+  return PRESS_MAP.filter(p => p.type === type)
+    .map(p => ({ value: p.id, label: p.name }));
+}
+
+function initPressTypeSegment() {
+  const seg = document.getElementById("segPressType");
+  const hidden = document.getElementById("pressType");
+  if (!seg || !hidden) return;
+  seg.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      seg.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      hidden.value = btn.dataset.value;
+      if (ddPress) {
+        ddPress.setOptions(filterPressByType(hidden.value));
+        ddPress.setValue("");
+      }
+    });
+  });
 }
 
 function initForm() {
   const form = document.getElementById("caseForm");
   if (!form) return;
 
-  ddPressType = makeDropdown(document.getElementById("dd-press-type"), {
-    placeholder: "Press Type",
-    options: [
-      { value: "S10", label: "S10" },
-      { value: "S11", label: "S11" },
-      { value: "W10", label: "W10" },
-      { value: "Other", label: "Other" }
-    ]
-  });
+  initPressTypeSegment();
+
   ddPress = makeDropdown(document.getElementById("dd-press"), {
-    placeholder: "Press Name",
-    options: getPressOptions(),
+    placeholder: "Select press",
+    options: filterPressByType(document.getElementById("pressType").value),
     onChange: (val) => {
-      const pm = PRESS_MAP.find(p => p.id === val);
-      if (pm) {
-        const cust = document.getElementById("customer");
-        if (cust && !cust.value) cust.value = pm.customer;
-      }
+      const p = PRESS_MAP.find(x => x.id === val);
+      const custEl = document.getElementById("customer");
+      if (p && custEl) custEl.value = p.customer;
     }
   });
+
   ddRegion = makeDropdown(document.getElementById("dd-region"), {
     placeholder: "Region",
     options: [
@@ -306,64 +323,21 @@ function initForm() {
       { value: "Other", label: "Other" }
     ]
   });
+
   ddSystem = makeDropdown(document.getElementById("dd-system"), {
     placeholder: "System",
-    options: [
-      { value: "Print Engine", label: "Print Engine" },
-      { value: "Feeder", label: "Feeder" },
-      { value: "Coater", label: "Coater" },
-      { value: "Dryer", label: "Dryer" },
-      { value: "ICS", label: "ICS" },
-      { value: "IRD", label: "IRD" },
-      { value: "STS", label: "STS" },
-      { value: "Other", label: "Other" }
-    ],
+    options: Object.keys(SYSTEMS).map(s => ({ value: s, label: s })),
     onChange: (v) => {
-      const subs = {
-        "Print Engine": ["Ink Delivery", "Imaging", "Registration"],
-        "Feeder": ["Loader", "Vacuum", "Sensors"],
-        "Coater": ["Varnish", "Anilox", "UV"],
-        "Dryer": ["Hot Air", "IR", "Cooling"],
-        "ICS": ["ICS SW", "ICS HW"],
-        "IRD": ["Mass Balance", "Pipes", "Sensors"],
-        "STS": ["Powder", "Vacuum"],
-        "Other": []
-      }[v] || [];
-      ddSubsystem.setOptions(subs.map(x => ({ value: x, label: x })));
+      const subs = SYSTEMS[v] || [];
+      ddSubsystem.setOptions(subs.map(s => ({ value: s, label: s })));
     }
   });
+
   ddSubsystem = makeDropdown(document.getElementById("dd-subsystem"), {
     placeholder: "Sub System",
     options: []
   });
-  ddSeverity = makeDropdown(document.getElementById("dd-severity"), {
-    placeholder: "Severity",
-    options: [
-      { value: "Critical", label: "Critical" },
-      { value: "High", label: "High" },
-      { value: "Medium", label: "Medium" },
-      { value: "Low", label: "Low" }
-    ]
-  });
-  ddCategory = makeDropdown(document.getElementById("dd-category"), {
-    placeholder: "Category",
-    options: [
-      { value: "Quality", label: "Quality" },
-      { value: "Availability", label: "Availability" },
-      { value: "Usability", label: "Usability" },
-      { value: "Performance", label: "Performance" },
-      { value: "Other", label: "Other" }
-    ]
-  });
-  ddOrigin = makeDropdown(document.getElementById("dd-origin"), {
-    placeholder: "Origin",
-    options: [
-      { value: "Field", label: "Field" },
-      { value: "Lab", label: "Lab" },
-      { value: "Internal", label: "Internal" },
-      { value: "Customer", label: "Customer" }
-    ]
-  });
+
   ddHwSw = makeDropdown(document.getElementById("dd-hw-sw"), {
     placeholder: "Type",
     options: [
@@ -378,6 +352,7 @@ function initForm() {
       else row.classList.add("hidden");
     }
   });
+
   ddStatus = makeDropdown(document.getElementById("dd-status"), {
     placeholder: "Status",
     options: [
@@ -388,6 +363,85 @@ function initForm() {
     ]
   });
 
+  // Troubleshooting steps
+  const tsContainer = document.getElementById("tsSteps");
+  const btnAddStep = document.getElementById("btnAddStep");
+  function renderSteps() {
+    tsContainer.innerHTML = "";
+    tsStepsState.forEach((t, idx) => {
+      const row = document.createElement("div");
+      row.className = "ts-step-row";
+      row.innerHTML = `
+        <textarea class="input v13" rows="2" data-idx="${idx}">${esc(t)}</textarea>
+        <button type="button" class="btn small ts-remove" data-idx="${idx}">×</button>
+      `;
+      tsContainer.appendChild(row);
+    });
+    tsContainer.querySelectorAll("textarea").forEach(ta => {
+      ta.addEventListener("input", () => {
+        const i = Number(ta.dataset.idx);
+        tsStepsState[i] = ta.value;
+      });
+    });
+    tsContainer.querySelectorAll(".ts-remove").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.idx);
+        tsStepsState.splice(i, 1);
+        renderSteps();
+      });
+    });
+  }
+  btnAddStep?.addEventListener("click", () => {
+    tsStepsState.push("");
+    renderSteps();
+  });
+
+  // Attachments
+  const attachList = document.getElementById("attachList");
+  const attachInput = document.getElementById("attachInput");
+  const btnAddAttachment = document.getElementById("btnAddAttachment");
+
+  function renderAttachments() {
+    attachList.innerHTML = "";
+    attachmentsState.forEach((a, idx) => {
+      const pill = document.createElement("div");
+      pill.className = "attach-pill";
+      pill.innerHTML = `
+        <span>${esc(a)}</span>
+        <button type="button" data-idx="${idx}" data-act="preview">👁</button>
+        <button type="button" data-idx="${idx}" data-act="remove">×</button>
+      `;
+      attachList.appendChild(pill);
+    });
+
+    attachList.querySelectorAll("button").forEach(btn => {
+      const idx = Number(btn.dataset.idx);
+      const act = btn.dataset.act;
+      btn.addEventListener("click", () => {
+        const val = attachmentsState[idx];
+        if (act === "remove") {
+          attachmentsState.splice(idx, 1);
+          renderAttachments();
+        } else if (act === "preview" && val) {
+          if (/^https?:\/\//i.test(val)) {
+            window.open(val, "_blank");
+          } else {
+            alert("Attachment: " + val);
+          }
+        }
+      });
+    });
+  }
+
+  btnAddAttachment?.addEventListener("click", () => {
+    const v = (attachInput.value || "").trim();
+    if (!v) return;
+    attachmentsState.push(v);
+    attachInput.value = "";
+    renderAttachments();
+  });
+
+  // Save
   form.addEventListener("submit", e => {
     e.preventDefault();
     const sfCase = document.getElementById("sfCase").value.trim();
@@ -398,78 +452,67 @@ function initForm() {
       return;
     }
 
-    const cases = getCases();
     const now = (new Date()).toISOString().slice(0, 10);
-    const currentEditId = window.currentEditId || null;
-
-    const createdAt = document.getElementById("createdAt").value || now;
-    const updatedAt = document.getElementById("updatedAt").value || now;
+    const caseDate = document.getElementById("caseDate").value || now;
     const hwSw = ddHwSw ? ddHwSw.value : "";
     const hwPart = document.getElementById("hwPart")?.value.trim() || "";
 
-    const base = currentEditId ? cases.find(c => c.id === currentEditId) || {} : {};
+    const id = window.currentEditId || Date.now();
 
     const c = {
-      id: currentEditId || Date.now(),
+      id,
       sfCase,
-      pressType: ddPressType?.value || "",
+      pressType: document.getElementById("pressType").value,
       press: ddPress?.value || "",
       customer: document.getElementById("customer").value.trim(),
       region: ddRegion?.value || "",
       system: ddSystem?.value || "",
       subsystem: ddSubsystem?.value || "",
       swVersion: document.getElementById("swVersion").value.trim(),
-      severity: ddSeverity?.value || "",
-      category: ddCategory?.value || "",
-      origin: ddOrigin?.value || "",
       subject,
       description,
-      attachments: document.getElementById("attachments").value.trim(),
       notes: document.getElementById("notes").value.trim(),
       owner: document.getElementById("owner").value.trim(),
       tags: document.getElementById("tags").value.trim(),
       hwSw,
       hwPart,
-      targetDate: document.getElementById("targetDate").value,
+      caseDate,
       status: ddStatus?.value || "",
-      createdAt: base.createdAt || createdAt,
-      updatedAt,
-      rcaLink: document.getElementById("rcaLink").value.trim()
+      troubleshooting: tsStepsState.slice(),
+      attachments: attachmentsState.slice()
     };
+
     upsertCase(c);
     window.currentEditId = null;
     toast("Case saved", "ok");
-    form.reset();
-    ddPressType.setValue("");
-    ddPress.setValue("");
-    ddRegion.setValue("");
-    ddSystem.setValue("");
-    ddSubsystem.setValue("");
-    ddSeverity.setValue("");
-    ddCategory.setValue("");
-    ddOrigin.setValue("");
-    ddHwSw.setValue("");
-    ddStatus.setValue("");
-    const row = document.getElementById("hwPartRow");
-    row && row.classList.add("hidden");
+    resetForm();
     updateKPIs();
   });
 
   document.getElementById("btnResetCaseForm")?.addEventListener("click", () => {
     window.currentEditId = null;
+    resetForm();
+  });
+
+  function resetForm() {
     form.reset();
-    ddPressType.setValue("");
+    document.getElementById("pressType").value = "S";
+    document.querySelectorAll("#segPressType button").forEach((b, i) => {
+      b.classList.toggle("active", i === 0);
+    });
+    ddPress.setOptions(filterPressByType("S"));
     ddPress.setValue("");
     ddRegion.setValue("");
     ddSystem.setValue("");
     ddSubsystem.setValue("");
-    ddSeverity.setValue("");
-    ddCategory.setValue("");
-    ddOrigin.setValue("");
     ddHwSw.setValue("");
     ddStatus.setValue("");
     document.getElementById("hwPartRow")?.classList.add("hidden");
-  });
+    tsStepsState = [];
+    attachmentsState = [];
+    document.getElementById("tsSteps").innerHTML = "";
+    document.getElementById("attachList").innerHTML = "";
+  }
 }
 initForm();
 
@@ -479,21 +522,22 @@ window.editCaseFromList = function (id) {
   if (!c) return;
   window.currentEditId = id;
   go("create");
-  // Fill form
+
   document.getElementById("sfCase").value = c.sfCase || "";
-  ddPressType.setValue(c.pressType || "");
-  ddPress.setValue(c.press || "");
+  document.getElementById("pressType").value = c.pressType || "S";
+  document.querySelectorAll("#segPressType button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === document.getElementById("pressType").value);
+  });
+
+  ddPress.setOptions(filterPressByType(c.pressType || "S"));
+  if (c.press) ddPress.setValue(c.press);
   document.getElementById("customer").value = c.customer || "";
   ddRegion.setValue(c.region || "");
   ddSystem.setValue(c.system || "");
   ddSubsystem.setValue(c.subsystem || "");
   document.getElementById("swVersion").value = c.swVersion || "";
-  ddSeverity.setValue(c.severity || "");
-  ddCategory.setValue(c.category || "");
-  ddOrigin.setValue(c.origin || "");
   document.getElementById("subject").value = c.subject || "";
   document.getElementById("description").value = c.description || "";
-  document.getElementById("attachments").value = c.attachments || "";
   document.getElementById("notes").value = c.notes || "";
   document.getElementById("owner").value = c.owner || "";
   document.getElementById("tags").value = c.tags || "";
@@ -504,11 +548,72 @@ window.editCaseFromList = function (id) {
     else row.classList.add("hidden");
   }
   document.getElementById("hwPart").value = c.hwPart || "";
-  document.getElementById("targetDate").value = c.targetDate || "";
+  document.getElementById("caseDate").value = c.caseDate || "";
+
   ddStatus.setValue(c.status || "");
-  document.getElementById("createdAt").value = c.createdAt || "";
-  document.getElementById("updatedAt").value = c.updatedAt || "";
-  document.getElementById("rcaLink").value = c.rcaLink || "";
+
+  tsStepsState = (c.troubleshooting || []).slice();
+  attachmentsState = (c.attachments || []).slice();
+
+  // רנדר של steps & attachments
+  const evt = new Event("click");
+  document.getElementById("btnAddStep")?.dispatchEvent(evt); // טריק קטן להכריח רנדר? נפתור אחרת:
+  // נרנדר ידנית:
+  (function reRenderTs(){
+    const tsContainer = document.getElementById("tsSteps");
+    tsContainer.innerHTML = "";
+    tsStepsState.forEach((t, idx) => {
+      const row = document.createElement("div");
+      row.className = "ts-step-row";
+      row.innerHTML = `
+        <textarea class="input v13" rows="2" data-idx="${idx}">${esc(t)}</textarea>
+        <button type="button" class="btn small ts-remove" data-idx="${idx}">×</button>
+      `;
+      tsContainer.appendChild(row);
+    });
+    tsContainer.querySelectorAll("textarea").forEach(ta => {
+      ta.addEventListener("input", () => {
+        const i = Number(ta.dataset.idx);
+        tsStepsState[i] = ta.value;
+      });
+    });
+    tsContainer.querySelectorAll(".ts-remove").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.idx);
+        tsStepsState.splice(i, 1);
+        reRenderTs();
+      });
+    });
+  })();
+
+  (function reRenderAttach(){
+    const attachList = document.getElementById("attachList");
+    attachList.innerHTML = "";
+    attachmentsState.forEach((a, idx) => {
+      const pill = document.createElement("div");
+      pill.className = "attach-pill";
+      pill.innerHTML = `
+        <span>${esc(a)}</span>
+        <button type="button" data-idx="${idx}" data-act="preview">👁</button>
+        <button type="button" data-idx="${idx}" data-act="remove">×</button>
+      `;
+      attachList.appendChild(pill);
+    });
+    attachList.querySelectorAll("button").forEach(btn => {
+      const idx = Number(btn.dataset.idx);
+      const act = btn.dataset.act;
+      btn.addEventListener("click", () => {
+        const val = attachmentsState[idx];
+        if (act === "remove") {
+          attachmentsState.splice(idx, 1);
+          reRenderAttach();
+        } else if (act === "preview" && val) {
+          if (/^https?:\/\//i.test(val)) window.open(val, "_blank");
+          else alert("Attachment: " + val);
+        }
+      });
+    });
+  })();
 };
 
 /* ========= Dashboard KPIs ========= */
@@ -516,17 +621,14 @@ function updateKPIs() {
   const cases = getCases();
   const total = cases.length;
   const open = cases.filter(c => c.status === "Open" || c.status === "In Progress").length;
-  const critical = cases.filter(c => c.severity === "Critical" || c.severity === "High").length;
   const hw = cases.filter(c => c.hwSw === "HW" || c.hwSw === "Mixed").length;
 
   const elTotal = document.getElementById("kpiTotal");
-  const elOpen = document.getElementById("kpiOpen");
-  const elCrit = document.getElementById("kpiCritical");
-  const elHW = document.getElementById("kpiHW");
+  const elOpen  = document.getElementById("kpiOpen");
+  const elHW    = document.getElementById("kpiHW");
   if (elTotal) elTotal.textContent = total;
-  if (elOpen) elOpen.textContent = open;
-  if (elCrit) elCrit.textContent = critical;
-  if (elHW) elHW.textContent = hw;
+  if (elOpen)  elOpen.textContent  = open;
+  if (elHW)    elHW.textContent    = hw;
 
   const countEl = document.getElementById("casesCount");
   if (countEl) countEl.textContent = total;
@@ -545,7 +647,6 @@ function aggregateBy(cases, field, limit = 6) {
   if (limit && arr.length > limit) return arr.slice(0, limit);
   return arr;
 }
-
 function renderBarList(containerId, items, filterField) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -570,67 +671,58 @@ function renderBarList(containerId, items, filterField) {
     el.appendChild(row);
   });
 }
-
 function renderTimeline(cases) {
   const el = document.getElementById("dashTimeline");
   if (!el) return;
   el.innerHTML = "";
   const map = new Map();
   cases.forEach(c => {
-    const d = c.createdAt || "";
+    const d = c.caseDate || "";
     if (!d || d.length < 7) return;
-    const year = d.slice(0, 4);
-    const month = parseInt(d.slice(5, 7), 10);
+    const year = d.slice(0,4);
+    const month = parseInt(d.slice(5,7),10);
     if (!month) return;
-    const q = "Q" + (Math.floor((month - 1) / 3) + 1);
+    const q = "Q" + (Math.floor((month-1)/3)+1);
     const key = `${year}-${q}`;
-    map.set(key, (map.get(key) || 0) + 1);
+    map.set(key, (map.get(key)||0)+1);
   });
-  const arr = Array.from(map.entries()).map(([k, count]) => ({ key: k, count }));
-  arr.sort((a, b) => a.key.localeCompare(b.key));
+  const arr = Array.from(map.entries()).map(([k,count])=>({key:k,count}));
+  arr.sort((a,b)=>a.key.localeCompare(b.key));
   if (!arr.length) {
     el.innerHTML = `<div class="timeline-col"><span>No data</span></div>`;
     return;
   }
-  const max = Math.max(...arr.map(a => a.count));
-  arr.forEach(it => {
+  const max = Math.max(...arr.map(a=>a.count));
+  arr.forEach(it=>{
     const col = document.createElement("div");
-    col.className = "timeline-col";
+    col.className="timeline-col";
     col.innerHTML = `
-      <div class="timeline-bar-wrap">
-        <div class="timeline-bar" style="height:${(it.count / max) * 80 + 10}px"></div>
-      </div>
+      <div class="timeline-bar-wrap"><div class="timeline-bar" style="height:${(it.count/max)*80+10}px"></div></div>
       <div>${esc(it.key)}</div>
       <div>${it.count}</div>
     `;
-    col.addEventListener("click", () => {
-      window.pendingCasesFilter = { field: "quarter", value: it.key };
+    col.addEventListener("click", ()=>{
+      window.pendingCasesFilter = { field:"quarter", value:it.key };
       go("cases");
     });
     el.appendChild(col);
   });
 }
-
 function renderDashboardBreakdowns(cases) {
-  renderBarList("dashBySystem", aggregateBy(cases, "system"), "system");
-  renderBarList("dashByCustomer", aggregateBy(cases, "customer"), "customer");
-
-  // HW / SW breakdown
-  const hwMap = new Map();
-  cases.forEach(c => {
-    const k = c.hwSw || "Unknown";
-    hwMap.set(k, (hwMap.get(k) || 0) + 1);
+  renderBarList("dashBySystem", aggregateBy(cases,"system"), "system");
+  renderBarList("dashByCustomer", aggregateBy(cases,"customer"), "customer");
+  // HW/SW
+  const map = new Map();
+  cases.forEach(c=>{
+    const k=c.hwSw||"Unknown";
+    map.set(k,(map.get(k)||0)+1);
   });
-  const hwArr = Array.from(hwMap.entries()).map(([label, count]) => ({ label, count }));
+  const hwArr = Array.from(map.entries()).map(([label,count])=>({label,count}));
   renderBarList("dashHwSw", hwArr, "hwSw");
-
-  // SW version breakdown
-  renderBarList("dashByVersion", aggregateBy(cases, "swVersion"), "swVersion");
-
-  // timeline
+  // Versions
+  renderBarList("dashByVersion", aggregateBy(cases,"swVersion"), "swVersion");
   renderTimeline(cases);
 }
-
 updateKPIs();
 
 /* ========= Settings: Export / Import / Clear ========= */
@@ -659,13 +751,12 @@ document.getElementById("inputImportCases")?.addEventListener("change", e => {
       const merged = [...current];
       imported.forEach(ic => {
         if (!ic || typeof ic !== "object") return;
-        // if same id, replace; else push
         const idx = merged.findIndex(c => c.id === ic.id);
         if (idx >= 0) merged[idx] = ic; else merged.push(ic);
       });
       setCases(merged);
       toast("Cases imported", "ok");
-    } catch (err) {
+    } catch {
       toast("Import failed – invalid file", "err");
     }
   };
@@ -679,9 +770,10 @@ document.getElementById("btnClearCases")?.addEventListener("click", () => {
   toast("All cases cleared", "ok");
 });
 
-/* ========= Expose helpers to other files ========= */
+/* ========= Expose for other files ========= */
 window.getCases = getCases;
 window.setCases = setCases;
 window.getCaseById = getCaseById;
 window.go = go;
 window.toast = toast;
+window.makeDropdown = makeDropdown;
