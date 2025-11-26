@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landa Quantum – Troubleshoot Suite (V19.0 – Next)</title>
+<title>Landa Quantum – Troubleshoot Suite (V19 – Next)</title>
 <link rel="icon" type="image/svg+xml"
   href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='4' y='4' width='32' height='32' rx='9' fill='%2305090b' stroke='%23ffffff15'/%3E%3Ccircle cx='20' cy='20' r='9' fill='%2300aeef'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
@@ -13,7 +13,7 @@
 <canvas id="particles"></canvas>
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- LOGIN – full screen -->
+<!-- LOGIN -->
 <section id="loginPage">
   <div class="auth panel center">
     <div class="logo">
@@ -34,13 +34,12 @@
       <div class="subtitle">Quantum Troubleshoot Suite</div>
     </div>
     <h2>Sign in to continue</h2>
-    <p class="auth-sub">User: <b>Expert</b> &nbsp;•&nbsp; Password: <b>Landa123456</b></p>
 
     <label class="label" for="authUser">Username</label>
-    <input class="input" id="authUser" placeholder="Expert" autocomplete="username">
+    <input class="input" id="authUser" autocomplete="username">
 
     <label class="label" for="authPass">Password</label>
-    <input class="input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+    <input class="input" id="authPass" type="password" autocomplete="current-password">
 
     <button class="btn primary full" id="btnLogin">Login</button>
   </div>
@@ -50,9 +49,7 @@
 <div class="app hidden" id="appRoot">
   <header class="header">
     <div class="header-left">
-      <button class="menu-btn btn small" id="btnMenu" aria-label="Toggle menu">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </button>
+      <!-- הורדנו את כפתור ההמבורגר -->
       <div class="header-title" id="logoHome">
         <div class="mark">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
@@ -73,7 +70,7 @@
       </div>
     </div>
     <div class="header-right">
-      <span class="badge-env">V19.0 · Next Level</span>
+      <span class="badge-env">V19 · Next Level</span>
       <span class="user-pill">
         <span class="dot"></span>
         Expert
@@ -101,11 +98,17 @@
         <a class="item" data-route="settings">
           <span>Settings</span>
         </a>
+
         <div class="nav-section-label">Session</div>
         <a class="item" id="btnLogout">
           <span>Logout</span>
         </a>
       </nav>
+
+      <!-- כפתור יצירת קייס אלגנטי בתחתית התפריט -->
+      <div class="nav-create-wrap">
+        <button class="btn primary full" id="btnNavCreateCase">+ Create Case</button>
+      </div>
     </aside>
 
     <main class="main">
@@ -118,12 +121,12 @@
           </div>
         </div>
 
-        <!-- High level KPIs -->
-        <div class="grid cols-4 kpi-row">
+        <!-- KPIs -->
+        <div class="grid cols-3 kpi-row">
           <div class="panel kpi-card" data-kpi="total">
             <div class="kpi-label">Total Cases</div>
             <div class="kpi-value" id="kpiTotal">0</div>
-            <div class="kpi-foot">All recorded cases in the system.</div>
+            <div class="kpi-foot">All recorded cases.</div>
           </div>
 
           <div class="panel kpi-card" data-kpi="open">
@@ -132,16 +135,10 @@
             <div class="kpi-foot">Active cases not closed yet.</div>
           </div>
 
-          <div class="panel kpi-card" data-kpi="critical">
-            <div class="kpi-label">Critical & High</div>
-            <div class="kpi-value" id="kpiCritical">0</div>
-            <div class="kpi-foot">High-impact cases requiring focus.</div>
-          </div>
-
           <div class="panel kpi-card" data-kpi="hw">
             <div class="kpi-label">HW Related</div>
             <div class="kpi-value" id="kpiHW">0</div>
-            <div class="kpi-foot">Cases tagged as HW or Mixed.</div>
+            <div class="kpi-foot">HW or Mixed classification.</div>
           </div>
         </div>
 
@@ -183,7 +180,7 @@
             <div class="panel-header">
               <div>
                 <div class="title">By Software Version</div>
-                <div class="subtitle">Top versions with most cases</div>
+                <div class="subtitle">Versions with most cases</div>
               </div>
             </div>
             <div class="bar-list" id="dashByVersion"></div>
@@ -194,7 +191,7 @@
           <div class="panel-header">
             <div>
               <div class="title">Timeline</div>
-              <div class="subtitle">Cases by quarter (based on Created At)</div>
+              <div class="subtitle">Cases by quarter (Case Date)</div>
             </div>
           </div>
           <div class="timeline" id="dashTimeline"></div>
@@ -220,19 +217,28 @@
                   <input class="input v13" id="sfCase" required placeholder="CS-123456">
                 </div>
 
-                <div>
+                <!-- Press Type as segmented control -->
+                <div class="full">
                   <label class="label v13">Press Type *</label>
-                  <div id="dd-press-type" class="dd field-press-type"></div>
+                  <div class="segmented" id="segPressType">
+                    <button type="button" data-value="S" class="active">S</button>
+                    <button type="button" data-value="D">D</button>
+                    <button type="button" data-value="NS">NS</button>
+                    <button type="button" data-value="Other">Other</button>
+                  </div>
+                  <input type="hidden" id="pressType" value="S">
                 </div>
-                <div>
-                  <label class="label v13">Press Name *</label>
+
+                <div class="full">
+                  <label class="label v13">Press (Name + Customer) *</label>
                   <div id="dd-press" class="dd field-press"></div>
                 </div>
 
                 <div>
                   <label class="label v13">Customer</label>
-                  <input class="input v13" id="customer" placeholder="Customer name">
+                  <input class="input v13" id="customer" placeholder="Will auto-fill from press">
                 </div>
+
                 <div>
                   <label class="label v13">Region</label>
                   <div id="dd-region" class="dd field-region"></div>
@@ -248,21 +254,18 @@
                 </div>
 
                 <div>
-                  <label class="label v13">SW Version *</label>
+                  <label class="label v13">SW Version</label>
                   <input class="input v13" id="swVersion" placeholder="Q20.4.1">
-                </div>
-                <div>
-                  <label class="label v13">Severity *</label>
-                  <div id="dd-severity" class="dd field-severity"></div>
                 </div>
 
                 <div>
-                  <label class="label v13">Category</label>
-                  <div id="dd-category" class="dd field-category"></div>
+                  <label class="label v13">HW / SW</label>
+                  <div id="dd-hw-sw" class="dd field-hwsw"></div>
                 </div>
-                <div>
-                  <label class="label v13">Origin</label>
-                  <div id="dd-origin" class="dd field-origin"></div>
+
+                <div id="hwPartRow" class="hw-only hidden">
+                  <label class="label v13">Part (for HW)</label>
+                  <input class="input v13" id="hwPart" placeholder="Part number / description">
                 </div>
 
                 <div class="full">
@@ -275,9 +278,21 @@
                   <textarea class="input v13" id="description" rows="4" placeholder="Detailed description"></textarea>
                 </div>
 
+                <!-- Troubleshooting steps -->
+                <div class="full">
+                  <label class="label v13">Troubleshooting Steps</label>
+                  <div id="tsSteps" class="ts-steps"></div>
+                  <button type="button" class="btn small" id="btnAddStep">+ Add step</button>
+                </div>
+
+                <!-- Attachments -->
                 <div class="full">
                   <label class="label v13">Attachments</label>
-                  <input class="input v13" id="attachments" placeholder="Links / file names">
+                  <div id="attachList" class="attach-list"></div>
+                  <div class="attach-input-row">
+                    <input class="input v13" id="attachInput" placeholder="Paste link or file name">
+                    <button type="button" class="btn small" id="btnAddAttachment">Add</button>
+                  </div>
                 </div>
 
                 <div class="full">
@@ -294,36 +309,15 @@
                   <input class="input v13" id="tags" placeholder="Comma separated">
                 </div>
 
+                <!-- רק תאריך אחד -->
                 <div>
-                  <label class="label v13">HW / SW</label>
-                  <div id="dd-hw-sw" class="dd field-hwsw"></div>
-                </div>
-                <div id="hwPartRow" class="hw-only hidden">
-                  <label class="label v13">Part (for HW)</label>
-                  <input class="input v13" id="hwPart" placeholder="Part number / description">
+                  <label class="label v13">Case Date</label>
+                  <input class="input v13" type="date" id="caseDate">
                 </div>
 
-                <div>
-                  <label class="label v13">Target Date</label>
-                  <input class="input v13" type="date" id="targetDate">
-                </div>
                 <div>
                   <label class="label v13">Status</label>
                   <div id="dd-status" class="dd field-status"></div>
-                </div>
-
-                <div>
-                  <label class="label v13">Created At</label>
-                  <input class="input v13" type="date" id="createdAt">
-                </div>
-                <div>
-                  <label class="label v13">Updated At</label>
-                  <input class="input v13" type="date" id="updatedAt">
-                </div>
-
-                <div class="full">
-                  <label class="label v13">Link to RCA / IRD</label>
-                  <input class="input v13" id="rcaLink" placeholder="Reference to IRD / Root Cause doc">
                 </div>
               </div>
 
@@ -335,12 +329,12 @@
           </div>
 
           <div class="panel">
-            <div class="title">Context & Guidelines</div>
+            <div class="title">Guidelines</div>
             <ul class="hint-list">
-              <li>Use <b>consistent wording</b> in Subject and Description – this will feed future analytics.</li>
-              <li>Always set <b>Severity</b>, <b>System</b> and <b>SW Version</b> – they drive dashboards and RCA.</li>
-              <li>For HW issues, select <b>HW/Mixed</b> and specify the <b>Part</b> to enable parts statistics.</li>
-              <li>Created / Updated dates are used for <b>quarterly analysis</b>.</li>
+              <li>Press & Customer are selected from a controlled list – no free text.</li>
+              <li>System / Sub-system are also controlled to keep analysis consistent.</li>
+              <li>Use Troubleshooting Steps to document actual actions taken in the field.</li>
+              <li>Attachments are references (links / file names) that can be previewed later.</li>
             </ul>
           </div>
         </div>
@@ -348,12 +342,12 @@
 
       <!-- ================= ALL CASES ================= -->
       <section id="page-cases" class="page hidden">
-        <!-- Filled dynamically by js/cases.js -->
+        <!-- נבנה ע"י js/cases.js -->
       </section>
 
       <!-- ================= ROOT CAUSE ANALYZER ================= -->
       <section id="page-diagnosis" class="page hidden">
-        <!-- Filled dynamically by js/rca.js -->
+        <!-- נבנה ע"י js/rca.js (נשדרג בסבב הבא) -->
       </section>
 
       <!-- ================= SETTINGS ================= -->
@@ -406,7 +400,7 @@
 <script src="app.js"></script>
 <script src="fishbone.js"></script>
 
-<!-- Cases (Create / All Cases pages) -->
+<!-- Cases -->
 <script src="js/cases.js"></script>
 
 <!-- Root Cause Analyzer -->
