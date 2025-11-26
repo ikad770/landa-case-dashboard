@@ -1,0 +1,47 @@
+/* ---------------------------------------------------
+   Landa Quantum – Press Map (V20)
+--------------------------------------------------- */
+
+window.PRESS_MAP = [
+  { id: "S08", name: "S08 ZRP", type: "Simplex", region: "APJ" },
+  { id: "S10", name: "S10 Virtual", type: "Simplex", region: "EU" },
+  { id: "S12", name: "S12 SWR MX", type: "Simplex", region: "EU" },
+  { id: "S14", name: "S14 McGowans", type: "Simplex", region: "EU" },
+  { id: "S15", name: "S15 BPI", type: "Simplex", region: "NA" },
+  { id: "S16", name: "S16 K-1", type: "Simplex", region: "APJ" },
+  { id: "S18", name: "S18 Dugal", type: "Simplex", region: "EU" },
+  { id: "S21", name: "S21 SCT", type: "Simplex", region: "EU" },
+  { id: "S22", name: "S22 Primary", type: "Simplex", region: "NA" },
+  { id: "S23", name: "S23 FP Mercure", type: "Simplex", region: "EU" },
+  { id: "S24", name: "S24 PIGI TEA", type: "Simplex", region: "IL" },
+  { id: "S26", name: "S26 ZRP", type: "Simplex", region: "APJ" },
+  { id: "S27", name: "S27 Menasha", type: "Simplex", region: "NA" },
+  { id: "S28", name: "S28 SWR PL", type: "Simplex", region: "EU" },
+  { id: "S29", name: "S29 Marketing", type: "Simplex", region: "IL" },
+  { id: "S30", name: "S30 Neff", type: "Simplex", region: "NA" },
+  { id: "S32", name: "S32 SWR IE", type: "Simplex", region: "EU" },
+  { id: "S35", name: "S35 Wynalda", type: "Simplex", region: "NA" },
+
+  /* DUPLEX */
+  { id: "D04", name: "D04 Bluetree", type: "Duplex", region: "EU" },
+  { id: "D06", name: "D06 GP", type: "Duplex", region: "NA" },
+  { id: "D07", name: "D07 BluePrint", type: "Duplex", region: "NA" },
+  { id: "D08", name: "D08 Simian", type: "Duplex", region: "APJ" },
+  { id: "D09", name: "D09 BJU", type: "Duplex", region: "NA" },
+  { id: "D11", name: "D11 De Jong", type: "Duplex", region: "EU" },
+  { id: "D12", name: "D12 Quantum", type: "Duplex", region: "IL" },
+  { id: "D13", name: "D13 Quad", type: "Duplex", region: "NA" },
+  { id: "D14", name: "D14 Advantage", type: "Duplex", region: "NA" },
+  { id: "D16", name: "D16 Superior", type: "Duplex", region: "NA" },
+  { id: "D18", name: "D18 De Jong", type: "Duplex", region: "EU" },
+  { id: "D19", name: "D19 Abeka", type: "Duplex", region: "NA" },
+  { id: "D21", name: "D21 M13", type: "Duplex", region: "EU" },
+  { id: "D22", name: "D22 Mapprint", type: "Duplex", region: "APJ" },
+  { id: "D23", name: "D23 Bluetree", type: "Duplex", region: "EU" },
+  { id: "D24", name: "D24 Shengda", type: "Duplex", region: "APJ" },
+  { id: "D25", name: "D25 Wirtz", type: "Duplex", region: "EU" },
+  { id: "D26", name: "D26 Advantage", type: "Duplex", region: "NA" },
+  { id: "D27", name: "D27 Quantum", type: "Duplex", region: "IL" },
+  { id: "D28", name: "D28 Publication", type: "Duplex", region: "EU" },
+  { id: "D30", name: "NS40-105 Komori", type: "Duplex", region: "APJ" },
+];
